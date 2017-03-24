@@ -102,7 +102,9 @@ EA | Name | Basicblock | Instructions | Edges
 
 We have found culprits,  [`IsDeviceServiceable(void)`](https://gist.github.com/zeffy/e5ec266952932bc905eb0cbc6ed72185) and [`IsCPUSupported(void)`](https://gist.github.com/zeffy/1a8f8984d2bec97ae24af63a76278694)!
 
-`IsCPUSupported(void)` is only ever called by `IsDeviceServiceable(void)`, which is called by four other functions. As you may be able to tell, there are a few potential ways to kill this CPU check.
+## Solutions
+
+`IsCPUSupported(void)` is only ever called by `IsDeviceServiceable(void)`, which is called by five other functions. Luckily, there are a few potential ways to kill this CPU check.
 
 1. Patch `wuaueng.dll` and change `dword_600002EE948` (see [this line](https://gist.github.com/zeffy/e5ec266952932bc905eb0cbc6ed72185#file-isdeviceserviceable-c-L7)) which is at file offset `0x26C948`, from `0x01` to `0x00`, which makes `IsDeviceServiceable(void)` jump over its entire body and return 1 (supported CPU) immediately. This is my preferred method, because it is the least intrusive and doesn't require any runtime memory patching. **These offsets are only for the Windows 7 x64 version, I will upload `.xdelta` files for all of the other versions eventually.** The only downside of this method is you have to re-apply the patch whenever `wuaueng.dll` gets updated. 
 2. `nop` all the instructions out highlighted [here](https://gist.github.com/zeffy/e5ec266952932bc905eb0cbc6ed72185#file-isdeviceserviceable-asm-L24-L26) in `IsDeviceServiceable(void)`, this will enable the usage of the `ForceUnsupportedCPU` of type `REG_DWORD` under the registry key `HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Test\Scan` (create it if it doesn't exist, if you want to use this method). Set this value to `0x00000001` to force unsupported CPUs, and back to `0x00000000` to change the behaviour back to default.
