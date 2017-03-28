@@ -63,7 +63,7 @@ That's narrowed it down quite a bit! This is now what we're looking at:
 - `wuapp.exe`
 - `wuwebv.dll`
 
-Next, I started comparing these binaries with the ones already on my system with [BinDiff] and [Diaphora], starting with `wuauclt.exe`. After turning up empty with that (the two binaries were nearly identical), I decided to take a look at `wuaueng.dll`, which turned up quite a few relevant new functions:
+Next, I started comparing these binaries with the ones already on my system with [BinDiff] and [Diaphora], starting with `wuauclt.exe`. After turning up empty with that (the two binaries were nearly identical), I decided to take a look at `wuaueng.dll`, which turned up quite a few interesting new functions:
 
 EA | Name | Basicblock | Instructions | Edges 
 -- | ---- | ---------- | ------------ | -----
@@ -110,7 +110,7 @@ We have found culprits,  [`IsDeviceServiceable(void)`](https://gist.github.com/z
 
 `IsCPUSupported(void)` is only ever called by `IsDeviceServiceable(void)`, which is called by five other functions. Luckily, there are a couple easy ways to kill this CPU check.
 
-1. Patch `wuaueng.dll` and change `dword_600002EE948` (see [this line](https://gist.github.com/zeffy/e5ec266952932bc905eb0cbc6ed72185#file-isdeviceserviceable-c-L7)) which is at file offset `0x26C948`, from `0x01` to `0x00`, which makes `IsDeviceServiceable(void)` jump over its entire body and return 1 (supported CPU) immediately. This is my preferred method. **Note: these offsets are only for the Windows 7 x64 version.**
+1. Patch `wuaueng.dll` and change `dword_600002EE948` (see [this line](https://gist.github.com/zeffy/e5ec266952932bc905eb0cbc6ed72185#file-isdeviceserviceable-c-L7)) which is at file offset `0x26C948`, from `0x01` to `0x00`. This makes `IsDeviceServiceable(void)` jump over its entire body and return 1 (supported CPU) immediately. This is my preferred method. **Note: these offsets are only for the Windows 7 x64 version.**
 
 2. Patch `wuaueng.dll` and `nop` out all the instructions highlighted [here](https://gist.github.com/zeffy/e5ec266952932bc905eb0cbc6ed72185#file-isdeviceserviceable-asm-L24-L26) in `IsDeviceServiceable(void)`, this will enable the usage of the `ForceUnsupportedCPU` of type `REG_DWORD` under the registry key `HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Test\Scan` (you will most likely have to create this registry key). Set this value to `0x00000001` to force unsupported CPUs, and back to `0x00000000` to change the behaviour back to default. You will probably need to restart your PC or restart the `wuauserv` service in order for changes to apply. **This behaviour is undocumented and could be removed in future updates.**
 
