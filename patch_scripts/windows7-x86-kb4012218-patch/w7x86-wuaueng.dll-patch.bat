@@ -3,7 +3,6 @@
 net session >nul 2>&1 || (
     echo This batch script requires administrator privileges. Right-click on
     echo %~nx0 and select "Run as administrator".
-    echo.
     goto :die
 )
 
@@ -13,14 +12,12 @@ echo.
 wmic /output:stdout qfe get hotfixid | find "KB4012218" >nul || (
     echo Detected that update KB4012218 is not installed, please verify that
     echo you are trying to install the right patch file and try again.
-    echo.
     goto :die
 )
 
 wmic /output:stdout os get osarchitecture | find "32-bit" >nul || (
     echo Detected that you are not running 32-bit Windows, please verify
     echo that you are trying to install the right patch file and try again.
-    echo.
     goto :die
 )
 
@@ -100,6 +97,7 @@ pause >nul
 exit
 
 :cancel
+echo.
 echo Canceled by user input, press any key to close . . .
 pause >nul
 exit
