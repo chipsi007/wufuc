@@ -19,7 +19,7 @@ After reading [this article](https://www.ghacks.net/2017/03/22/kb4012218-kb40122
 
 > Enabled detection of processor generation and hardware support when PC tries to scan or download updates through Windows Update.
 
-Which is just Microsoft's nice way of telling everyone who'd rather keep using Windows 7 or 8.1 to fuck themselves. _There have even been people with AMD and Intel systems from 2015 who have reportedly been locked out of Windows Update because of this!_
+Which is just Microsoft's nice way of telling everyone who'd rather keep using Windows 7 or 8.1 on their Intel Kaby Lake or AMD Ryzen systems to fuck themselves. _There have even been people with Intel and AMD systems from 2015 who have reportedly been locked out of Windows Update because of this!_
 
 ## Bad Microsoft!
 
