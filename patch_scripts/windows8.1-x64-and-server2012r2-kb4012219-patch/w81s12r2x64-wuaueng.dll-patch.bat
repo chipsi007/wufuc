@@ -9,6 +9,11 @@ net session >nul 2>&1 || (
 echo Checking system requirements...
 echo.
 
+wmic /output:stdout os get version | find "6.3" > nul || (
+    echo Detected that you are not running Windows 8.1. Please verify that
+    echo you are trying to install the right patch file and try again.
+)
+
 wmic /output:stdout qfe get hotfixid | find "KB4012219" >nul || (
     echo Detected that update KB4012219 is not installed, please verify that
     echo you are trying to install the right patch file and try again.
