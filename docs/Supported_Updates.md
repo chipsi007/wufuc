@@ -18,3 +18,10 @@ April, 2017 Security Monthly Quality Rollup for Windows 7 ([KB4015549]) | Window
 April, 2017 Security Monthly Quality Rollup for Windows 8.1 for x64-based Systems ([KB4015550]) | Windows 8.1 | Security Updates | 4/10/2017 | n/a | 220.9 MB
 April, 2017 Security Monthly Quality Rollup for Windows Server 2012 R2 ([KB4015550]) | Windows Server 2012 R2 | Security Updates | 4/10/2017 | n/a | 220.9 MB
 April, 2017 Security Monthly Quality Rollup for Windows 8.1 ([KB4015550]) | Windows 8.1 | Security Updates | 4/10/2017 | n/a | 122.4 MB
+
+[KB4012218]: https://www.catalog.update.microsoft.com/search.aspx?q=kb4012218
+[KB4012219]: https://www.catalog.update.microsoft.com/search.aspx?q=kb4012219
+[KB4015546]: https://www.catalog.update.microsoft.com/search.aspx?q=KB4015546
+[KB4015547]: https://www.catalog.update.microsoft.com/search.aspx?q=KB4015547
+[KB4015549]: https://www.catalog.update.microsoft.com/search.aspx?q=KB4015549
+[KB4015550]: https://www.catalog.update.microsoft.com/search.aspx?q=KB4015550

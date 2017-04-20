@@ -2,7 +2,7 @@
 
 ---
 
-### [Click here for a list of the Windows updates supported by the patch](docs/Supported_Updates.md)
+### [Click here for a list of Windows updates supported by this patch](docs/Supported_Updates.md)
 
 ---
 
@@ -96,11 +96,5 @@ We have found culprits, [`IsDeviceServiceable(void)`](https://gist.github.com/ze
 - You have to apply a new patch whenever `wuaueng.dll` gets updated.
 - SFC scan errors will most likely occur as it will believe the integrity of the system has been compromised.
 
-[KB4012218]: https://www.catalog.update.microsoft.com/search.aspx?q=kb4012218
-[KB4012219]: https://www.catalog.update.microsoft.com/search.aspx?q=kb4012219
-[KB4015546]: https://www.catalog.update.microsoft.com/search.aspx?q=KB4015546
-[KB4015547]: https://www.catalog.update.microsoft.com/search.aspx?q=KB4015547
-[KB4015549]: https://www.catalog.update.microsoft.com/search.aspx?q=KB4015549
-[KB4015550]: https://www.catalog.update.microsoft.com/search.aspx?q=KB4015550
 [BinDiff]: https://www.zynamics.com/software.html
 [Diaphora]: http://diaphora.re
