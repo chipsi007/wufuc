@@ -1,6 +1,6 @@
 ### [If you are looking for the latest patch files, you can find them here!](https://github.com/zeffy/kb4012218-19/releases)
 
-### [Click here for a list of the Windows updates supported by the patch](docs/Supported Updates.md)
+### [Click here for a list of the Windows updates supported by the patch](docs/Supported_Updates.md)
 
 ---
 
