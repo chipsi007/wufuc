@@ -1,4 +1,18 @@
 @echo off
+:: Copyright (C) 2017 zeffy <https://github.com/zeffy>
+
+:: This program is free software: you can redistribute it and/or modify
+:: it under the terms of the GNU General Public License as published by
+:: the Free Software Foundation, either version 3 of the License, or
+:: (at your option) any later version.
+
+:: This program is distributed in the hope that it will be useful,
+:: but WITHOUT ANY WARRANTY; without even the implied warranty of
+:: MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+:: GNU General Public License for more details.
+
+:: You should have received a copy of the GNU General Public License
+:: along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 net session >nul 2>&1 || (
     echo This batch script requires administrator privileges. Right-click on
@@ -138,7 +152,7 @@ net stop wuauserv
 takeown /F "%WUAUENG_DLL%" /A
 icacls "%WUAUENG_DLL%" /save "%ACL_TEMP_FILE%"
 
-rem Administrators group SID
+:: Administrators group SID
 icacls "%WUAUENG_DLL%" /grant *S-1-5-32-544:F
 move "%WUAUENG_DLL%" "%BACKUP_FILE%"
 
@@ -148,7 +162,7 @@ if errorlevel 1 (
     move /Y "%BACKUP_FILE%" "%WUAUENG_DLL%"
 )
 
-rem NT Service\TrustedInstaller SID
+:: "NT Service\TrustedInstaller" SID
 icacls "%WUAUENG_DLL%" /setowner *S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464
 icacls "%SYSTEM32_DIR%" /restore "%ACL_TEMP_FILE%"
 
