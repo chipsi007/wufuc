@@ -8,13 +8,15 @@
 
 ## Preface
 
-After reading [this article on gHacks](https://www.ghacks.net/2017/03/22/kb4012218-kb4012219-windows-update-processor-generation-detection/), I was inspired to look into these new rollup updates that Microsoft released on March 16. Among other things included in these updates, the changelog mentions the following:
+After reading [this article on gHacks](https://www.ghacks.net/2017/03/22/kb4012218-kb4012219-windows-update-processor-generation-detection/), I was inspired to look into these new rollup updates that Microsoft released on March 16. Among other things, the changelog mentions the following:
 
 > Enabled detection of processor generation and hardware support when PC tries to scan or download updates through Windows Update.
 
-Which is essentially a giant middle finger to anyone who dare not "upgrade" to the steaming pile of garbage known as Windows 10.
+This update marked the implementation of a [policy change](https://blogs.windows.com/windowsexperience/2016/01/15/windows-10-embracing-silicon-innovation/) they announced some time ago, where Microsoft stated that they would not be supporting Windows 7 or 8.1 on next-gen Intel, AMD and Qualcomm processors. 
 
-There have even been people with Intel and AMD systems from 2015 who have allegedly been locked out of Windows Update because of these updates!
+This is essentially a giant middle finger to anyone who dare not "upgrade" to the steaming pile of garbage known as Windows 10. Especially considering the extended support periods for Windows 7 and 8.1 still have a few years left, and will be coming to a close in 2020 and 2024 respectively.
+
+There have even been people with older Intel and AMD systems who have been locked out of Windows Update because of these updates (see #7 and [this](https://answers.microsoft.com/en-us/windows/forum/windows8_1-update/amd-carrizo-ddr4-unsupported-hardware-message-on/f3fb2326-f413-41c9-a24b-7c14e6d51b0c?tab=question&status=AllReplies)).
 
 ## Bad Microsoft!
 
@@ -85,9 +87,9 @@ We have found culprits, [`IsDeviceServiceable(void)`](https://gist.github.com/ze
 
 ## Solutions
 
-`IsCPUSupported(void)` is only ever called by `IsDeviceServiceable(void)`, which is called by a few other functions. Luckily, there are a couple easy ways to kill this CPU check.
+Luckily, there are a couple easy ways to kill this CPU check.
 
-1. Patch `wuaueng.dll` and change `dword_600002EE948` (see [this line](https://gist.github.com/zeffy/e5ec266952932bc905eb0cbc6ed72185#file-isdeviceserviceable-c-L7)) which is at file offset `0x26C948`, from `0x01` to `0x00`. This makes `IsDeviceServiceable(void)` jump over its entire body and return 1 (supported CPU) immediately. This is my preferred method. **Note: this offset is only for the KB4012218-x64, for a list of all the patch offsets [click here](docs/Patch_Offsets.md).**
+1. Patch `wuaueng.dll` and change `dword_600002EE948` (see [this line](https://gist.github.com/zeffy/e5ec266952932bc905eb0cbc6ed72185#file-isdeviceserviceable-c-L7)) which is at file offset `0x26C948`, from `0x01` to `0x00`. This makes `IsDeviceServiceable(void)` skip over the entire CPU check and return the value stored at `dword_600002EE94C`, which by default is 1 (supported CPU) immediately. This is my preferred method, as it is a simple 1-byte change. **Note: this offset is only for the KB4012218-x64, for a list of all the patch offsets [click here](docs/Patch_Offsets.md).**
 
 2. Patch `wuaueng.dll` and `nop` out all the instructions highlighted [here](https://gist.github.com/zeffy/e5ec266952932bc905eb0cbc6ed72185#file-isdeviceserviceable-asm-L24-L26) in `IsDeviceServiceable(void)`, this will enable the usage of the `ForceUnsupportedCPU` of type `REG_DWORD` under the registry key `HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Test\Scan` (you will most likely have to create this registry key). Set this value to `0x00000001` to force unsupported CPUs, and back to `0x00000000` to change the behaviour back to default. You will probably need to restart your PC or restart the `wuauserv` service in order for changes to apply. **This behaviour is an internal test feature used by Microsoft and could be removed in future updates, so I will not be providing xdelta files for it.**
 
