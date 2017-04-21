@@ -87,7 +87,7 @@ We have found culprits, [`IsDeviceServiceable(void)`](https://gist.github.com/ze
 
 ## Solutions
 
-Luckily, there are a couple easy ways to kill this CPU check.
+Luckily, there are a couple of different ways to kill this CPU check.
 
 1. Patch `wuaueng.dll` and change `dword_600002EE948` (see [this line](https://gist.github.com/zeffy/e5ec266952932bc905eb0cbc6ed72185#file-isdeviceserviceable-c-L7)) which is at file offset `0x26C948`, from `0x01` to `0x00`. This makes `IsDeviceServiceable(void)` skip over the entire CPU check and immediately return the value stored at `dword_600002EE94C`, which by default is 1 (supported CPU). This is my preferred method, as it is a simple 1-byte change. **Note: this offset is only for the KB4012218-x64, for a list of all the patch offsets [click here](docs/Patch_Offsets.md).**
 
