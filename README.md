@@ -16,7 +16,7 @@ This update marked the implementation of a [policy change](https://blogs.windows
 
 This is essentially a giant middle finger to anyone who dare not "upgrade" to the steaming pile of garbage known as Windows 10. Especially considering the extended support periods for Windows 7 and 8.1 still have a few years left, and will be coming to a close in 2020 and 2024 respectively.
 
-There have even been people with older Intel and AMD systems who have been locked out of Windows Update because of these updates (see #7 and [this](https://answers.microsoft.com/en-us/windows/forum/windows8_1-update/amd-carrizo-ddr4-unsupported-hardware-message-on/f3fb2326-f413-41c9-a24b-7c14e6d51b0c?tab=question&status=AllReplies)).
+There have even been people with older Intel and AMD systems who have been locked out of Windows Update because of these updates (see [#7](/../../issues/7) and [this](https://answers.microsoft.com/en-us/windows/forum/windows8_1-update/amd-carrizo-ddr4-unsupported-hardware-message-on/f3fb2326-f413-41c9-a24b-7c14e6d51b0c?tab=question&status=AllReplies)).
 
 ## Bad Microsoft!
 
