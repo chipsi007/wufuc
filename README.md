@@ -20,7 +20,7 @@ There have even been people with older Intel and AMD systems who have been locke
 
 ## Bad Microsoft!
 
-I started by downloading the `.msu` package for my system (in my case, it was `windows6.1-kb4012218-x64_590943c04550a47c1ed02d3a040d325456f03663.msu`)
+I started by downloading the update package for my system (in my case, it was `windows6.1-kb4012218-x64_590943c04550a47c1ed02d3a040d325456f03663.msu`)
 
 I extracted it using the command line `expand` tool:
 
