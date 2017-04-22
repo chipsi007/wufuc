@@ -144,7 +144,7 @@ set "WUAUENG_DLL=%SYSTEM32_DIR%\wuaueng.dll"
 
 for /f "delims=" %%a in ('wmic os get localdatetime ^| find "."') do set dt=%%a
 set "TIMESTAMP=%dt:~0,4%-%dt:~4,2%-%dt:~6,2%_%dt:~8,2%-%dt:~10,2%-%dt:~12,2%"
-set "BACKUP_FILE=%WUAUENG_DLL%_%TIMESTAMP%_%random%.bak"
+set "BACKUP_FILE=%WUAUENG_DLL%_%TIMESTAMP%_%random%_before-%PATCH_TYPE%.bak"
 set "ACL_TEMP_FILE=%temp%\wuaueng.dll_acl_%TIMESTAMP%_%random%.txt"
 
 net stop wuauserv
@@ -183,7 +183,9 @@ if defined THERE_WAS_AN_ERROR (
     echo You can also manually restore the backup file located at 
     echo '%BACKUP_FILE%' by renaming it 
     echo back to wuaueng.dll, changing the owner back to "NT Service\TrustedInstaller", 
-    echo and restoring the original permissions from '%ACL_TEMP_FILE%'.
+    echo and restoring the original permissions from '%ACL_TEMP_FILE%'. However,
+    echo be careful to make sure you only restore the backup that is the same version
+    echo as the current wuaueng.dll, or you could corrupt the WinSxS component store.
 )
 
 :die
