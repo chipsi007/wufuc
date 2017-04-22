@@ -71,14 +71,14 @@ wmic /output:stdout os get version | findstr "^6\.3\." >nul && (
 )
 
 :unsupported
-echo Detected that you are using an unsupported version of Windows.
+echo Detected that you are using an unsupported operating system.
 echo.
-echo This patch only works on the following versions:
+echo This patch only works on the following versions of Windows:
 echo.
 echo - Windows 7 (x64 and x86)
 echo - Windows 8.1 (x64 and x86)
-echo - Windows Server 2008 R2
-echo - Windows Server 2012 R2
+echo - Windows Server 2008 R2 (reported as Windows 7 x64)
+echo - Windows Server 2012 R2 (reported as Windows 8.1 x64)
 goto :die
 
 :check_hotfix
@@ -181,11 +181,13 @@ if defined THERE_WAS_AN_ERROR (
     echo reason, you can run this script again and pick the other option.
     echo.
     echo You can also manually restore the backup file located at 
-    echo '%BACKUP_FILE%' by renaming it 
-    echo back to wuaueng.dll, changing the owner back to "NT Service\TrustedInstaller", 
-    echo and restoring the original permissions from '%ACL_TEMP_FILE%'. However,
-    echo be careful to make sure you only restore the backup that is the same version
-    echo as the current wuaueng.dll, or you could corrupt the WinSxS component store.
+    echo '%BACKUP_FILE%'
+    echo by renaming it back to wuaueng.dll, changing the owner back to 
+    echo "NT Service\TrustedInstaller",  and restoring the original permissions from 
+    echo '%ACL_TEMP_FILE%'. 
+    echo However, be careful to make sure you only restore the backup that is the same 
+    echo version as the current wuaueng.dll, or you could corrupt the WinSxS component
+    echo store.
 )
 
 :die
