@@ -217,14 +217,14 @@ echo.>>"%DEBUG_LOG_FILE%"
 echo ## Operating System>>"%DEBUG_LOG_FILE%"
 echo.>>"%DEBUG_LOG_FILE%"
 echo ```>>"%DEBUG_LOG_FILE%"
-wmic os get BuildNumber,Caption,MUILanguages,OSArchitecture,OSLanguage,Version /value | findstr /V "^$" >>"%DEBUG_LOG_FILE%"
+wmic /output:stdout os get BuildNumber,Caption,MUILanguages,OSArchitecture,OSLanguage,Version /value | findstr /V "^$" >>"%DEBUG_LOG_FILE%"
 echo ```>>"%DEBUG_LOG_FILE%"
 echo.>>"%DEBUG_LOG_FILE%"
 
 echo ## Installed Hotfixes>>"%DEBUG_LOG_FILE%"
 echo.>>"%DEBUG_LOG_FILE%"
 echo ```>>"%DEBUG_LOG_FILE%"
-wmic qfe get HotFixID,InstalledOn /value | findstr /V "^$" >>"%DEBUG_LOG_FILE%"
+wmic /output:stdout qfe get HotFixID,InstalledOn /value | findstr /V "^$" >>"%DEBUG_LOG_FILE%"
 echo ```>>"%DEBUG_LOG_FILE%"
 echo.>>"%DEBUG_LOG_FILE%"
 
@@ -238,7 +238,7 @@ echo.>>"%DEBUG_LOG_FILE%"
 certutil -hashfile "%WUAUENG_DLL%" SHA256 | find /V "CertUtil" >>"%DEBUG_LOG_FILE%"
 echo.>>"%DEBUG_LOG_FILE%"
 
-wmic datafile where "name='%WUAUENG_DLL:\=\\%'" get CreationDate,FileSize,InstallDate,LastAccessed,LastModified,Version /value | findstr /V "^$" >>"%DEBUG_LOG_FILE%"
+wmic /output:stdout datafile where "name='%WUAUENG_DLL:\=\\%'" get CreationDate,FileSize,InstallDate,LastAccessed,LastModified,Version /value | findstr /V "^$" >>"%DEBUG_LOG_FILE%"
 echo ```>>"%DEBUG_LOG_FILE%"
 echo ^</details^>>>"%DEBUG_LOG_FILE%"
 
@@ -250,7 +250,7 @@ start "" notepad "%DEBUG_LOG_FILE%"
 exit /b
 
 :set_timestamp_var
-for /f "delims=" %%a in ('wmic os get localdatetime ^| find "."') do set dt=%%a
+for /f "delims=" %%a in ('wmic /output:stdout os get localdatetime ^| find "."') do set dt=%%a
 set "TIMESTAMP=%dt:~0,4%-%dt:~4,2%-%dt:~6,2%_%dt:~8,2%-%dt:~10,2%-%dt:~12,2%_%dt:~15,6%"
 exit /b
 
