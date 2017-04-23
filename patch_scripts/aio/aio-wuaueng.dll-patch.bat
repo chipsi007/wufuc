@@ -211,34 +211,44 @@ echo Gathering debugging information, please wait...
 call :set_timestamp_var
 set "DEBUG_LOG_FILE=%temp%\%~nx0-debuginfo_%TIMESTAMP%.log"
 
+set "WMI_OS_VALUES=BuildNumber,Caption,MUILanguages,OSArchitecture,OSLanguage,Version"
+set "WMI_CPU_VALUES=Description,DeviceID,Family,Manufacturer,Name,NumberOfCores,NumberOfLogicalProcessors,ProcessorId,Revision,SocketDesignation"
+set "WMI_QFE_VALUES=HotFixID,InstalledOn"
+set "WMI_DATAFILE_VALUES=CreationDate,FileSize,InstallDate,LastAccessed,LastModified,Version"
+set "CERTUTIL_HASH_ALGS=MD5 SHA1 SHA256"
+
 echo.>"%DEBUG_LOG_FILE%"
 echo ^<details^>>>"%DEBUG_LOG_FILE%"
 echo.>>"%DEBUG_LOG_FILE%"
 echo ## Operating System>>"%DEBUG_LOG_FILE%"
 echo.>>"%DEBUG_LOG_FILE%"
 echo ```>>"%DEBUG_LOG_FILE%"
-wmic /output:stdout os get BuildNumber,Caption,MUILanguages,OSArchitecture,OSLanguage,Version /value | findstr /V "^$" >>"%DEBUG_LOG_FILE%"
+wmic /output:stdout os get %WMI_OS_VALUES% /value | findstr /V "^$" >>"%DEBUG_LOG_FILE%"
+echo ```>>"%DEBUG_LOG_FILE%"
+echo.>>"%DEBUG_LOG_FILE%"
+
+echo ## Processor>>"%DEBUG_LOG_FILE%"
+echo.>>"%DEBUG_LOG_FILE%"
+echo ```>>"%DEBUG_LOG_FILE%"
+wmic /output:stdout cpu get %WMI_CPU_VALUES% /value | findstr /V "^$" >>"%DEBUG_LOG_FILE%"
 echo ```>>"%DEBUG_LOG_FILE%"
 echo.>>"%DEBUG_LOG_FILE%"
 
 echo ## Installed Hotfixes>>"%DEBUG_LOG_FILE%"
 echo.>>"%DEBUG_LOG_FILE%"
 echo ```>>"%DEBUG_LOG_FILE%"
-wmic /output:stdout qfe get HotFixID,InstalledOn /value | findstr /V "^$" >>"%DEBUG_LOG_FILE%"
+wmic /output:stdout qfe get %WMI_QFE_VALUES% /value | findstr /V "^$" >>"%DEBUG_LOG_FILE%"
 echo ```>>"%DEBUG_LOG_FILE%"
 echo.>>"%DEBUG_LOG_FILE%"
 
 echo ## wuaueng.dll Properties>>"%DEBUG_LOG_FILE%"
 echo.>>"%DEBUG_LOG_FILE%"
 echo ```>>"%DEBUG_LOG_FILE%"
-certutil -hashfile "%WUAUENG_DLL%" MD5 | find /V "CertUtil" >>"%DEBUG_LOG_FILE%"
-echo.>>"%DEBUG_LOG_FILE%"
-certutil -hashfile "%WUAUENG_DLL%" SHA1 | find /V "CertUtil" >>"%DEBUG_LOG_FILE%"
-echo.>>"%DEBUG_LOG_FILE%"
-certutil -hashfile "%WUAUENG_DLL%" SHA256 | find /V "CertUtil" >>"%DEBUG_LOG_FILE%"
-echo.>>"%DEBUG_LOG_FILE%"
-
-wmic /output:stdout datafile where "name='%WUAUENG_DLL:\=\\%'" get CreationDate,FileSize,InstallDate,LastAccessed,LastModified,Version /value | findstr /V "^$" >>"%DEBUG_LOG_FILE%"
+for %%a in (%CERTUTIL_HASH_ALGS%) do (
+    certutil -hashfile "%WUAUENG_DLL%" "%%a" | find /V "CertUtil" >>"%DEBUG_LOG_FILE%"
+    echo.>>"%DEBUG_LOG_FILE%"
+)
+wmic /output:stdout datafile where "name='%WUAUENG_DLL:\=\\%'" get %WMI_DATAFILE_VALUES% /value | findstr /V "^$" >>"%DEBUG_LOG_FILE%"
 echo ```>>"%DEBUG_LOG_FILE%"
 echo ^</details^>>>"%DEBUG_LOG_FILE%"
 
