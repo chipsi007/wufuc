@@ -212,7 +212,7 @@ call :set_timestamp_var
 set "DEBUG_LOG_FILE=%temp%\%~nx0-debuginfo_%TIMESTAMP%.log"
 
 set "WMI_OS_VALUES=BuildNumber,Caption,MUILanguages,OSArchitecture,OSLanguage,Version"
-set "WMI_CPU_VALUES=Description,DeviceID,Family,Manufacturer,Name,NumberOfCores,NumberOfLogicalProcessors,ProcessorId,Revision,SocketDesignation"
+set "WMI_CPU_VALUES=Description,Family,Manufacturer,Name,NumberOfCores,NumberOfLogicalProcessors,ProcessorId,Revision"
 set "WMI_QFE_VALUES=HotFixID,InstalledOn"
 set "WMI_DATAFILE_VALUES=CreationDate,FileSize,InstallDate,LastAccessed,LastModified,Version"
 set "CERTUTIL_HASH_ALGS=MD5 SHA1 SHA256"
