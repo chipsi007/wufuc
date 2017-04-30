@@ -1,4 +1,4 @@
-### [Click here if you are looking for the latest patch files! <img src="https://img.shields.io/github/downloads/zeffy/kb4012218-19/total.svg"/>](https://github.com/zeffy/kb4012218-19/releases)
+### [Click here if you are looking for the latest patch files!](https://github.com/zeffy/kb4012218-19/releases)  [<img src="https://img.shields.io/github/downloads/zeffy/kb4012218-19/total.svg"/>](https://github.com/zeffy/kb4012218-19/releases)
 
 ---
 
