@@ -24,6 +24,13 @@ April, 2017 Preview of Monthly Quality Rollup for Windows 7 ([KB4015552]) | Wind
 April, 2017 Preview of Monthly Quality Rollup for Windows Server 2012 R2 ([KB4015553]) | Windows Server 2012 R2 | Updates | 4/13/2017 | n/a | 224.0 MB
 April, 2017 Preview of Monthly Quality Rollup for Windows 8.1 ([KB4015553]) | Windows 8.1 | Updates | 4/13/2017 | n/a | 124.6 MB
 April, 2017 Preview of Monthly Quality Rollup for Windows 8.1 for x64-based Systems ([KB4015553]) | Windows 8.1 | Updates | 4/13/2017 | n/a | 224.0 MB
+2017-05 Security Monthly Quality Rollup for Windows 8.1 for x86-based Systems ([KB4019215]) | Windows 8.1 | Security Updates | 5/5/2017 | n/a | 126.4 MB
+2017-05 Security Monthly Quality Rollup for Windows Server 2012 R2 for x64-based Systems ([KB4019215]) | Windows Server 2012 R2 | Security Updates | 5/5/2017 | n/a | 227.8 MB
+2017-05 Security Monthly Quality Rollup for Windows 8.1 for x64-based Systems ([KB4019215]) | Windows 8.1 | Security Updates | 5/5/2017 | n/a | 227.8 MB
+
+2017-05 Security Monthly Quality Rollup for Windows 7 for x86-based Systems ([KB4019264]) | Windows 7 | Security Updates | 5/5/2017 | n/a | 99.3 MB
+2017-05 Security Monthly Quality Rollup for Windows Server 2008 R2 for x64-based Systems ([KB4019264]) | Windows Server 2008 R2 | Security Updates | 5/5/2017 | n/a | 162.9 MB
+2017-05 Security Monthly Quality Rollup for Windows 7 for x64-based Systems ([KB4019264]) | Windows 7 | Security Updates | 5/5/2017 | n/a | 162.9 MB
 
 [KB4012218]: https://www.catalog.update.microsoft.com/search.aspx?q=kb4012218
 [KB4012219]: https://www.catalog.update.microsoft.com/search.aspx?q=kb4012219
@@ -33,3 +40,5 @@ April, 2017 Preview of Monthly Quality Rollup for Windows 8.1 for x64-based Syst
 [KB4015550]: https://www.catalog.update.microsoft.com/search.aspx?q=KB4015550
 [KB4015552]: https://www.catalog.update.microsoft.com/search.aspx?q=KB4015552
 [KB4015553]: https://www.catalog.update.microsoft.com/search.aspx?q=KB4015553
+[KB4019215]: https://www.catalog.update.microsoft.com/search.aspx?q=KB4019215
+[KB4019264]: https://www.catalog.update.microsoft.com/search.aspx?q=KB4019264
