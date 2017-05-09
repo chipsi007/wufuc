@@ -59,13 +59,13 @@ if not exist "%XDELTA3_EXE%" (
 
 wmic /output:stdout os get version | findstr "^6\.1\." >nul && (
     set "WINDOWS_VER=6.1"
-    set "SUPPORTED_HOTFIXES=KB4015552 KB4015549 KB4015546 KB4012218"
+    set "SUPPORTED_HOTFIXES=KB4019264 KB4015552 KB4015549 KB4015546 KB4012218"
     echo Detected supported operating system: Windows 7 %WINDOWS_ARCHITECTURE%
     goto :check_hotfix
 )
 wmic /output:stdout os get version | findstr "^6\.3\." >nul && (
     set "WINDOWS_VER=8.1"
-    set "SUPPORTED_HOTFIXES=KB4015553 KB4015550 KB4015547 KB4012219"
+    set "SUPPORTED_HOTFIXES=KB4019215 KB4015553 KB4015550 KB4015547 KB4012219"
     echo Detected supported operating system: Windows 8.1 %WINDOWS_ARCHITECTURE%
     goto :check_hotfix
 )
