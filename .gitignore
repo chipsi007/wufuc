@@ -1,4 +1,4 @@
 *.exe
 *.rar
 *.zip
-patch_scripts/aio/COPYING.txt
+patch_scripts/*/COPYING.txt
