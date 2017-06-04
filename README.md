@@ -16,9 +16,9 @@ There have even been people with older Intel and AMD systems who have been locke
 
 ## Bad Microsoft!
 
-<sup>If you are interested, you can read my original write up on discovering the CPU check [here](../../tree/old-kb4012218-19).</sup>
+If you are interested, you can read my original write up on discovering the CPU check [here](../../tree/old-kb4012218-19).
 
-Basically, inside a file called `wuaueng.dll` there are two functions: [`IsDeviceServiceable(void)`](https://gist.github.com/zeffy/e5ec266952932bc905eb0cbc6ed72185) and [`IsCPUSupported(void)`](https://gist.github.com/zeffy/1a8f8984d2bec97ae24af63a76278694). `IsDeviceServiceable(void)` is essentially a wrapper around `IsCPUSupported(void)` that caches the result it recieves and returns it on subsequent calls. 
+Basically, inside a file called `wuaueng.dll` there are two functions: [`IsDeviceServiceable(void)`](https://gist.github.com/zeffy/e5ec266952932bc905eb0cbc6ed72185) and [`IsCPUSupported(void)`](https://gist.github.com/zeffy/1a8f8984d2bec97ae24af63a76278694). `IsDeviceServiceable(void)` is essentially a wrapper around `IsCPUSupported(void)` that caches the result it recieves and recycles it on subsequent calls. 
 
 My patch takes advantage of this result caching behavior by setting the "hasn't run once" value to `FALSE` and the cached result to `TRUE`.
 
@@ -28,4 +28,21 @@ My patch takes advantage of this result caching behavior by setting the "hasn't 
 - `wufuc` determines what service host process the Windows Update service (`wuauserv`) runs in, and injects itself into it.
 - Once injected, it applies a hook to `LoadLibraryEx` that automatically patches `wuaueng.dll` when it is loaded.
 - Any previously loaded `wuaueng.dll` is also patched.
-- **No system files are modified!**
+
+### Several improvements over my script-based approach:		
+- **No system files are modified!***
+- Heuristic byte signature patching persists over new updates.		
+- C is best language.		
+- No external dependencies except for Microsoft Visual C++ 2015 Redistributable.	
+
+### How to install/uninstall?
+
+Just run move the `wufuc` folder to wherever you want and run `install_wufuc.bat` as administrator.
+
+To uninstall run `uninstall_wufuc.bat` as administrator. 
+
+To temporarily disable the patch, just go to the Task Scheduler and disable the `wufuc.{ ... }` task, then restart your computer.
+
+### How do I remove your old patch and use this instead?
+
+I've included a utility script called `repair_wuaueng.dll.bat` that will initiate an sfc scan and attempt to automatically revert any changes made to `wuaueng.dll`.

@@ -1,5 +1,5 @@
 @echo off
-title wufuc uninstaller - v0.6
+title install wufuc (repair wuaueng.dll) - v0.6
 :: Copyright (C) 2017 zeffy
 
 :: This program is free software: you can redistribute it and/or modify
@@ -27,36 +27,16 @@ fltmc >nul 2>&1 || (
     goto :die
 )
 
-if /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
-    goto :is_x64
-) else (
-    if /I "%PROCESSOR_ARCHITEW6432%"=="AMD64" (
-        goto :is_x64
-    )
-    if /I "%PROCESSOR_ARCHITECTURE%"=="x86" (
-        set "WINDOWS_ARCHITECTURE=x86"
-        set "wufuc_dll=%~dp0wufuc32.dll"
-        goto :confirmation
-    )
-)
-goto :die
-
-:is_x64
-set "WINDOWS_ARCHITECTURE=x64"
-set "wufuc_dll=%~dp0wufuc64.dll"
-
 :confirmation
-set /p CONTINUE=Enter 'Y' if you want to uninstall wufuc: 
+echo You may want to use this script if you previously modified wuaueng.dll
+echo with "aio-wuaueng.dll-patch.bat" or by other means.
+echo.
+echo This will run the sfc utility and it will restore any changes that were made.
+
+set /p CONTINUE=Enter 'Y' if you want to repair wuaueng.dll: 
 if /I not "%CONTINUE%"=="Y" goto :cancel
-echo.
 
-:uninstall
-set "wufuc_task=wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307}"
-rundll32 "%wufuc_dll%",Rundll32Unload
-schtasks /Delete /TN "%wufuc_task%" /F
-
-echo.
-echo Unloaded and uninstalled wufuc!
+sfc /SCANFILE="%systemroot%\System32\wuaueng.dll"
 
 :die
 echo.

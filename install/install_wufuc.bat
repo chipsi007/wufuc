@@ -82,9 +82,9 @@ for %%a in (%SUPPORTED_HOTFIXES%) do (
 )
 
 echo.
-echo Warning - Detected that no supported updates are installed! 
+echo WARNING - Detected that no supported updates are installed! 
 echo.
-echo This can be a false warning, if you are sure you know you need wufuc you
+echo This can be a false warning, if you are certain that need wufuc then you
 echo can continue (there will be no side effects even if you don't need it)
 
 set /p CONTINUE=Enter 'Y' if you still want to continue: 
@@ -101,18 +101,26 @@ set /p CONTINUE=Enter 'Y' if you want to install wufuc:
 if /I not "%CONTINUE%"=="Y" goto :cancel
 echo.
 
+set "vcredist_path=%~dp0_Redist\vcredist_%WINDOWS_ARCHITECTURE%.exe"
+if exist "%vcredist_path%" (
+    echo Installing Microsoft Visual C^+^+ 2017 Redistributable ^(%WINDOWS_ARCHITECTURE%^)...
+    "%vcredist_path%" /passive /norestart
+    goto :install
+)
+
+echo Couldn't locate and install Microsoft Visual C^+^+ 2017 Redistributable ^(%WINDOWS_ARCHITECTURE%^).
+
+set /p CONTINUE=Enter 'Y' if you still want to continue: 
+if /I not "%CONTINUE%"=="Y" goto :cancel
+echo.
+
 :install
 set "wufuc_task=wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307}"
 schtasks /Create /XML "%~dp0wufuc.xml" /TN "%wufuc_task%" /F
-echo %ERRORLEVEL%
 schtasks /Change /TN "%wufuc_task%" /TR "'%systemroot%\system32\rundll32.exe' """%wufuc_dll%""",Rundll32Entry"
-echo %ERRORLEVEL%
 schtasks /Change /TN "%wufuc_task%" /ENABLE
-echo %ERRORLEVEL%
 rundll32 "%wufuc_dll%",Rundll32Unload
-echo %ERRORLEVEL%
 schtasks /Run /TN "%wufuc_task%"
-echo %ERRORLEVEL%
 
 echo.
 echo Installed and started wufuc!
