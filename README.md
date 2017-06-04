@@ -37,7 +37,7 @@ My patch takes advantage of this result caching behavior by setting the "hasn't 
 
 ### How to install/uninstall?
 
-Just run move the `wufuc` folder to wherever you want and run `install_wufuc.bat` as administrator.
+Just run move the `wufuc` folder to a permanent location (like `C:\Program Files\wufuc`) and run `install_wufuc.bat` as administrator. 
 
 To uninstall run `uninstall_wufuc.bat` as administrator. 
 
