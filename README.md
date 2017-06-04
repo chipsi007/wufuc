@@ -41,7 +41,7 @@ Just run move the `wufuc` folder to wherever you want and run `install_wufuc.bat
 
 To uninstall run `uninstall_wufuc.bat` as administrator. 
 
-To temporarily disable the patch, just go to the Task Scheduler and disable the `wufuc.{ ... }` task, then restart your computer.
+To temporarily disable the patch, just go to the Task Scheduler and disable the `wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307}` task, then restart your computer.
 
 ### How do I remove your old patch and use this instead?
 
