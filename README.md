@@ -30,7 +30,7 @@ My patch takes advantage of this result caching behavior by setting the "hasn't 
 - Any previously loaded `wuaueng.dll` is also patched.
 
 ### Several improvements over my script-based approach:		
-- **No system files are modified!***
+- **No system files are modified!**
 - Heuristic byte signature patching persists over new updates.		
 - C is best language.		
 - No external dependencies except for Microsoft Visual C++ 2015 Redistributable.	
