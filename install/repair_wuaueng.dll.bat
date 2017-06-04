@@ -1,5 +1,5 @@
 @echo off
-title install wufuc (repair wuaueng.dll) - v0.6
+title install wufuc ^(repair wuaueng.dll^) - v0.6
 :: Copyright (C) 2017 zeffy
 
 :: This program is free software: you can redistribute it and/or modify
