@@ -32,6 +32,7 @@ echo You may want to use this script if you previously modified wuaueng.dll
 echo with "aio-wuaueng.dll-patch.bat" or by other means.
 echo.
 echo This will run the sfc utility and it will restore any changes that were made.
+echo.
 
 set /p CONTINUE=Enter 'Y' if you want to repair wuaueng.dll: 
 if /I not "%CONTINUE%"=="Y" goto :cancel
