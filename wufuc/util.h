@@ -39,4 +39,3 @@ VOID _dbgprintf(LPCSTR format, ...);
 //#else
 //#define _tdbgprintf(format, ...)
 //#endif // !_DEBUG
-
