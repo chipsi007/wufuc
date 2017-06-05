@@ -41,7 +41,7 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
 	DETOUR_IAT(hm, LoadLibraryExA);
 	DETOUR_IAT(hm, LoadLibraryExW);
 
-	DbgPrint("Applied LoadLibraryEx hooks.");
+	_tdbgprintf(_T("Applied LoadLibraryEx hooks."));
 
 	HMODULE hwu = GetModuleHandle(_T("wuaueng.dll"));
 	if (hwu) {
@@ -52,14 +52,14 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
 	WaitForSingleObject(hEvent, INFINITE);
 	CloseHandle(hEvent);
 
-	DbgPrint("Received wufuc_UnloadEvent, removing hooks.");
+	_tdbgprintf(_T("Received wufuc_UnloadEvent, removing hooks."));
 
 	SuspendProcess(lphThreads, _countof(lphThreads), &cb);
 	RESTORE_IAT(hm, LoadLibraryExA);
 	RESTORE_IAT(hm, LoadLibraryExW);
 	ResumeAndCloseThreads(lphThreads, cb);
 
-	DbgPrint("Unloading library. Cya!");
+	_tdbgprintf(_T("Unloading library. Cya!"));
 	FreeLibraryAndExitThread(HINST_THISCOMPONENT, 0);
 	return 0;
 }
@@ -118,20 +118,20 @@ BOOL PatchWUModule(HMODULE hModule) {
 	if (!FindPattern(modinfo.lpBaseOfDll, modinfo.SizeOfImage, lpszPattern, 0, &offset)) {
 		return FALSE;
 	}
-	DbgPrint("IsDeviceServiceable(void) matched at %p", (UINT_PTR)modinfo.lpBaseOfDll + offset);
+	_tdbgprintf(_T("IsDeviceServiceable(void) matched at %p"), (UINT_PTR)modinfo.lpBaseOfDll + offset);
 
 	DWORD *lpdwResultIsNotCachedOffset = (DWORD *)((UINT_PTR)modinfo.lpBaseOfDll + offset + n1);
 	BOOL *lpbResultIsNotCached = (BOOL *)((UINT_PTR)modinfo.lpBaseOfDll + offset + n1 + sizeof(DWORD) + *lpdwResultIsNotCachedOffset);
 	if (*lpbResultIsNotCached) {
 		*lpbResultIsNotCached = FALSE;
-		DbgPrint("Patched %p=%d", lpbResultIsNotCached, *lpbResultIsNotCached);
+		_tdbgprintf(_T("Patched %p=%d"), lpbResultIsNotCached, *lpbResultIsNotCached);
 	}
 
 	DWORD *lpdwCachedResultOffset = (DWORD *)((UINT_PTR)modinfo.lpBaseOfDll + offset + n2);
 	BOOL *lpbCachedResult = (BOOL *)((UINT_PTR)modinfo.lpBaseOfDll + offset + n2 + sizeof(DWORD) + *lpdwCachedResultOffset);
 	if (!*lpbCachedResult) {
 		*lpbCachedResult = TRUE;
-		DbgPrint("Patched %p=%d", lpbCachedResult, *lpbCachedResult);
+		_tdbgprintf(_T("Patched %p=%d"), lpbCachedResult, *lpbCachedResult);
 	}
 	return TRUE;
 }

@@ -1,4 +1,5 @@
 #include <Windows.h>
+#include <stdio.h>
 #include <VersionHelpers.h>
 #include <tchar.h>
 #include "util.h"
@@ -15,13 +16,20 @@ BOOL IsWindows8Point1(void) {
 	return IsWindows8Point1OrGreater() && !IsWindows10OrGreater();
 }
 
-//#ifdef _DEBUG
-VOID _DbgPrint(LPCTSTR format, ...) {
-	TCHAR buffer[0x1000];
+VOID _wdbgprintf(LPCWSTR format, ...) {
+	WCHAR buffer[0x1000];
 	va_list argptr;
 	va_start(argptr, format);
-	_vstprintf_s(buffer, _countof(buffer), format, argptr);
+	vswprintf_s(buffer, _countof(buffer), format, argptr);
 	va_end(argptr);
-	OutputDebugString(buffer);
+	OutputDebugStringW(buffer);
 }
-//#endif
+
+VOID _dbgprintf(LPCSTR format, ...) {
+	CHAR buffer[0x1000];
+	va_list argptr;
+	va_start(argptr, format);
+	vsprintf_s(buffer, _countof(buffer), format, argptr);
+	va_end(argptr);
+	OutputDebugStringA(buffer);
+}

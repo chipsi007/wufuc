@@ -17,7 +17,7 @@ VOID DetourIAT(HMODULE hModule, LPSTR lpFuncName, LPVOID *lpOldAddress, LPVOID l
 	if (lpOldAddress) {
 		*lpOldAddress = *lpAddress;
 	}
-	DbgPrint("%S %p => %p", lpFuncName, *lpAddress, lpNewAddress);
+	_tdbgprintf(_T("%S %p => %p"), lpFuncName, *lpAddress, lpNewAddress);
 	*lpAddress = lpNewAddress;
 	VirtualProtect(lpAddress, sizeof(LPVOID), flOldProtect, &flNewProtect);
 }
@@ -99,7 +99,7 @@ BOOL InjectLibrary(HANDLE hProcess, LPCTSTR lpLibFileName, DWORD cb) {
 		}
 	} while (Module32Next(hSnap, &me));
 	CloseHandle(hSnap);
-	DbgPrint("Injecting %s into process %d", lpLibFileName, dwProcessId);
+	_tdbgprintf(_T("Injecting %s into process %d"), lpLibFileName, dwProcessId);
 	HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)GetProcAddress(me.hModule, _CRT_STRINGIZE(LoadLibrary)), lpBaseAddress, 0, NULL);
 	CloseHandle(hThread);
 	return TRUE;
@@ -127,7 +127,7 @@ VOID SuspendProcess(HANDLE *lphThreads, SIZE_T dwSize, SIZE_T *lpcb) {
 	CloseHandle(hSnap);
 
 	*lpcb = count;
-	DbgPrint("Suspended other threads.");
+	_tdbgprintf(_T("Suspended other threads."));
 }
 
 VOID ResumeAndCloseThreads(HANDLE *lphThreads, SIZE_T cb) {
@@ -135,5 +135,5 @@ VOID ResumeAndCloseThreads(HANDLE *lphThreads, SIZE_T cb) {
 		ResumeThread(lphThreads[i]);
 		CloseHandle(lphThreads[i]);
 	}
-	DbgPrint("Resumed threads.");
+	_tdbgprintf(_T("Resumed threads."));
 }

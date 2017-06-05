@@ -34,7 +34,7 @@ void CALLBACK Rundll32Entry(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int n
 void CALLBACK Rundll32Unload(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow) {
 	HANDLE hEvent = OpenEvent(EVENT_MODIFY_STATE, FALSE, _T("Global\\wufuc_UnloadEvent"));
 	if (hEvent) {
-		DbgPrint("Setting wufuc_UnloadEvent...");
+		_tdbgprintf(_T("Setting wufuc_UnloadEvent..."));
 		SetEvent(hEvent);
 		CloseHandle(hEvent);
 	}

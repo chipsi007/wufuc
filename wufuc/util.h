@@ -9,13 +9,17 @@ BOOL IsWindows7(void);
 
 BOOL IsWindows8Point1(void);
 
+VOID _wdbgprintf(LPCWSTR format, ...);
+VOID _dbgprintf(LPCSTR format, ...);
 //#ifdef _DEBUG
-VOID _DbgPrint(LPCTSTR format, ...);
-#define DbgPrint(format, ...) \
-	_DbgPrint(_T(__FUNCTION__) _T(": ") _T(format), ##__VA_ARGS__)
+#ifdef UNICODE
+#define _tdbgprintf _wdbgprintf
+#else
+#define _tdbgprintf _dbgprintf
+#endif // !UNICODE
 //#else
-//#define DbgPrint(format, ...)
-//#endif
+//#define _tdbgprintf(format, ...)
+//#endif // !_DEBUG
 
 #ifdef UNICODE
 #define CommandLineToArgv  CommandLineToArgvW

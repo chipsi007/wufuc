@@ -34,7 +34,7 @@ BOOL QueryServiceProcessId(SC_HANDLE hSCManager, LPCTSTR lpServiceName, DWORD *l
 	if (QueryServiceStatusEx(hService, SC_STATUS_PROCESS_INFO, (LPBYTE)&lpBuffer, sizeof(lpBuffer), &cbBytesNeeded) && lpBuffer.dwProcessId) {
 		*lpdwProcessId = lpBuffer.dwProcessId;
 		result = TRUE;
-		DbgPrint("Found %s pid %d", lpServiceName, *lpdwProcessId);
+		_tdbgprintf(_T("Found %s pid %d"), lpServiceName, *lpdwProcessId);
 	}
 	CloseServiceHandle(hService);
 	return result;
@@ -61,7 +61,7 @@ BOOL GetServiceGroupName(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPTSTR lpG
 			if (!_tcsicmp(*(p++), _T("-k"))) {
 				_tcscpy_s(lpGroupName, dwSize, *p);
 				result = TRUE;
-				DbgPrint("Found %s svc group: %s", lpServiceName, lpGroupName);
+				_tdbgprintf(_T("Found %s svc group: %s"), lpServiceName, lpGroupName);
 				break;
 			}
 		}
@@ -86,7 +86,7 @@ BOOL FindServiceGroupProcessId(SC_HANDLE hSCManager, LPTSTR lpServiceGroupName, 
 			result = !_tcsicmp(group, lpServiceGroupName);
 		}
 		if (result) {
-			DbgPrint("Found %s pid %d", lpServiceGroupName, dwProcessId);
+			_tdbgprintf(_T("Found %s pid %d"), lpServiceGroupName, dwProcessId);
 			*lpdwProcessId = dwProcessId;
 			break;
 		}
