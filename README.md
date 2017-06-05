@@ -34,7 +34,7 @@ My patch takes advantage of this result caching behavior by setting the "hasn't 
 - **No system files are modified!**
 - Heuristic-based patching, which means it will usually keep working even after updates.		
 - C is best language.		
-- No external dependencies except for Microsoft Visual C++ 2015 Redistributable.	
+- No external dependencies except for Microsoft Visual C++ 2017 Redistributable.	
 
 ### How to install/uninstall?
 
