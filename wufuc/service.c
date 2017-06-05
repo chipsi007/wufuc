@@ -14,12 +14,11 @@ BOOL get_svcpath(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPTSTR lpBinaryPat
 	QueryServiceConfig(hService, NULL, 0, &cbBytesNeeded);
 	LPQUERY_SERVICE_CONFIG sc = malloc(cbBytesNeeded);
 	BOOL result = QueryServiceConfig(hService, sc, cbBytesNeeded, &cbBytesNeeded);
-	int a = GetLastError();
 	CloseServiceHandle(hService);
 	if (result) {
 		_tcscpy_s(lpBinaryPathName, dwSize, sc->lpBinaryPathName);
 	}
-	LocalFree(sc);
+	free(sc);
 	return result;
 }
 
@@ -87,6 +86,6 @@ BOOL get_svcgpid(SC_HANDLE hSCManager, LPTSTR lpServiceGroupName, DWORD *lpdwPro
 			break;
 		}
 	}
-	LocalFree(pvData);
+	free(pvData);
 	return result;
 }
