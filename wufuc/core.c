@@ -119,7 +119,7 @@ BOOL PatchWUModule(HMODULE hModule) {
         return FALSE;
     }
     SIZE_T rva = (SIZE_T)modinfo.lpBaseOfDll + offset;
-    _tdbgprintf(_T("IsDeviceServiceable(void) matched at %IX"), rva);
+    _tdbgprintf(_T("IsDeviceServiceable(void) matched at %p"), rva);
 
     BOOL *lpbNotRunOnce = (BOOL *)(rva + n1 + sizeof(DWORD) + *(DWORD *)(rva + n1));
     if (*lpbNotRunOnce) {

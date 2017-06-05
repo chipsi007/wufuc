@@ -1,5 +1,5 @@
 @echo off
-title wufuc uninstaller - v0.6
+title wufuc uninstaller - v0.6.0.1
 :: Copyright (C) 2017 zeffy
 
 :: This program is free software: you can redistribute it and/or modify
