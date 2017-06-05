@@ -119,17 +119,16 @@ BOOL PatchWUModule(HMODULE hModule) {
 	if (!FindPattern(modinfo.lpBaseOfDll, modinfo.SizeOfImage, lpszPattern, 0, &offset)) {
 		return FALSE;
 	}
-	_tdbgprintf(_T("IsDeviceServiceable(void) matched at %p"), (UINT_PTR)modinfo.lpBaseOfDll + offset);
+	SIZE_T rva = (SIZE_T)modinfo.lpBaseOfDll + offset;
+	_tdbgprintf(_T("IsDeviceServiceable(void) matched at %IX"), rva);
 
-	DWORD *lpdwResultIsNotCachedOffset = (DWORD *)((UINT_PTR)modinfo.lpBaseOfDll + offset + n1);
-	BOOL *lpbResultIsNotCached = (BOOL *)((UINT_PTR)modinfo.lpBaseOfDll + offset + n1 + sizeof(DWORD) + *lpdwResultIsNotCachedOffset);
-	if (*lpbResultIsNotCached) {
-		*lpbResultIsNotCached = FALSE;
-		_tdbgprintf(_T("Patched %p=%d"), lpbResultIsNotCached, *lpbResultIsNotCached);
+	BOOL *lpbNotRunOnce = (BOOL *)(rva + n1 + sizeof(DWORD) + *(DWORD *)(rva + n1));
+	if (*lpbNotRunOnce) {
+		*lpbNotRunOnce = FALSE;
+		_tdbgprintf(_T("Patched %p=%d"), lpbNotRunOnce, *lpbNotRunOnce);
 	}
 
-	DWORD *lpdwCachedResultOffset = (DWORD *)((UINT_PTR)modinfo.lpBaseOfDll + offset + n2);
-	BOOL *lpbCachedResult = (BOOL *)((UINT_PTR)modinfo.lpBaseOfDll + offset + n2 + sizeof(DWORD) + *lpdwCachedResultOffset);
+	BOOL *lpbCachedResult = (BOOL *)(rva + n2 + sizeof(DWORD) + *(DWORD *)(rva + n2));
 	if (!*lpbCachedResult) {
 		*lpbCachedResult = TRUE;
 		_tdbgprintf(_T("Patched %p=%d"), lpbCachedResult, *lpbCachedResult);

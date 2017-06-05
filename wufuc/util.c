@@ -29,55 +29,55 @@ VOID DetourIAT(HMODULE hModule, LPSTR lpFuncName, LPVOID *lpOldAddress, LPVOID l
 	if (lpOldAddress) {
 		*lpOldAddress = *lpAddress;
 	}
-	_tdbgprintf(_T("%S %p => %p"), lpFuncName, *lpAddress, lpNewAddress);
+	_dbgprintf("%s %p => %p", lpFuncName, *lpAddress, lpNewAddress);
 	*lpAddress = lpNewAddress;
 	VirtualProtect(lpAddress, sizeof(LPVOID), flOldProtect, &flNewProtect);
 }
 
-LPVOID *FindIAT(HMODULE hModule, LPSTR lpFuncName) {
-	PIMAGE_DOS_HEADER dos = (PIMAGE_DOS_HEADER)hModule;
-	PIMAGE_NT_HEADERS nt = (PIMAGE_NT_HEADERS)((LPBYTE)dos + dos->e_lfanew);
-	PIMAGE_IMPORT_DESCRIPTOR desc = (PIMAGE_IMPORT_DESCRIPTOR)((LPBYTE)dos + nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
+LPVOID *FindIAT(HMODULE hModule, LPSTR lpFunctionName) {
+	SIZE_T hm = (SIZE_T)hModule;
 
-	for (PIMAGE_IMPORT_DESCRIPTOR iid = desc; iid->Name != 0; iid++) {
-		for (int i = 0; *(i + (LPVOID*)(iid->FirstThunk + (SIZE_T)hModule)) != NULL; i++) {
-			LPSTR name = (LPSTR)(*(i + (SIZE_T*)(iid->OriginalFirstThunk + (SIZE_T)hModule)) + (SIZE_T)hModule + 2);
-			const uintptr_t n = (uintptr_t)name;
-			if (!(n & (sizeof(n) == 4 ? 0x80000000 : 0x8000000000000000)) && !_stricmp(lpFuncName, name)) {
-				return i + (LPVOID*)(iid->FirstThunk + (SIZE_T)hModule);
+	for (PIMAGE_IMPORT_DESCRIPTOR iid = (PIMAGE_IMPORT_DESCRIPTOR)(hm +
+		((PIMAGE_NT_HEADERS)(hm + ((PIMAGE_DOS_HEADER)hm)->e_lfanew))->OptionalHeader
+			.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT]
+			.VirtualAddress); iid->Name; iid++) {
+
+		LPVOID *p;
+		for (SIZE_T i = 0; *(p = i + (LPVOID *)(hm + iid->FirstThunk)); i++) {
+			LPSTR fn = (LPSTR)(hm + *(i + (SIZE_T *)(hm + iid->OriginalFirstThunk)) + 2);
+			if (!((uintptr_t)fn & IMAGE_ORDINAL_FLAG) && !_stricmp(lpFunctionName, fn)) {
+				return p;
 			}
 		}
 	}
 	return NULL;
 }
 
-BOOL FindPattern(LPCBYTE lpBytes, SIZE_T nNumberOfBytes, LPSTR lpszPattern, SIZE_T nStart, SIZE_T *lpOffset) {
-	SIZE_T nPatternLength = strlen(lpszPattern);
-	SIZE_T nMaskLength = nPatternLength / 2;
-	if (nMaskLength > nNumberOfBytes || nPatternLength % 2) {
+BOOL FindPattern(LPCBYTE pvData, SIZE_T nNumberOfBytes, LPSTR lpszPattern, SIZE_T nStart, SIZE_T *lpOffset) {
+	SIZE_T length = strlen(lpszPattern);
+	SIZE_T nBytes;
+	if (length % 2 || (nBytes = length / 2) > nNumberOfBytes) {
 		return FALSE;
 	}
 
-	LPBYTE lpPattern = malloc(nMaskLength * sizeof(BYTE));
-	BOOL *lpbMask = malloc(nMaskLength * sizeof(BOOL));
+	LPBYTE lpBytes = malloc(nBytes * sizeof(BYTE));
+	BOOL *lpbwc = malloc(nBytes * sizeof(BOOL));
 
 	LPSTR p = lpszPattern;
 	BOOL valid = TRUE;
-	for (SIZE_T i = 0; i < nMaskLength; i++) {
-		if (lpbMask[i] = strncmp(p, "??", 2)) {
-			if (sscanf_s(p, "%2hhx", &lpPattern[i]) != 1) {
+	for (SIZE_T i = 0; i < nBytes; i++) {
+		if ((lpbwc[i] = strncmp(p, "??", 2)) && sscanf_s(p, "%2hhx", &lpBytes[i]) != 1) {
 				valid = FALSE;
 				break;
-			}
 		}
 		p += 2;
 	}
 	BOOL result = FALSE;
 	if (valid) {
-		for (SIZE_T i = nStart; i < nNumberOfBytes - nStart - (nMaskLength - 1); i++) {
+		for (SIZE_T i = nStart; i < nNumberOfBytes - nStart - (nBytes - 1); i++) {
 			BOOL found = TRUE;
-			for (SIZE_T j = 0; j < nMaskLength; j++) {
-				if (lpbMask[j] && lpBytes[i + j] != lpPattern[j]) {
+			for (SIZE_T j = 0; j < nBytes; j++) {
+				if (lpbwc[j] && pvData[i + j] != lpBytes[j]) {
 					found = FALSE;
 					break;
 				}
@@ -89,8 +89,8 @@ BOOL FindPattern(LPCBYTE lpBytes, SIZE_T nNumberOfBytes, LPSTR lpszPattern, SIZE
 			}
 		}
 	}
-	free(lpPattern);
-	free(lpbMask);
+	free(lpBytes);
+	free(lpbwc);
 	return result;
 }
 

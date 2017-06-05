@@ -35,7 +35,6 @@ BOOL get_svcpid(SC_HANDLE hSCManager, LPCTSTR lpServiceName, DWORD *lpdwProcessI
 	if (QueryServiceStatusEx(hService, SC_STATUS_PROCESS_INFO, (LPBYTE)&lpBuffer, sizeof(lpBuffer), &cbBytesNeeded) && lpBuffer.dwProcessId) {
 		*lpdwProcessId = lpBuffer.dwProcessId;
 		result = TRUE;
-		_tdbgprintf(_T("QueryServiceProcessId: Found %s pid %d"), lpServiceName, *lpdwProcessId);
 	}
 	CloseServiceHandle(hService);
 	return result;
@@ -62,7 +61,6 @@ BOOL get_svcgname(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPTSTR lpGroupNam
 			if (!_tcsicmp(*(p++), _T("-k"))) {
 				_tcscpy_s(lpGroupName, dwSize, *p);
 				result = TRUE;
-				_tdbgprintf(_T("Found %s svc group: %s"), lpServiceName, lpGroupName);
 				break;
 			}
 		}
@@ -76,23 +74,18 @@ BOOL get_svcgpid(SC_HANDLE hSCManager, LPTSTR lpServiceGroupName, DWORD *lpdwPro
 
 	RegGetValue(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Svchost"), lpServiceGroupName, RRF_RT_REG_MULTI_SZ, NULL, pvData, &uBytes);
 
-	LPTSTR lpSvc = (LPTSTR)pvData;
-
 	BOOL result = FALSE;
-	while (*lpSvc) {
+	for (LPTSTR p = (LPTSTR)pvData; *p; p += _tcslen(p) + 1) {
 		DWORD dwProcessId;
 		TCHAR group[256];
-		if (get_svcpid(hSCManager, lpSvc, &dwProcessId)) {
-			get_svcgname(hSCManager, lpSvc, group, _countof(group));
+		if (get_svcpid(hSCManager, p, &dwProcessId)) {
+			get_svcgname(hSCManager, p, group, _countof(group));
 			result = !_tcsicmp(group, lpServiceGroupName);
-			if (result) {
-			}
 		}
 		if (result) {
 			*lpdwProcessId = dwProcessId;
 			break;
 		}
-		lpSvc += _tcslen(lpSvc) + 1;
 	}
 	LocalFree(pvData);
 	return result;
