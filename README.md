@@ -24,12 +24,12 @@ My patch takes advantage of this result caching behavior by setting the "hasn't 
 
 ## How it works
 
-- On system boot the wufuc scheduled task runs under the `NT AUTHORITY\SYSTEM` user.
 - wufuc determines what service host process the Windows Update service (`wuauserv`) runs in, and injects itself into it.
 - Once injected, it applies a hook to `LoadLibraryEx` that automatically patches `wuaueng.dll` when it is loaded.
 - Any previously loaded `wuaueng.dll` is also patched.
 
-### Several improvements over my script-based approach:		
+### Several improvements over my xdelta3/batch script method:
+
 - **No system files are modified!**
 - Heuristic-based patching, which means it will usually keep working even after updates.		
 - C is best language.		
