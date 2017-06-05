@@ -24,6 +24,7 @@ My patch takes advantage of this result caching behavior by setting the "hasn't 
 
 ## How it works
 
+- At system boot the wufuc scheduled task runs as the `NT AUTHORITY\SYSTEM` user.
 - wufuc determines what service host process the Windows Update service (`wuauserv`) runs in, and injects itself into it.
 - Once injected, it applies a hook to `LoadLibraryEx` that automatically patches `wuaueng.dll` when it is loaded.
 - Any previously loaded `wuaueng.dll` is also patched.
