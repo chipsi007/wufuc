@@ -24,8 +24,8 @@ My patch takes advantage of this result caching behavior by setting the "hasn't 
 
 ## How it works
 
-- On system boot the `wufuc` scheduled task runs under the `NT AUTHORITY\SYSTEM` user.
-- `wufuc` determines what service host process the Windows Update service (`wuauserv`) runs in, and injects itself into it.
+- On system boot the wufuc scheduled task runs under the `NT AUTHORITY\SYSTEM` user.
+- wufuc determines what service host process the Windows Update service (`wuauserv`) runs in, and injects itself into it.
 - Once injected, it applies a hook to `LoadLibraryEx` that automatically patches `wuaueng.dll` when it is loaded.
 - Any previously loaded `wuaueng.dll` is also patched.
 
@@ -46,3 +46,16 @@ To temporarily disable the patch, just go to the Task Scheduler and disable the 
 ### How do I remove your old patch and use this instead?
 
 I've included a utility script called `repair_wuaueng.dll.bat` that will initiate an sfc scan and revert any changes made to `wuaueng.dll`.
+
+### How to see wufuc's debugging message output?
+
+You will need to download [DebugView](https://technet.microsoft.com/en-us/sysinternals/debugview.aspx) to do this.
+
+The best way to get a log of the entire life-cycle of wufuc is to do the following:
+
+1. Disable wufuc in Task Scheduler.
+2. Restart your computer.
+3. Start `DebugView.exe` as administrator and check `Capture -> Capture Global Win32`.
+4. Enable wufuc in Task Scheduler. 
+5. Run wufuc in Task Scheduler.
+6. Output will be shown in DebugView.
