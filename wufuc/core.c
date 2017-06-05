@@ -13,7 +13,7 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
 	SC_HANDLE hSCManager = OpenSCManager(NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_CONNECT);
 
 	TCHAR lpBinaryPathName[0x8000];
-	QueryServiceBinaryPathName(hSCManager, _T("wuauserv"), lpBinaryPathName, _countof(lpBinaryPathName));
+	get_svcpath(hSCManager, _T("wuauserv"), lpBinaryPathName, _countof(lpBinaryPathName));
 
 	BOOL result = _tcsicmp(GetCommandLine(), lpBinaryPathName);
 	CloseServiceHandle(hSCManager);
@@ -27,21 +27,22 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
 	ConvertStringSecurityDescriptorToSecurityDescriptor(_T("D:PAI(A;;FA;;;BA)"), SDDL_REVISION_1, &(sa.lpSecurityDescriptor), NULL);
 	sa.bInheritHandle = FALSE;
 
-	HANDLE hEvent = CreateEvent(&sa, FALSE, FALSE, _T("Global\\wufuc_UnloadEvent"));
+	HANDLE hEvent = CreateEvent(&sa, TRUE, FALSE, _T("Global\\wufuc_UnloadEvent"));
 
 	if (!hEvent) {
 		return 0;
 	}
 
+	DWORD dwProcessId = GetCurrentProcessId();
+	DWORD dwThreadId = GetCurrentThreadId();
 	HANDLE lphThreads[0x1000];
 	SIZE_T cb;
-	SuspendProcess(lphThreads, _countof(lphThreads), &cb);
+
+	SuspendProcessThreads(dwProcessId, dwThreadId, lphThreads, _countof(lphThreads), &cb);
 
 	HMODULE hm = GetModuleHandle(NULL);
 	DETOUR_IAT(hm, LoadLibraryExA);
 	DETOUR_IAT(hm, LoadLibraryExW);
-
-	_tdbgprintf(_T("Applied LoadLibraryEx hooks."));
 
 	HMODULE hwu = GetModuleHandle(_T("wuaueng.dll"));
 	if (hwu) {
@@ -50,16 +51,16 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
 	ResumeAndCloseThreads(lphThreads, cb);
 
 	WaitForSingleObject(hEvent, INFINITE);
-	CloseHandle(hEvent);
 
 	_tdbgprintf(_T("Received wufuc_UnloadEvent, removing hooks."));
 
-	SuspendProcess(lphThreads, _countof(lphThreads), &cb);
+	SuspendProcessThreads(dwProcessId, dwThreadId, lphThreads, _countof(lphThreads), &cb);
 	RESTORE_IAT(hm, LoadLibraryExA);
 	RESTORE_IAT(hm, LoadLibraryExW);
 	ResumeAndCloseThreads(lphThreads, cb);
 
 	_tdbgprintf(_T("Unloading library. Cya!"));
+	CloseHandle(hEvent);
 	FreeLibraryAndExitThread(HINST_THISCOMPONENT, 0);
 	return 0;
 }

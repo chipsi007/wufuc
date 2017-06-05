@@ -168,7 +168,6 @@
     <ClCompile Include="core.c" />
     <ClCompile Include="dllmain.c" />
     <ClCompile Include="entrypoint.c" />
-    <ClCompile Include="process.c" />
     <ClCompile Include="service.c" />
     <ClCompile Include="util.c" />
   </ItemGroup>
@@ -177,8 +176,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h" />
-    <ClInclude Include="process.h" />
     <ClInclude Include="service.h" />
+    <ClInclude Include="shellapihelper.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>
   <ItemGroup>
