@@ -15,7 +15,7 @@ title wufuc installer - v0.6
 :: You should have received a copy of the GNU General Public License
 :: along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-echo Copyright (C) 2017 zeffy
+echo Copyright ^(C^) 2017 zeffy
 echo This program comes with ABSOLUTELY NO WARRANTY.
 echo This is free software, and you are welcome to redistribute it
 echo under certain conditions; see COPYING.txt for details.
@@ -76,7 +76,7 @@ goto :die
 for %%a in (%SUPPORTED_HOTFIXES%) do (
     wmic /output:stdout qfe get hotfixid | find "%%a" >nul && (
         set "INSTALLED_HOTFIX=%%a"
-        echo Detected installed supported update: %%a
+        echo Detected supported installed update: %%a
         goto :confirmation
     )
 )
@@ -84,8 +84,15 @@ for %%a in (%SUPPORTED_HOTFIXES%) do (
 echo.
 echo WARNING - Detected that no supported updates are installed! 
 echo.
-echo This can be a false warning, if you are certain that need wufuc then you
-echo can continue (there will be no side effects even if you don't need it)
+echo This can be a false warning, sometimes it is caused by the WMI 
+echo Win32_QuickFixEngineering class being broken. If you are certain
+echo that you need wufuc, then you can continue ^(there should be no 
+echo side effects even if you don't need it^).
+echo.
+echo This warning could also mean that a new update came out and the 
+echo installer script's list of updates hasn't been updated yet. If 
+echo this is the case and you know which update it is, feel free to
+echo create an issue.  https://github.com/zeffy/wufuc/issues
 
 set /p CONTINUE=Enter 'Y' if you still want to continue: 
 if /I not "%CONTINUE%"=="Y" goto :cancel
@@ -123,7 +130,9 @@ rundll32 "%wufuc_dll%",Rundll32Unload
 schtasks /Run /TN "%wufuc_task%"
 
 echo.
-echo Installed and started wufuc!
+echo Installed and started wufuc, you can now continue installing updates! :^)
+echo.
+echo To uninstall, run uninstall_wufuc.bat as administrator.
 goto :die
 
 :die

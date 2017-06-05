@@ -15,7 +15,7 @@ title wufuc uninstaller - v0.6
 :: You should have received a copy of the GNU General Public License
 :: along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-echo Copyright (C) 2017 zeffy
+echo Copyright ^(C^) 2017 zeffy
 echo This program comes with ABSOLUTELY NO WARRANTY.
 echo This is free software, and you are welcome to redistribute it
 echo under certain conditions; see COPYING.txt for details.
@@ -56,7 +56,7 @@ rundll32 "%wufuc_dll%",Rundll32Unload
 schtasks /Delete /TN "%wufuc_task%" /F
 
 echo.
-echo Unloaded and uninstalled wufuc!
+echo Unloaded and uninstalled wufuc. :^(
 
 :die
 echo.

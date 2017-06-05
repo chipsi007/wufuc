@@ -15,7 +15,7 @@ title install wufuc ^(repair wuaueng.dll^) - v0.6
 :: You should have received a copy of the GNU General Public License
 :: along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-echo Copyright (C) 2017 zeffy
+echo Copyright ^(C^) 2017 zeffy
 echo This program comes with ABSOLUTELY NO WARRANTY.
 echo This is free software, and you are welcome to redistribute it
 echo under certain conditions; see COPYING.txt for details.

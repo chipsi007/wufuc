@@ -31,7 +31,7 @@ My patch takes advantage of this result caching behavior by setting the "hasn't 
 
 ### Several improvements over my script-based approach:		
 - **No system files are modified!**
-- Heuristic byte signature patching persists over new updates.		
+- Heuristic-based patching, which means it will usually keep working even after updates.		
 - C is best language.		
 - No external dependencies except for Microsoft Visual C++ 2015 Redistributable.	
 
@@ -45,4 +45,4 @@ To temporarily disable the patch, just go to the Task Scheduler and disable the 
 
 ### How do I remove your old patch and use this instead?
 
-I've included a utility script called `repair_wuaueng.dll.bat` that will initiate an sfc scan and attempt to automatically revert any changes made to `wuaueng.dll`.
+I've included a utility script called `repair_wuaueng.dll.bat` that will initiate an sfc scan and revert any changes made to `wuaueng.dll`.
