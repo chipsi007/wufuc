@@ -108,19 +108,6 @@ set /p CONTINUE=Enter 'Y' if you want to install wufuc:
 if /I not "%CONTINUE%"=="Y" goto :cancel
 echo.
 
-set "vcredist_path=%~dp0_Redist\vcredist_%WINDOWS_ARCHITECTURE%.exe"
-if exist "%vcredist_path%" (
-    echo Installing Microsoft Visual C^+^+ 2017 Redistributable ^(%WINDOWS_ARCHITECTURE%^)...
-    "%vcredist_path%" /passive /norestart
-    goto :install
-)
-
-echo Couldn't locate and install Microsoft Visual C^+^+ 2017 Redistributable ^(%WINDOWS_ARCHITECTURE%^).
-
-set /p CONTINUE=Enter 'Y' if you still want to continue: 
-if /I not "%CONTINUE%"=="Y" goto :cancel
-echo.
-
 :install
 set "wufuc_task=wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307}"
 schtasks /Create /XML "%~dp0wufuc.xml" /TN "%wufuc_task%" /F
