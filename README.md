@@ -34,19 +34,17 @@ My patch takes advantage of this result caching behavior by setting the "hasn't 
 - **No system files are modified!**
 - Heuristic-based patching, which means it will usually keep working even after updates.		
 - C is best language.		
-- No external dependencies except for Microsoft Visual C++ 2017 Redistributable.	
+- No external dependencies.	
 
 ### How to install/uninstall?
 
 Just download the [latest release](../../releases/latest), and extract the `wufuc` folder to a permanent location (like `C:\Program Files\wufuc`) and then run `install_wufuc.bat` as administrator. 
 
-To uninstall run `uninstall_wufuc.bat` as administrator. 
-
-To temporarily disable the patch, just go to the Task Scheduler and disable the `wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307}` task, then restart your computer.
+To uninstall run `uninstall_wufuc.bat` as administrator.
 
 ### How do I remove your old patch and use this instead?
 
-I've included a utility script called `repair_wuaueng.dll.bat` that will initiate an sfc scan and revert any changes made to `wuaueng.dll`.
+I've included a utility script called `repair_wuaueng.dll.bat`. When you run it, it will initiate an `sfc` scan and revert any changes made to `wuaueng.dll`.
 
 ### How to see wufuc's debugging message output?
 
@@ -54,9 +52,7 @@ You will need to download [DebugView](https://technet.microsoft.com/en-us/sysint
 
 The best way to get a log of the entire life-cycle of wufuc is to do the following:
 
-1. Disable wufuc in Task Scheduler.
-2. Restart your computer.
-3. Start `Dbgview.exe` as administrator and check `Capture -> Capture Global Win32`.
-4. Enable wufuc in Task Scheduler. 
-5. Run wufuc in Task Scheduler.
-6. Output will be shown in DebugView.
+1. Disable wufuc by running `disable_wufuc.bat` as administrator.
+2. Start `Dbgview.exe` as administrator and check `Capture -> Capture Global Win32`.
+3. Enable wufuc by running `enable_wufuc.bat` as administrator.
+4. Output will be shown in DebugView.

@@ -1,5 +1,5 @@
 @echo off
-title wufuc installer - v0.6.0.1
+title wufuc installer
 :: Copyright (C) 2017 zeffy
 
 :: This program is free software: you can redistribute it and/or modify
@@ -46,6 +46,9 @@ goto :unsupported_os
 :is_x64
 set "WINDOWS_ARCHITECTURE=x64"
 set "wufuc_dll=%~dp0wufuc64.dll"
+
+for /f "tokens=*" %%i in ('wmic /output:stdout datafile where "name='%wufuc_dll:\=\\%'" get Version /value ^| find "="') do set "%%i"
+title wufuc installer - v%Version%
 
 :check_ver
 wmic /output:stdout os get version | findstr "^6\.1\." >nul && (

@@ -1,5 +1,5 @@
 @echo off
-title install wufuc ^(repair wuaueng.dll^) - v0.6.0.1
+title wufuc utility - enable task
 :: Copyright (C) 2017 zeffy
 
 :: This program is free software: you can redistribute it and/or modify
@@ -27,17 +27,16 @@ fltmc >nul 2>&1 || (
     goto :die
 )
 
-:confirmation
-echo You may want to use this script if you previously modified wuaueng.dll
-echo with "aio-wuaueng.dll-patch.bat" or by other means.
-echo.
-echo This will run the sfc utility and it will restore any changes that were made.
-echo.
-
-set /p CONTINUE=Enter 'Y' if you want to repair wuaueng.dll: 
+set /p CONTINUE=Enter 'Y' if you want to enable wufuc: 
 if /I not "%CONTINUE%"=="Y" goto :cancel
+echo.
 
-sfc /SCANFILE="%systemroot%\System32\wuaueng.dll"
+set "wufuc_task=wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307}"
+schtasks /Change /TN "%wufuc_task%" /ENABLE
+schtasks /Run /TN "%wufuc_task%"
+
+echo.
+echo Enabled and started wufuc!
 
 :die
 echo.

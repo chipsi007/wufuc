@@ -1,5 +1,5 @@
 @echo off
-title wufuc uninstaller
+title wufuc utility - disable task
 :: Copyright (C) 2017 zeffy
 
 :: This program is free software: you can redistribute it and/or modify
@@ -43,22 +43,19 @@ goto :die
 
 :is_x64
 set "WINDOWS_ARCHITECTURE=x64"
-set "wufuc_dll=%~dp0wufuc64.dll"
-
-for /f "tokens=*" %%i in ('wmic /output:stdout datafile where "name='%wufuc_dll:\=\\%'" get Version /value ^| find "="') do set "%%i"
-title wufuc uninstaller - v%Version%
+set "wufuc_dll=%~dp0..\wufuc64.dll"
 
 :confirmation
-set /p CONTINUE=Enter 'Y' if you want to uninstall wufuc: 
+set /p CONTINUE=Enter 'Y' if you want to disable wufuc: 
 if /I not "%CONTINUE%"=="Y" goto :cancel
 echo.
 
 set "wufuc_task=wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307}"
 rundll32 "%wufuc_dll%",Rundll32Unload
-schtasks /Delete /TN "%wufuc_task%" /F
+schtasks /Change /TN "%wufuc_task%" /DISABLE
 
 echo.
-echo Unloaded and uninstalled wufuc. :^(
+echo Disabled wufuc! The patch will remain active until you restart.
 
 :die
 echo.

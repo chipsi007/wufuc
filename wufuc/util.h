@@ -3,12 +3,6 @@
 EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 #define HINST_THISCOMPONENT ((HINSTANCE)&__ImageBase)
 
-BOOL IsWindows7Or8Point1(void);
-
-BOOL IsWindows7(void);
-
-BOOL IsWindows8Point1(void);
-
 VOID DetourIAT(HMODULE hModule, LPSTR lpFuncName, LPVOID *lpOldAddress, LPVOID lpNewAddress);
 
 #define DETOUR_IAT(x, y) \
@@ -27,6 +21,12 @@ BOOL InjectLibrary(HANDLE hProcess, LPCTSTR lpLibFileName, DWORD cb);
 VOID SuspendProcessThreads(DWORD dwProcessId, DWORD dwThreadId, HANDLE *lphThreads, SIZE_T dwSize, SIZE_T *lpcb);
 
 VOID ResumeAndCloseThreads(HANDLE *lphThreads, SIZE_T dwSize);
+
+BOOL IsWindows7Or8Point1(void);
+
+BOOL IsWindows7(void);
+
+BOOL IsWindows8Point1(void);
 
 VOID _wdbgprintf(LPCWSTR format, ...);
 VOID _dbgprintf(LPCSTR format, ...);
