@@ -55,7 +55,7 @@ rundll32 "%wufuc_dll%",Rundll32Unload
 schtasks /Change /TN "%wufuc_task%" /DISABLE
 
 echo.
-echo Disabled wufuc! The patch will remain active until you restart.
+echo Disabled wufuc! You will still be able to check for updates until you restart.
 
 :die
 echo.
