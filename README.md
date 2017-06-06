@@ -1,4 +1,4 @@
-# wufuc [![a.k.a. kb4012218-19](https://img.shields.io/badge/a.k.a.-kb4012218--19-blue.svg)](../../tree/old-kb4012218-19) [![downloads](https://img.shields.io/github/downloads/zeffy/wufuc/total.svg) ![downloads before v0.6](https://img.shields.io/badge/downloads%20before%20v0.6-13k-brightgreen.svg)](https://github.com/zeffy/wufuc/releases/latest)
+# wufuc [![a.k.a. kb4012218-19](https://img.shields.io/badge/a.k.a.-kb4012218--19-blue.svg)](../../tree/old-kb4012218-19) [![Downloads](https://img.shields.io/github/downloads/zeffy/wufuc/total.svg)](../../releases) [![Issue Stats](https://img.shields.io/issuestats/i/long/github/zeffy/wufuc.svg)](../../issues)
 
 Disables the "Unsupported Hardware" message in Windows Update, and allows you to continue installing updates on Windows 7 and 8.1 systems with Intel Kaby Lake, AMD Ryzen, or other unsupported processors.
 
@@ -38,7 +38,7 @@ My patch takes advantage of this result caching behavior by setting the "hasn't 
 
 ### How to install/uninstall?
 
-Just download the [latest release](https://github.com/zeffy/wufuc/releases/latest), and extract the `wufuc` folder to a permanent location (like `C:\Program Files\wufuc`) and then run `install_wufuc.bat` as administrator. 
+Just download the [latest release](../../releases/latest), and extract the `wufuc` folder to a permanent location (like `C:\Program Files\wufuc`) and then run `install_wufuc.bat` as administrator. 
 
 To uninstall run `uninstall_wufuc.bat` as administrator. 
 
@@ -56,7 +56,7 @@ The best way to get a log of the entire life-cycle of wufuc is to do the followi
 
 1. Disable wufuc in Task Scheduler.
 2. Restart your computer.
-3. Start `DebugView.exe` as administrator and check `Capture -> Capture Global Win32`.
+3. Start `Dbgview.exe` as administrator and check `Capture -> Capture Global Win32`.
 4. Enable wufuc in Task Scheduler. 
 5. Run wufuc in Task Scheduler.
 6. Output will be shown in DebugView.
