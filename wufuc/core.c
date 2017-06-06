@@ -80,30 +80,30 @@ BOOL PatchWUModule(HMODULE hModule) {
     SIZE_T n1, n2;
 #ifdef _WIN64
     lpszPattern =
-        "FFF3"					// push rbx
-        "4883EC??"				// sub rsp,??
-        "33DB"					// xor ebx,ebx
-        "391D????????"			// cmp dword ptr ds:[???????????],ebx
-        "7508"					// jnz $+8
-        "8B05????????";			// mov eax,dword ptr ds:[???????????]
+        "FFF3"                  // push rbx
+        "4883EC??"              // sub rsp,??
+        "33DB"                  // xor ebx,ebx
+        "391D????????"          // cmp dword ptr ds:[???????????],ebx
+        "7508"                  // jnz $+8
+        "8B05????????";         // mov eax,dword ptr ds:[???????????]
     n1 = 10;
     n2 = 18;
 #elif defined(_WIN32)
     if (IsWindows8Point1()) {
         lpszPattern =
-            "8BFF"				// mov edi,edi
-            "51"				// push ecx
-            "833D????????00"	// cmp dword ptr ds:[????????],0
-            "7507"				// jnz $+7
-            "A1????????";		// mov eax,dword ptr ds:[????????]
+            "8BFF"              // mov edi,edi
+            "51"                // push ecx
+            "833D????????00"    // cmp dword ptr ds:[????????],0
+            "7507"              // jnz $+7
+            "A1????????";       // mov eax,dword ptr ds:[????????]
         n1 = 5;
         n2 = 13;
     } else if (IsWindows7()) {
         lpszPattern =
-            "833D????????00"	// cmp dword ptr ds:[????????],0
-            "743E"				// je $+3E
-            "E8????????"		// call <wuaueng.IsCPUSupported>
-            "A3????????";		// mov dword ptr ds:[????????],eax
+            "833D????????00"    // cmp dword ptr ds:[????????],0
+            "743E"              // je $+3E
+            "E8????????"        // call <wuaueng.IsCPUSupported>
+            "A3????????";       // mov dword ptr ds:[????????],eax
         n1 = 2;
         n2 = 15;
     }
@@ -114,20 +114,20 @@ BOOL PatchWUModule(HMODULE hModule) {
     MODULEINFO modinfo;
     GetModuleInformation(GetCurrentProcess(), hModule, &modinfo, sizeof(MODULEINFO));
 
-    SIZE_T offset;
-    if (!FindPattern(modinfo.lpBaseOfDll, modinfo.SizeOfImage, lpszPattern, 0, &offset)) {
+    SIZE_T rva;
+    if (!FindPattern(modinfo.lpBaseOfDll, modinfo.SizeOfImage, lpszPattern, 0, &rva)) {
         return FALSE;
     }
-    SIZE_T rva = (SIZE_T)modinfo.lpBaseOfDll + offset;
-    _tdbgprintf(_T("IsDeviceServiceable(void) matched at %p"), rva);
+    SIZE_T fpIsDeviceServiceable = (SIZE_T)modinfo.lpBaseOfDll + rva;
+    _tdbgprintf(_T("IsDeviceServiceable(void) matched at %p"), fpIsDeviceServiceable);
 
-    BOOL *lpbNotRunOnce = (BOOL *)(rva + n1 + sizeof(DWORD) + *(DWORD *)(rva + n1));
+    BOOL *lpbNotRunOnce = (BOOL *)(fpIsDeviceServiceable + n1 + sizeof(DWORD) + *(DWORD *)(fpIsDeviceServiceable + n1));
     if (*lpbNotRunOnce) {
         *lpbNotRunOnce = FALSE;
         _tdbgprintf(_T("Patched %p=%d"), lpbNotRunOnce, *lpbNotRunOnce);
     }
 
-    BOOL *lpbCachedResult = (BOOL *)(rva + n2 + sizeof(DWORD) + *(DWORD *)(rva + n2));
+    BOOL *lpbCachedResult = (BOOL *)(fpIsDeviceServiceable + n2 + sizeof(DWORD) + *(DWORD *)(fpIsDeviceServiceable + n2));
     if (!*lpbCachedResult) {
         *lpbCachedResult = TRUE;
         _tdbgprintf(_T("Patched %p=%d"), lpbCachedResult, *lpbCachedResult);
