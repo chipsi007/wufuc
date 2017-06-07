@@ -1,4 +1,4 @@
-# wufuc [![a.k.a. kb4012218-19](https://img.shields.io/badge/a.k.a.-kb4012218--19-blue.svg)](../../tree/old-kb4012218-19) [![Downloads](https://img.shields.io/github/downloads/zeffy/wufuc/total.svg) ![](https://img.shields.io/badge/downloads%20before%20v0.6-13k-brightgreen.svg)](../../releases)
+# wufuc [![a.k.a. kb4012218-19](https://img.shields.io/badge/a.k.a.-kb4012218--19-blue.svg)](../../tree/old-kb4012218-19) [![Build status](https://ci.appveyor.com/api/projects/status/0s2unkpokttyslf0?svg=true)](https://ci.appveyor.com/project/zeffy/wufuc)
 
 Disables the "Unsupported Hardware" message in Windows Update, and allows you to continue installing updates on Windows 7 and 8.1 systems with Intel Kaby Lake, AMD Ryzen, or other unsupported processors.
 
