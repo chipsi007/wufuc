@@ -25,10 +25,7 @@ void CALLBACK Rundll32Entry(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int n
     TCHAR lpLibFileName[MAX_PATH + 1];
     GetModuleFileName(HINST_THISCOMPONENT, lpLibFileName, _countof(lpLibFileName));
 
-    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwProcessId);
-
-    InjectLibrary(hProcess, lpLibFileName, _countof(lpLibFileName));
-    CloseHandle(hProcess);
+    InjectLibrary(dwProcessId, lpLibFileName, _countof(lpLibFileName));
 }
 
 void CALLBACK Rundll32Unload(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow) {

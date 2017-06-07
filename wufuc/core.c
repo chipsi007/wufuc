@@ -65,12 +65,6 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
     return 0;
 }
 
-BOOL IsWUModule(HMODULE hModule) {
-    TCHAR lpBaseName[MAX_PATH + 1];
-    GetModuleBaseName(GetCurrentProcess(), hModule, lpBaseName, _countof(lpBaseName));
-    return !_tcsicmp(lpBaseName, _T("wuaueng.dll"));
-}
-
 BOOL PatchWUModule(HMODULE hModule) {
     if (!IsWindows7Or8Point1()) {
         return FALSE;
@@ -119,17 +113,24 @@ BOOL PatchWUModule(HMODULE hModule) {
         return FALSE;
     }
     SIZE_T fpIsDeviceServiceable = (SIZE_T)modinfo.lpBaseOfDll + rva;
-    _tdbgprintf(_T("IsDeviceServiceable(void) matched at %p"), fpIsDeviceServiceable);
 
     BOOL *lpbNotRunOnce = (BOOL *)(fpIsDeviceServiceable + n1 + sizeof(DWORD) + *(DWORD *)(fpIsDeviceServiceable + n1));
     if (*lpbNotRunOnce) {
+        DWORD flOldProtect;
+        DWORD flNewProtect = PAGE_READWRITE;
+        VirtualProtect(lpbNotRunOnce, sizeof(BOOL), flNewProtect, &flOldProtect);
         *lpbNotRunOnce = FALSE;
+        VirtualProtect(lpbNotRunOnce, sizeof(BOOL), flOldProtect, &flNewProtect);
         _tdbgprintf(_T("Patched %p=%d"), lpbNotRunOnce, *lpbNotRunOnce);
     }
 
     BOOL *lpbCachedResult = (BOOL *)(fpIsDeviceServiceable + n2 + sizeof(DWORD) + *(DWORD *)(fpIsDeviceServiceable + n2));
     if (!*lpbCachedResult) {
+        DWORD flOldProtect;
+        DWORD flNewProtect = PAGE_READWRITE;
+        VirtualProtect(lpbCachedResult, sizeof(BOOL), flNewProtect, &flOldProtect);
         *lpbCachedResult = TRUE;
+        VirtualProtect(lpbCachedResult, sizeof(BOOL), flOldProtect, &flNewProtect);
         _tdbgprintf(_T("Patched %p=%d"), lpbCachedResult, *lpbCachedResult);
     }
     return TRUE;
@@ -141,7 +142,11 @@ HMODULE WINAPI _LoadLibraryExA(
     _In_       DWORD   dwFlags
 ) {
     HMODULE result = LoadLibraryExA(lpFileName, hFile, dwFlags);
-    if (IsWUModule(result)) {
+
+    CHAR path[MAX_PATH + 1];
+    get_svcdllA("wuauserv", path, _countof(path));
+
+    if (!_stricmp(lpFileName, path)) {
         PatchWUModule(result);
     }
     return result;
@@ -153,7 +158,11 @@ HMODULE WINAPI _LoadLibraryExW(
     _In_       DWORD   dwFlags
 ) {
     HMODULE result = LoadLibraryExW(lpFileName, hFile, dwFlags);
-    if (IsWUModule(result)) {
+
+    WCHAR path[MAX_PATH + 1];
+    get_svcdllW(L"wuauserv", path, _countof(path));
+
+    if (!_wcsicmp(lpFileName, path)) {
         PatchWUModule(result);
     }
     return result;

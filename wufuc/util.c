@@ -80,12 +80,12 @@ BOOL FindPattern(LPCBYTE pvData, SIZE_T nNumberOfBytes, LPSTR lpszPattern, SIZE_
     return result;
 }
 
-BOOL InjectLibrary(HANDLE hProcess, LPCTSTR lpLibFileName, DWORD cb) {
+BOOL InjectLibrary(DWORD dwProcessId, LPCTSTR lpLibFileName, DWORD cb) {
+    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwProcessId);
     LPVOID lpBaseAddress = VirtualAllocEx(hProcess, NULL, cb, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
     if (!WriteProcessMemory(hProcess, lpBaseAddress, lpLibFileName, cb, NULL)) {
         return FALSE;
     }
-    DWORD dwProcessId = GetProcessId(hProcess);
     HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, dwProcessId);
     MODULEENTRY32 me;
     me.dwSize = sizeof(me);
@@ -100,6 +100,7 @@ BOOL InjectLibrary(HANDLE hProcess, LPCTSTR lpLibFileName, DWORD cb) {
     _tdbgprintf(_T("Injecting %s into process %d"), lpLibFileName, dwProcessId);
     HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)GetProcAddress(me.hModule, _CRT_STRINGIZE(LoadLibrary)), lpBaseAddress, 0, NULL);
     CloseHandle(hThread);
+    CloseHandle(hProcess);
     return TRUE;
 }
 

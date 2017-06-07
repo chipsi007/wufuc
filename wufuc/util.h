@@ -16,7 +16,7 @@ LPVOID *FindIAT(HMODULE hModule, LPSTR lpFuncName);
 
 BOOL FindPattern(LPCBYTE lpBytes, SIZE_T nNumberOfBytes, LPSTR lpszPattern, SIZE_T nStart, SIZE_T *lpOffset);
 
-BOOL InjectLibrary(HANDLE hProcess, LPCTSTR lpLibFileName, DWORD cb);
+BOOL InjectLibrary(DWORD dwProcessId, LPCTSTR lpLibFileName, DWORD cb);
 
 VOID SuspendProcessThreads(DWORD dwProcessId, DWORD dwThreadId, HANDLE *lphThreads, SIZE_T dwSize, SIZE_T *lpcb);
 

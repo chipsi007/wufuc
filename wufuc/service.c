@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <stdio.h>
 #include <tchar.h>
 #include "util.h"
 #include "service.h"
@@ -22,6 +23,31 @@ BOOL get_svcpath(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPTSTR lpBinaryPat
     return result;
 }
 
+BOOL get_svcdllA(LPCSTR lpServiceName, LPSTR lpServiceDll, DWORD dwSize) {
+    CHAR lpSubKey[MAX_PATH + 1];
+    sprintf_s(lpSubKey, _countof(lpSubKey), "SYSTEM\\CurrentControlSet\\services\\%s\\Parameters", lpServiceName);
+
+    DWORD uBytes = _MAX_PATH + 1;
+    LPBYTE pvData = malloc(uBytes);
+
+    RegGetValueA(HKEY_LOCAL_MACHINE, lpSubKey, "ServiceDll", RRF_RT_REG_EXPAND_SZ | RRF_NOEXPAND, NULL, pvData, &uBytes);
+
+    ExpandEnvironmentStringsA((LPSTR)pvData, lpServiceDll, dwSize);
+    return TRUE;
+}
+
+BOOL get_svcdllW(LPCWSTR lpServiceName, LPWSTR lpServiceDll, DWORD dwSize) {
+    WCHAR lpSubKey[MAX_PATH + 1];
+    swprintf_s(lpSubKey, _countof(lpSubKey), L"SYSTEM\\CurrentControlSet\\services\\%s\\Parameters", lpServiceName);
+
+    DWORD uBytes = _MAX_PATH + 1;
+    LPBYTE pvData = malloc(uBytes);
+    RegGetValueW(HKEY_LOCAL_MACHINE, lpSubKey, L"ServiceDll", RRF_RT_REG_EXPAND_SZ | RRF_NOEXPAND, NULL, pvData, &uBytes);
+
+    ExpandEnvironmentStringsW((LPWSTR)pvData, lpServiceDll, dwSize);
+    return TRUE;
+}
+
 BOOL get_svcpid(SC_HANDLE hSCManager, LPCTSTR lpServiceName, DWORD *lpdwProcessId) {
     SC_HANDLE hService = OpenService(hSCManager, lpServiceName, SERVICE_QUERY_STATUS);
     if (!hService) {
@@ -31,7 +57,9 @@ BOOL get_svcpid(SC_HANDLE hSCManager, LPCTSTR lpServiceName, DWORD *lpdwProcessI
     SERVICE_STATUS_PROCESS lpBuffer;
     DWORD cbBytesNeeded;
     BOOL result = FALSE;
-    if (QueryServiceStatusEx(hService, SC_STATUS_PROCESS_INFO, (LPBYTE)&lpBuffer, sizeof(lpBuffer), &cbBytesNeeded) && lpBuffer.dwProcessId) {
+    if (QueryServiceStatusEx(hService, SC_STATUS_PROCESS_INFO, (LPBYTE)&lpBuffer, sizeof(lpBuffer), &cbBytesNeeded)
+        && lpBuffer.dwProcessId) {
+        
         *lpdwProcessId = lpBuffer.dwProcessId;
         result = TRUE;
     }
@@ -71,7 +99,8 @@ BOOL get_svcgpid(SC_HANDLE hSCManager, LPTSTR lpServiceGroupName, DWORD *lpdwPro
     DWORD uBytes = 0x100000;
     LPBYTE pvData = malloc(uBytes);
 
-    RegGetValue(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Svchost"), lpServiceGroupName, RRF_RT_REG_MULTI_SZ, NULL, pvData, &uBytes);
+    RegGetValue(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Svchost"),
+        lpServiceGroupName, RRF_RT_REG_MULTI_SZ, NULL, pvData, &uBytes);
 
     BOOL result = FALSE;
     for (LPTSTR p = (LPTSTR)pvData; *p; p += _tcslen(p) + 1) {
