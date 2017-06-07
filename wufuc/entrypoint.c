@@ -24,14 +24,13 @@ void CALLBACK Rundll32Entry(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int n
     }
     TCHAR lpLibFileName[MAX_PATH + 1];
     GetModuleFileName(HINST_THISCOMPONENT, lpLibFileName, _countof(lpLibFileName));
-
     InjectLibrary(dwProcessId, lpLibFileName, _countof(lpLibFileName));
 }
 
 void CALLBACK Rundll32Unload(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow) {
     HANDLE hEvent = OpenEvent(EVENT_MODIFY_STATE, FALSE, _T("Global\\wufuc_UnloadEvent"));
     if (hEvent) {
-        _tdbgprintf(_T("Setting wufuc_UnloadEvent..."));
+        _tdbgprintf(_T("Setting unload event..."));
         SetEvent(hEvent);
         CloseHandle(hEvent);
     }

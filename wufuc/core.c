@@ -52,7 +52,7 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
 
     WaitForSingleObject(hEvent, INFINITE);
 
-    _tdbgprintf(_T("Received wufuc_UnloadEvent, removing hooks."));
+    _tdbgprintf(_T("Unload event was set, removing hooks."));
 
     SuspendProcessThreads(dwProcessId, dwThreadId, lphThreads, _countof(lphThreads), &cb);
     RESTORE_IAT(hm, LoadLibraryExA);
@@ -110,9 +110,11 @@ BOOL PatchWUModule(HMODULE hModule) {
 
     SIZE_T rva;
     if (!FindPattern(modinfo.lpBaseOfDll, modinfo.SizeOfImage, lpszPattern, 0, &rva)) {
+        _tdbgprintf(_T("Could not match byte pattern. Not good!"));
         return FALSE;
     }
     SIZE_T fpIsDeviceServiceable = (SIZE_T)modinfo.lpBaseOfDll + rva;
+    _tdbgprintf(_T("Matched pattern at %p"), fpIsDeviceServiceable);
 
     BOOL *lpbNotRunOnce = (BOOL *)(fpIsDeviceServiceable + n1 + sizeof(DWORD) + *(DWORD *)(fpIsDeviceServiceable + n1));
     if (*lpbNotRunOnce) {
@@ -121,7 +123,7 @@ BOOL PatchWUModule(HMODULE hModule) {
         VirtualProtect(lpbNotRunOnce, sizeof(BOOL), flNewProtect, &flOldProtect);
         *lpbNotRunOnce = FALSE;
         VirtualProtect(lpbNotRunOnce, sizeof(BOOL), flOldProtect, &flNewProtect);
-        _tdbgprintf(_T("Patched %p=%d"), lpbNotRunOnce, *lpbNotRunOnce);
+        _tdbgprintf(_T("Patched value at %p = %d"), lpbNotRunOnce, *lpbNotRunOnce);
     }
 
     BOOL *lpbCachedResult = (BOOL *)(fpIsDeviceServiceable + n2 + sizeof(DWORD) + *(DWORD *)(fpIsDeviceServiceable + n2));
@@ -131,7 +133,7 @@ BOOL PatchWUModule(HMODULE hModule) {
         VirtualProtect(lpbCachedResult, sizeof(BOOL), flNewProtect, &flOldProtect);
         *lpbCachedResult = TRUE;
         VirtualProtect(lpbCachedResult, sizeof(BOOL), flOldProtect, &flNewProtect);
-        _tdbgprintf(_T("Patched %p=%d"), lpbCachedResult, *lpbCachedResult);
+        _tdbgprintf(_T("Patched value at %p = %d"), lpbCachedResult, *lpbCachedResult);
     }
     return TRUE;
 }
@@ -142,11 +144,13 @@ HMODULE WINAPI _LoadLibraryExA(
     _In_       DWORD   dwFlags
 ) {
     HMODULE result = LoadLibraryExA(lpFileName, hFile, dwFlags);
+    _dbgprintf("Loaded library: %s.", lpFileName);
 
     CHAR path[MAX_PATH + 1];
     get_svcdllA("wuauserv", path, _countof(path));
 
     if (!_stricmp(lpFileName, path)) {
+        _dbgprintf("%s is wu module, applying patch...", lpFileName);
         PatchWUModule(result);
     }
     return result;
@@ -158,11 +162,13 @@ HMODULE WINAPI _LoadLibraryExW(
     _In_       DWORD   dwFlags
 ) {
     HMODULE result = LoadLibraryExW(lpFileName, hFile, dwFlags);
+    _wdbgprintf(L"Loaded library: %s.", lpFileName);
 
     WCHAR path[MAX_PATH + 1];
     get_svcdllW(L"wuauserv", path, _countof(path));
 
     if (!_wcsicmp(lpFileName, path)) {
+        _wdbgprintf(L"%s is wu module, applying patch...", lpFileName);
         PatchWUModule(result);
     }
     return result;

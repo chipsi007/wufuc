@@ -17,7 +17,7 @@ VOID DetourIAT(HMODULE hModule, LPSTR lpFuncName, LPVOID *lpOldAddress, LPVOID l
     if (lpOldAddress) {
         *lpOldAddress = *lpAddress;
     }
-    _dbgprintf("%s %p => %p", lpFuncName, *lpAddress, lpNewAddress);
+    _dbgprintf("Detoured %s from %p to %p.", lpFuncName, *lpAddress, lpNewAddress);
     *lpAddress = lpNewAddress;
     VirtualProtect(lpAddress, sizeof(LPVOID), flOldProtect, &flNewProtect);
 }
@@ -97,7 +97,7 @@ BOOL InjectLibrary(DWORD dwProcessId, LPCTSTR lpLibFileName, DWORD cb) {
         }
     } while (Module32Next(hSnap, &me));
     CloseHandle(hSnap);
-    _tdbgprintf(_T("Injecting %s into process %d"), lpLibFileName, dwProcessId);
+
     HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)GetProcAddress(me.hModule, _CRT_STRINGIZE(LoadLibrary)), lpBaseAddress, 0, NULL);
     CloseHandle(hThread);
     CloseHandle(hProcess);
