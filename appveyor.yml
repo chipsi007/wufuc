@@ -1,0 +1,27 @@
+version: 0.6.0.{build}
+skip_commits:
+  files:
+    - README.md
+image: Visual Studio 2017
+configuration: Release
+platform:
+- x86
+- x64
+build:
+  verbosity: minimal
+after_build:
+- cmd: >-
+    set "ZIP_NAME=%APPVEYOR_PROJECT_NAME%_%APPVEYOR_REPO_COMMIT:~0,8%.zip"
+
+    cd "%APPVEYOR_BUILD_FOLDER%\install"
+    
+    unix2dos "COPYING.txt"
+    
+    for /R %%G in (*.bat) do unix2dos "%%G"
+    
+    7z a "%ZIP_NAME%" "..\install"
+    
+    7z rn "%ZIP_NAME%" "install" "wufuc"
+
+artifacts:
+- path: '*.zip'
