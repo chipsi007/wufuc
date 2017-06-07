@@ -50,7 +50,7 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
 
     HMODULE hwu = GetModuleHandle(lpServiceDll);
     if (hwu) {
-        _dbgprintf("Found previously loaded wu module %s, applying patch...", lpServiceDll);
+        _tdbgprintf(_T("Found previously loaded wu module %s, applying patch..."), lpServiceDll);
         PatchWUModule(hwu);
     }
     ResumeAndCloseThreads(lphThreads, cb);
