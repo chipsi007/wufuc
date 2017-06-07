@@ -44,22 +44,27 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
     DETOUR_IAT(hm, LoadLibraryExA);
     DETOUR_IAT(hm, LoadLibraryExW);
 
-    HMODULE hwu = GetModuleHandle(_T("wuaueng.dll"));
+
+    TCHAR lpServiceDll[MAX_PATH + 1];
+    get_svcdll(_T("wuauserv"), lpServiceDll, _countof(lpServiceDll));
+
+    HMODULE hwu = GetModuleHandle(lpServiceDll);
     if (hwu) {
+        _dbgprintf("Found previously loaded wu module %s, applying patch...", lpServiceDll);
         PatchWUModule(hwu);
     }
     ResumeAndCloseThreads(lphThreads, cb);
 
     WaitForSingleObject(hEvent, INFINITE);
 
-    _tdbgprintf(_T("Unload event was set, removing hooks."));
+    _tdbgprintf(_T("Unload event was set, removing hooks..."));
 
     SuspendProcessThreads(dwProcessId, dwThreadId, lphThreads, _countof(lphThreads), &cb);
     RESTORE_IAT(hm, LoadLibraryExA);
     RESTORE_IAT(hm, LoadLibraryExW);
     ResumeAndCloseThreads(lphThreads, cb);
 
-    _tdbgprintf(_T("Unloading library. Cya!"));
+    _tdbgprintf(_T("Unloading library. See ya!"));
     CloseHandle(hEvent);
     FreeLibraryAndExitThread(HINST_THISCOMPONENT, 0);
     return 0;
@@ -114,7 +119,7 @@ BOOL PatchWUModule(HMODULE hModule) {
         return FALSE;
     }
     SIZE_T fpIsDeviceServiceable = (SIZE_T)modinfo.lpBaseOfDll + rva;
-    _tdbgprintf(_T("Matched pattern at %p"), fpIsDeviceServiceable);
+    _tdbgprintf(_T("Matched pattern at %p."), fpIsDeviceServiceable);
 
     BOOL *lpbNotRunOnce = (BOOL *)(fpIsDeviceServiceable + n1 + sizeof(DWORD) + *(DWORD *)(fpIsDeviceServiceable + n1));
     if (*lpbNotRunOnce) {
@@ -123,7 +128,7 @@ BOOL PatchWUModule(HMODULE hModule) {
         VirtualProtect(lpbNotRunOnce, sizeof(BOOL), flNewProtect, &flOldProtect);
         *lpbNotRunOnce = FALSE;
         VirtualProtect(lpbNotRunOnce, sizeof(BOOL), flOldProtect, &flNewProtect);
-        _tdbgprintf(_T("Patched value at %p = %d"), lpbNotRunOnce, *lpbNotRunOnce);
+        _tdbgprintf(_T("Patched value at %p = %d."), lpbNotRunOnce, *lpbNotRunOnce);
     }
 
     BOOL *lpbCachedResult = (BOOL *)(fpIsDeviceServiceable + n2 + sizeof(DWORD) + *(DWORD *)(fpIsDeviceServiceable + n2));
@@ -133,7 +138,7 @@ BOOL PatchWUModule(HMODULE hModule) {
         VirtualProtect(lpbCachedResult, sizeof(BOOL), flNewProtect, &flOldProtect);
         *lpbCachedResult = TRUE;
         VirtualProtect(lpbCachedResult, sizeof(BOOL), flOldProtect, &flNewProtect);
-        _tdbgprintf(_T("Patched value at %p = %d"), lpbCachedResult, *lpbCachedResult);
+        _tdbgprintf(_T("Patched value at %p = %d."), lpbCachedResult, *lpbCachedResult);
     }
     return TRUE;
 }
