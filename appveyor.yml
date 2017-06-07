@@ -11,7 +11,8 @@ build:
   verbosity: minimal
 after_build:
 - cmd: >-
-    set "ZIP_NAME=..\%APPVEYOR_PROJECT_NAME%_%APPVEYOR_REPO_COMMIT:~0,8%.zip"
+
+    set "ZIP_NAME=..\%APPVEYOR_PROJECT_NAME%_v%APPVEYOR_BUILD_VERSION%-%APPVEYOR_REPO_COMMIT:~0,8%_%PLATFORM%.zip"
 
     cd "%APPVEYOR_BUILD_FOLDER%\install"
     
