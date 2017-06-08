@@ -80,30 +80,6 @@ BOOL FindPattern(LPCBYTE pvData, SIZE_T nNumberOfBytes, LPSTR lpszPattern, SIZE_
     return result;
 }
 
-BOOL InjectLibrary(DWORD dwProcessId, LPCTSTR lpLibFileName, DWORD cb) {
-    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwProcessId);
-    LPVOID lpBaseAddress = VirtualAllocEx(hProcess, NULL, cb, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-    if (!WriteProcessMemory(hProcess, lpBaseAddress, lpLibFileName, cb, NULL)) {
-        return FALSE;
-    }
-    HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, dwProcessId);
-    MODULEENTRY32 me;
-    me.dwSize = sizeof(me);
-
-    Module32First(hSnap, &me);
-    do {
-        if (!_tcsicmp(me.szModule, _T("kernel32.dll"))) {
-            break;
-        }
-    } while (Module32Next(hSnap, &me));
-    CloseHandle(hSnap);
-
-    HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)GetProcAddress(me.hModule, _CRT_STRINGIZE(LoadLibrary)), lpBaseAddress, 0, NULL);
-    CloseHandle(hThread);
-    CloseHandle(hProcess);
-    return TRUE;
-}
-
 VOID SuspendProcessThreads(DWORD dwProcessId, DWORD dwThreadId, HANDLE *lphThreads, SIZE_T dwSize, SIZE_T *lpcb) {
     HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
     THREADENTRY32 te;

@@ -149,10 +149,15 @@ HMODULE WINAPI _LoadLibraryExA(
     _In_       DWORD   dwFlags
 ) {
     HMODULE result = LoadLibraryExA(lpFileName, hFile, dwFlags);
+    if (!result) {
+        return result;
+    }
     _dbgprintf("Loaded library: %s.", lpFileName);
 
     CHAR path[MAX_PATH + 1];
-    get_svcdllA("wuauserv", path, _countof(path));
+    if (!get_svcdllA("wuauserv", path, _countof(path))) {
+        return result;
+    }
 
     if (!_stricmp(lpFileName, path)) {
         _dbgprintf("%s is wu module, applying patch...", lpFileName);
@@ -167,10 +172,15 @@ HMODULE WINAPI _LoadLibraryExW(
     _In_       DWORD   dwFlags
 ) {
     HMODULE result = LoadLibraryExW(lpFileName, hFile, dwFlags);
+    if (!result) {
+        return result;
+    }
     _wdbgprintf(L"Loaded library: %s.", lpFileName);
 
     WCHAR path[MAX_PATH + 1];
-    get_svcdllW(L"wuauserv", path, _countof(path));
+    if (!get_svcdllW(L"wuauserv", path, _countof(path))) {
+        return result;
+    }
 
     if (!_wcsicmp(lpFileName, path)) {
         _wdbgprintf(L"%s is wu module, applying patch...", lpFileName);
