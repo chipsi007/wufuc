@@ -83,22 +83,17 @@ for %%a in (%SUPPORTED_HOTFIXES%) do (
         goto :confirmation
     )
 )
-
+wmic /output:stdout qfe get /value 2>&1 | find "No Instance(s) Available" >nul && (
+    echo WARNING - wmic qfe is broken, can't check installed updates...
+    goto :confirmation
+)
 echo.
-echo WARNING - Detected that no supported updates are installed! 
+echo WARNING - Detected that no supported updates are installed.
 echo.
-echo This can be a false warning, sometimes it is caused by the WMI 
-echo Win32_QuickFixEngineering class being broken. If you are certain
-echo that you need wufuc, then you can continue ^(there should be no 
-echo side effects even if you don't need it^).
-echo.
-echo This warning could also mean that a new update came out and the 
-echo installer script's list of updates hasn't been updated yet. If 
-echo this is the case and you know which update it is, feel free to
-echo create an issue.  https://github.com/zeffy/wufuc/issues
-
-set /p CONTINUE=Enter 'Y' if you still want to continue: 
-if /I not "%CONTINUE%"=="Y" goto :cancel
+echo   This warning could also mean that a new update came out and the
+echo   wufuc installer script's list of updates hasn't been updated yet. 
+echo   If this is definitely the case and you know which update it is,
+echo   feel free to create an issue.  https://github.com/zeffy/wufuc/issues
 
 :confirmation
 echo.
@@ -106,7 +101,8 @@ echo wufuc disables the "Unsupported Hardware" message in Windows Update,
 echo and allows you to continue installing updates on Windows 7 and 8.1
 echo systems with Intel Kaby Lake, AMD Ryzen, or other unsupported processors.
 echo.
-
+echo Please be absolutely sure you really need wufuc before continuing.
+echo.
 set /p CONTINUE=Enter 'Y' if you want to install wufuc: 
 if /I not "%CONTINUE%"=="Y" goto :cancel
 echo.
