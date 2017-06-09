@@ -40,13 +40,23 @@ My patch takes advantage of this result caching behavior by setting the "hasn't 
 - **No system files are modified!**
 - Heuristic-based patching, which means it will usually keep working even after updates.		
 - C is best language.		
-- No external dependencies.	
+- No external dependencies.
 
 ### How to install/uninstall?
 
 Just download the [latest release](../../releases/latest), and extract the `wufuc` folder to a permanent location (like `C:\Program Files\wufuc`) and then run `install_wufuc.bat` as administrator. 
 
 To uninstall run `uninstall_wufuc.bat` as administrator.
+
+### How to update when a new version comes out?
+
+Unless otherwise noted, you should only have to:
+
+- Run `disable_wufuc.bat` as administrator.
+- Copy the new files into the install folder, overwriting the old ones.
+- Run `enable_wufuc.bat` as administrator.
+
+If you run into problems, try doing a full uninstall/reinstall.
 
 ### How do I remove your old patch and use this instead?
 
