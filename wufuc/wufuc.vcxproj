@@ -177,7 +177,7 @@
   <ItemGroup>
     <ClCompile Include="core.c" />
     <ClCompile Include="dllmain.c" />
-    <ClCompile Include="entrypoint.c" />
+    <ClCompile Include="rundll32.c" />
     <ClCompile Include="service.c" />
     <ClCompile Include="util.c" />
   </ItemGroup>
