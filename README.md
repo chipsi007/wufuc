@@ -54,7 +54,7 @@ Unless otherwise noted, you should only have to:
 
 - Run `disable_wufuc.bat` as administrator.
 - Copy the new files into the install folder, overwriting the old ones.
-- Run `enable_wufuc.bat` as administrator.
+- Run the new `install_wufuc.bat` as administrator.
 
 If you run into problems, try doing a full uninstall/reinstall.
 
