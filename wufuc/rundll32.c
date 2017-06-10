@@ -2,10 +2,15 @@
 #include <TlHelp32.h>
 #include <tchar.h>
 #include "service.h"
-#include "process.h"
 #include "util.h"
 
 void CALLBACK Rundll32Entry(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow) {
+    if (!WindowsVersionCompare(VER_EQUAL, 6, 1, 0, 0, VER_MAJORVERSION | VER_MINORVERSION)
+        && !WindowsVersionCompare(VER_EQUAL, 6, 3, 0, 0, VER_MAJORVERSION | VER_MINORVERSION)) {
+
+        return;
+    }
+
     HANDLE hEvent = OpenEvent(SYNCHRONIZE, FALSE, _T("Global\\wufuc_UnloadEvent"));
     if (hEvent) {
         CloseHandle(hEvent);

@@ -1,6 +1,5 @@
 #include <Windows.h>
 #include <stdio.h>
-#include <VersionHelpers.h>
 #include <TlHelp32.h>
 #include <tchar.h>
 #include "util.h"
@@ -110,16 +109,22 @@ VOID ResumeAndCloseThreads(HANDLE *lphThreads, SIZE_T cb) {
     _tdbgprintf(_T("Resumed %d other threads."), cb);
 }
 
-BOOL IsWindows7Or8Point1(void) {
-    return IsWindows7() || IsWindows8Point1();
-}
+BOOL WindowsVersionCompare(BYTE Operator, DWORD dwMajorVersion, DWORD dwMinorVersion, WORD wServicePackMajor, WORD wServicePackMinor, DWORD dwTypeMask) {
+    OSVERSIONINFOEX osvi;
+    ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+    osvi.dwMajorVersion = dwMajorVersion;
+    osvi.dwMinorVersion = dwMinorVersion;
+    osvi.wServicePackMajor = wServicePackMajor;
+    osvi.wServicePackMinor = wServicePackMinor;
 
-BOOL IsWindows7(void) {
-    return IsWindows7OrGreater() && !IsWindows8OrGreater();
-}
+    DWORDLONG dwlConditionMask = 0;
+    VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, Operator);
+    VER_SET_CONDITION(dwlConditionMask, VER_MINORVERSION, Operator);
+    VER_SET_CONDITION(dwlConditionMask, VER_SERVICEPACKMAJOR, Operator);
+    VER_SET_CONDITION(dwlConditionMask, VER_SERVICEPACKMINOR, Operator);
 
-BOOL IsWindows8Point1(void) {
-    return IsWindows8Point1OrGreater() && !IsWindows10OrGreater();
+    return VerifyVersionInfo(&osvi, dwTypeMask, dwlConditionMask);
 }
 
 VOID _wdbgprintf(LPCWSTR format, ...) {

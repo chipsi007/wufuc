@@ -20,11 +20,7 @@ VOID SuspendProcessThreads(DWORD dwProcessId, DWORD dwThreadId, HANDLE *lphThrea
 
 VOID ResumeAndCloseThreads(HANDLE *lphThreads, SIZE_T dwSize);
 
-BOOL IsWindows7Or8Point1(void);
-
-BOOL IsWindows7(void);
-
-BOOL IsWindows8Point1(void);
+BOOL WindowsVersionCompare(BYTE Operator, DWORD dwMajorVersion, DWORD dwMinorVersion, WORD wServicePackMajor, WORD wServicePackMinor, DWORD dwTypeMask);
 
 VOID _wdbgprintf(LPCWSTR format, ...);
 VOID _dbgprintf(LPCSTR format, ...);

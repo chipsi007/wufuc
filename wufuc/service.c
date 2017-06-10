@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <tchar.h>
 #include "util.h"
-#include "service.h"
 #include "shellapihelper.h"
+#include "service.h"
 
 BOOL get_svcdllA(LPCSTR lpServiceName, LPSTR lpServiceDll, DWORD dwSize) {
     CHAR lpSubKey[MAX_PATH + 1];
