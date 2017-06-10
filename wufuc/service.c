@@ -68,8 +68,7 @@ BOOL get_svcgname(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPTSTR lpGroupNam
     if (!_tcsicmp(fname, _T("svchost"))) {
         LPWSTR *p = argv;
         for (int i = 1; i < numArgs; i++) {
-            if (!_tcsicmp(*(p++), _T("-k"))) {
-                _tcscpy_s(lpGroupName, dwSize, *p);
+            if (!_tcsicmp(*(p++), _T("-k")) && !_tcscpy_s(lpGroupName, dwSize, *p)) {
                 result = TRUE;
                 _tdbgprintf(_T("Got group name of service %s: %s."), lpServiceName, lpGroupName);
                 break;
@@ -84,16 +83,16 @@ BOOL get_svcpath(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPTSTR lpBinaryPat
     if (!hService) {
         return FALSE;
     }
-
     DWORD cbBytesNeeded;
-    QueryServiceConfig(hService, NULL, 0, &cbBytesNeeded);
-    LPQUERY_SERVICE_CONFIG sc = malloc(cbBytesNeeded);
-    BOOL result = QueryServiceConfig(hService, sc, cbBytesNeeded, &cbBytesNeeded);
-    CloseServiceHandle(hService);
-    if (result) {
-        _tcscpy_s(lpBinaryPathName, dwSize, sc->lpBinaryPathName);
+    BOOL result = FALSE;
+    if (!QueryServiceConfig(hService, NULL, 0, &cbBytesNeeded) && GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+        LPQUERY_SERVICE_CONFIG sc = malloc(cbBytesNeeded);
+        if (QueryServiceConfig(hService, sc, cbBytesNeeded, &cbBytesNeeded) && !_tcscpy_s(lpBinaryPathName, dwSize, sc->lpBinaryPathName)) {
+            result = TRUE;
+        }
+        free(sc);
     }
-    free(sc);
+    CloseServiceHandle(hService);
     return result;
 }
 
