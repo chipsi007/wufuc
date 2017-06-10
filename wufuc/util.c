@@ -99,7 +99,7 @@ VOID SuspendProcessThreads(DWORD dwProcessId, DWORD dwThreadId, HANDLE *lphThrea
     CloseHandle(hSnap);
 
     *lpcb = count;
-    _tdbgprintf(_T("Suspended other threads."));
+    _tdbgprintf(_T("Suspended %d other threads."), count);
 }
 
 VOID ResumeAndCloseThreads(HANDLE *lphThreads, SIZE_T cb) {
@@ -107,7 +107,7 @@ VOID ResumeAndCloseThreads(HANDLE *lphThreads, SIZE_T cb) {
         ResumeThread(lphThreads[i]);
         CloseHandle(lphThreads[i]);
     }
-    _tdbgprintf(_T("Resumed threads."));
+    _tdbgprintf(_T("Resumed %d other threads."), cb);
 }
 
 BOOL IsWindows7Or8Point1(void) {
