@@ -38,47 +38,6 @@ LPVOID *FindIAT(HMODULE hModule, LPSTR lpFunctionName) {
     return NULL;
 }
 
-BOOL FindPattern(LPCBYTE pvData, SIZE_T nNumberOfBytes, LPSTR lpszPattern, SIZE_T nStart, SIZE_T *lpOffset) {
-    SIZE_T length = strlen(lpszPattern);
-    SIZE_T nBytes;
-    if (length % 2 || (nBytes = length / 2) > nNumberOfBytes) {
-        return FALSE;
-    }
-
-    LPBYTE lpBytes = malloc(nBytes * sizeof(BYTE));
-    BOOL *lpbwc = malloc(nBytes * sizeof(BOOL));
-
-    LPSTR p = lpszPattern;
-    BOOL valid = TRUE;
-    for (SIZE_T i = 0; i < nBytes; i++) {
-        if ((lpbwc[i] = strncmp(p, "??", 2)) && sscanf_s(p, "%2hhx", &lpBytes[i]) != 1) {
-            valid = FALSE;
-            break;
-        }
-        p += 2;
-    }
-    BOOL result = FALSE;
-    if (valid) {
-        for (SIZE_T i = nStart; i < nNumberOfBytes - nStart - (nBytes - 1); i++) {
-            BOOL found = TRUE;
-            for (SIZE_T j = 0; j < nBytes; j++) {
-                if (lpbwc[j] && pvData[i + j] != lpBytes[j]) {
-                    found = FALSE;
-                    break;
-                }
-            }
-            if (found) {
-                *lpOffset = i;
-                result = TRUE;
-                break;
-            }
-        }
-    }
-    free(lpBytes);
-    free(lpbwc);
-    return result;
-}
-
 VOID SuspendProcessThreads(DWORD dwProcessId, DWORD dwThreadId, HANDLE *lphThreads, SIZE_T dwSize, SIZE_T *lpcb) {
     HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
     THREADENTRY32 te;

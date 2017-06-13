@@ -5,6 +5,7 @@
 #include <sddl.h>
 #include "service.h"
 #include "util.h"
+#include "patternfind.h"
 #include "core.h"
 
 DWORD WINAPI NewThreadProc(LPVOID lpParam) {
@@ -46,7 +47,7 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
     get_svcdll(_T("wuauserv"), lpServiceDll, _countof(lpServiceDll));
 
     HMODULE hwu = GetModuleHandle(lpServiceDll);
-    if (hwu && PatchWUModule(hwu)) {
+    if (hwu && PatchWUAgentHMODULE(hwu)) {
         _tdbgprintf(_T("Patched previously loaded Windows Update module!"));
     }
     ResumeAndCloseThreads(lphThreads, cb);
@@ -66,35 +67,20 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
     return 0;
 }
 
-BOOL PatchWUModule(HMODULE hModule) {
+BOOL PatchWUAgentHMODULE(HMODULE hModule) {
     LPSTR lpszPattern;
     SIZE_T n1, n2;
 #ifdef _WIN64
-    lpszPattern =
-        "FFF3"                  // push rbx
-        "4883EC??"              // sub rsp,??
-        "33DB"                  // xor ebx,ebx
-        "391D????????"          // cmp dword ptr ds:[???????????],ebx
-        "7508"                  // jnz $+8
-        "8B05????????";         // mov eax,dword ptr ds:[???????????]
+    lpszPattern = "FFF3 4883EC?? 33DB 391D???????? 7508 8B05????????";
     n1 = 10;
     n2 = 18;
 #elif defined(_WIN32)
     if (WindowsVersionCompare(VER_EQUAL, 6, 1, 0, 0, VER_MAJORVERSION | VER_MINORVERSION)) {
-        lpszPattern =
-            "833D????????00"    // cmp dword ptr ds:[????????],0
-            "743E"              // je $+3E
-            "E8????????"        // call <wuaueng.IsCPUSupported>
-            "A3????????";       // mov dword ptr ds:[????????],eax
+        lpszPattern = "833D????????00 743E E8???????? A3????????";
         n1 = 2;
         n2 = 15;
     } else if (WindowsVersionCompare(VER_EQUAL, 6, 3, 0, 0, VER_MAJORVERSION | VER_MINORVERSION)) {
-        lpszPattern =
-            "8BFF"              // mov edi,edi
-            "51"                // push ecx
-            "833D????????00"    // cmp dword ptr ds:[????????],0
-            "7507"              // jnz $+7
-            "A1????????";       // mov eax,dword ptr ds:[????????]
+        lpszPattern = "8BFF 51 833D????????00 7507 A1????????";
         n1 = 5;
         n2 = 13;
     }
@@ -105,20 +91,21 @@ BOOL PatchWUModule(HMODULE hModule) {
     MODULEINFO modinfo;
     GetModuleInformation(GetCurrentProcess(), hModule, &modinfo, sizeof(MODULEINFO));
 
-    SIZE_T rva;
-    if (!FindPattern(modinfo.lpBaseOfDll, modinfo.SizeOfImage, lpszPattern, 0, &rva)) {
+    SIZE_T rva = patternfind(modinfo.lpBaseOfDll, modinfo.SizeOfImage, 0, lpszPattern);
+    if (rva == -1) {
         _tdbgprintf(_T("No pattern match!"));
         return FALSE;
     }
+    
     SIZE_T fpIsDeviceServiceable = (SIZE_T)modinfo.lpBaseOfDll + rva;
     _tdbgprintf(_T("Pattern match at offset %p."), fpIsDeviceServiceable);
 
     BOOL result = FALSE;
 
+    DWORD flOldProtect;
+    DWORD flNewProtect = PAGE_READWRITE;
     BOOL *lpbNotRunOnce = (BOOL *)(fpIsDeviceServiceable + n1 + sizeof(DWORD) + *(DWORD *)(fpIsDeviceServiceable + n1));
     if (*lpbNotRunOnce) {
-        DWORD flOldProtect;
-        DWORD flNewProtect = PAGE_READWRITE;
         VirtualProtect(lpbNotRunOnce, sizeof(BOOL), flNewProtect, &flOldProtect);
         *lpbNotRunOnce = FALSE;
         VirtualProtect(lpbNotRunOnce, sizeof(BOOL), flOldProtect, &flNewProtect);
@@ -128,8 +115,6 @@ BOOL PatchWUModule(HMODULE hModule) {
 
     BOOL *lpbCachedResult = (BOOL *)(fpIsDeviceServiceable + n2 + sizeof(DWORD) + *(DWORD *)(fpIsDeviceServiceable + n2));
     if (!*lpbCachedResult) {
-        DWORD flOldProtect;
-        DWORD flNewProtect = PAGE_READWRITE;
         VirtualProtect(lpbCachedResult, sizeof(BOOL), flNewProtect, &flOldProtect);
         *lpbCachedResult = TRUE;
         VirtualProtect(lpbCachedResult, sizeof(BOOL), flOldProtect, &flNewProtect);
@@ -145,14 +130,14 @@ HMODULE WINAPI _LoadLibraryExA(
     _In_       DWORD   dwFlags
 ) {
     HMODULE result = LoadLibraryExA(lpFileName, hFile, dwFlags);
-    _dbgprintf("Loaded %s.", lpFileName);
     if (result) {
+        _dbgprintf("Loaded %s.", lpFileName);
         CHAR path[MAX_PATH + 1];
         if (!get_svcdllA("wuauserv", path, _countof(path))) {
             return result;
         }
 
-        if (!_stricmp(lpFileName, path) && PatchWUModule(result)) {
+        if (!_stricmp(lpFileName, path) && PatchWUAgentHMODULE(result)) {
             _dbgprintf("Patched Windows Update module!");
         }
     }
@@ -165,14 +150,14 @@ HMODULE WINAPI _LoadLibraryExW(
     _In_       DWORD   dwFlags
 ) {
     HMODULE result = LoadLibraryExW(lpFileName, hFile, dwFlags);
-    _wdbgprintf(L"Loaded library: %s.", lpFileName);
     if (result) {
+        _wdbgprintf(L"Loaded library: %s.", lpFileName);
         WCHAR path[MAX_PATH + 1];
         if (!get_svcdllW(L"wuauserv", path, _countof(path))) {
             return result;
         }
 
-        if (!_wcsicmp(lpFileName, path) && PatchWUModule(result)) {
+        if (!_wcsicmp(lpFileName, path) && PatchWUAgentHMODULE(result)) {
             _wdbgprintf(L"Patched Windows Update module!");
         }
     }

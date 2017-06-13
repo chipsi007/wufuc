@@ -1,0 +1,118 @@
+#include <Windows.h>
+#include "patternfind.h"
+
+/* 
+    Work in progress. Ported to C from x64dbg's patternfind.cpp:
+        https://github.com/x64dbg/x64dbg/blob/development/src/dbg/patternfind.cpp
+     x64dbg license (GPL-3.0):
+        https://github.com/x64dbg/x64dbg/blob/development/LICENSE 
+*/
+
+int hexchtoint(CHAR ch) {
+    int result = -1;
+    if (ch >= '0' && ch <= '9') {
+        result = ch - '0';
+    } else if (ch >= 'A' && ch <= 'F') {
+        result = ch - 'A' + 10;
+    } else if (ch >= 'a' && ch <= 'f') {
+        result = ch - 'a' + 10;
+    }
+    return result;
+}
+
+SIZE_T formathexpattern(LPCSTR patterntext, LPSTR formattext, SIZE_T formattextsize) {
+    SIZE_T len = strlen(patterntext);
+    SIZE_T result = 0;
+    for (SIZE_T i = 0; i < len && (!formattext || result < formattextsize); i++) {
+        if (patterntext[i] == '?' || hexchtoint(patterntext[i]) != -1) {
+            if (formattext) {
+                formattext[result] = patterntext[i];
+            }
+            result++;
+        }
+    }
+    return result;
+}
+
+BOOL patterntransform(LPCSTR patterntext, LPPATTERNBYTE pattern, SIZE_T *patternsize) {
+    SIZE_T cb = formathexpattern(patterntext, NULL, 0);
+    if (!cb || cb > *patternsize) {
+        return FALSE;
+    }
+    LPSTR formattext = calloc(cb, sizeof(CHAR));
+    cb = formathexpattern(patterntext, formattext, cb);
+
+    if (cb % 2) {
+        formattext[++cb] = '?';
+    }
+    formattext[cb] = '\0';
+
+    for (SIZE_T i = 0, j = 0, k = 0; i < cb; i++, j ^= 1, k = (i - j) / 2) {
+        if (formattext[i] == '?') {
+            pattern[k].nibble[j].wildcard = TRUE;
+        } else {
+            pattern[k].nibble[j].wildcard = FALSE;
+            pattern[k].nibble[j].data = hexchtoint(formattext[i]) & 0xf;
+        }
+    }
+    free(formattext);
+    *patternsize = cb / 2;
+    return TRUE;
+}
+
+SIZE_T patternfind(LPCBYTE data, SIZE_T datasize, SIZE_T startindex, LPCSTR pattern) {
+    SIZE_T result = -1;
+    SIZE_T searchpatternsize = strlen(pattern);
+    LPPATTERNBYTE searchpattern = calloc(searchpatternsize, sizeof(PATTERNBYTE));
+    if (patterntransform(pattern, searchpattern, &searchpatternsize)) {
+        for (SIZE_T i = startindex, j = 0; i < datasize; i++) //search for the pattern
+        {
+            if ((searchpattern[j].nibble[0].wildcard || searchpattern[j].nibble[0].data == ((data[i] >> 4) & 0xf))
+                && (searchpattern[j].nibble[1].wildcard || searchpattern[j].nibble[1].data == (data[i] & 0xf))) { //check if our pattern matches the current byte
+
+                if (++j == searchpatternsize) { //everything matched
+                    result = i - searchpatternsize + 1;
+                    break;
+                }
+            } else if (j > 0) { //fix by Computer_Angel
+                i -= j;
+                j = 0; //reset current pattern position
+            }
+        }
+    }
+    return result;
+}
+
+//VOID patternwritebyte(LPBYTE byte, LPPATTERNBYTE pbyte) {
+//    BYTE n1 = (*byte >> 4) & 0xf;
+//    BYTE n2 = *byte & 0xf;
+//    if (!pbyte->nibble[0].wildcard) {
+//        n1 = pbyte->nibble[0].data;
+//    }
+//    if (!pbyte->nibble[1].wildcard) {
+//        n2 = pbyte->nibble[1].data;
+//    }
+//    *byte = ((n1 << 4) & 0xf0) | (n2 & 0xf);
+//}
+//
+//VOID patternwrite(LPBYTE data, SIZE_T datasize, LPCSTR pattern) {
+//    SIZE_T writepatternsize = strlen(pattern);
+//    if (writepatternsize > datasize) {
+//        writepatternsize = datasize;
+//    }
+//    LPPATTERNBYTE writepattern = calloc(writepatternsize, sizeof(PATTERNBYTE));
+//    if (!patterntransform(pattern, writepattern, &writepatternsize)) {
+//        return;
+//    }
+//    for (size_t i = 0; i < writepatternsize; i++) {
+//        patternwritebyte(&data[i], &writepattern[i]);
+//    }
+//}
+//
+//SIZE_T patternsnr(LPBYTE data, SIZE_T datasize, SIZE_T startindex, LPCSTR searchpattern, LPCSTR replacepattern) {
+//    SIZE_T result = patternfind(data, datasize, startindex, searchpattern, NULL, 0);
+//    if (result == -1)
+//        return result;
+//    patternwrite(data + result, datasize - result, replacepattern);
+//    return result;
+//}

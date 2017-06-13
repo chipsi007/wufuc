@@ -2,7 +2,7 @@
 
 DWORD WINAPI NewThreadProc(LPVOID lpParam);
 
-BOOL PatchWUModule(HMODULE hModule);
+BOOL PatchWUAgentHMODULE(HMODULE hModule);
 
 HMODULE WINAPI _LoadLibraryExA(
     _In_       LPCSTR  lpFileName,

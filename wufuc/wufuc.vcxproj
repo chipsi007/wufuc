@@ -177,6 +177,7 @@
   <ItemGroup>
     <ClCompile Include="core.c" />
     <ClCompile Include="dllmain.c" />
+    <ClCompile Include="patternfind.c" />
     <ClCompile Include="rundll32.c" />
     <ClCompile Include="service.c" />
     <ClCompile Include="util.c" />
@@ -186,6 +187,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h" />
+    <ClInclude Include="patternfind.h" />
     <ClInclude Include="service.h" />
     <ClInclude Include="shellapihelper.h" />
     <ClInclude Include="util.h" />

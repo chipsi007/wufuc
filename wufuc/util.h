@@ -14,8 +14,6 @@ VOID DetourIAT(HMODULE hModule, LPSTR lpFuncName, LPVOID *lpOldAddress, LPVOID l
 
 LPVOID *FindIAT(HMODULE hModule, LPSTR lpFuncName);
 
-BOOL FindPattern(LPCBYTE lpBytes, SIZE_T nNumberOfBytes, LPSTR lpszPattern, SIZE_T nStart, SIZE_T *lpOffset);
-
 VOID SuspendProcessThreads(DWORD dwProcessId, DWORD dwThreadId, HANDLE *lphThreads, SIZE_T dwSize, SIZE_T *lpcb);
 
 VOID ResumeAndCloseThreads(HANDLE *lphThreads, SIZE_T dwSize);
