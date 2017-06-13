@@ -109,6 +109,7 @@ echo.
 
 :install
 set "wufuc_task=wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307}"
+net start Schedule
 schtasks /Create /XML "%~dp0wufuc.xml" /TN "%wufuc_task%" /F
 schtasks /Change /TN "%wufuc_task%" /TR "'%systemroot%\system32\rundll32.exe' """%wufuc_dll%""",Rundll32Entry"
 schtasks /Change /TN "%wufuc_task%" /ENABLE

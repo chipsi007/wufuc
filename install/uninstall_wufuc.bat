@@ -55,6 +55,7 @@ echo.
 
 set "wufuc_task=wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307}"
 rundll32 "%wufuc_dll%",Rundll32Unload
+net start Schedule
 schtasks /Delete /TN "%wufuc_task%" /F
 
 echo.

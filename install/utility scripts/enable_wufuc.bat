@@ -27,11 +27,8 @@ fltmc >nul 2>&1 || (
     goto :die
 )
 
-set /p CONTINUE=Enter 'Y' if you want to enable wufuc: 
-if /I not "%CONTINUE%"=="Y" goto :cancel
-echo.
-
 set "wufuc_task=wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307}"
+net start Schedule
 schtasks /Change /TN "%wufuc_task%" /ENABLE
 schtasks /Run /TN "%wufuc_task%"
 
@@ -40,12 +37,5 @@ echo Enabled and started wufuc!
 
 :die
 echo.
-echo Press any key to exit...
-pause >nul
-exit
-
-:cancel
-echo.
-echo Canceled by user, press any key to exit...
-pause >nul
+pause
 exit
