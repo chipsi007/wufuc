@@ -86,6 +86,19 @@ BOOL WindowsVersionCompare(BYTE Operator, DWORD dwMajorVersion, DWORD dwMinorVer
     return VerifyVersionInfo(&osvi, dwTypeMask, dwlConditionMask);
 }
 
+BOOL Is64BitWindows(void) {
+#if defined(_WIN64)
+    return TRUE;  // 64-bit programs run only on Win64
+#elif defined(_WIN32)
+    // 32-bit programs run on both 32-bit and 64-bit Windows
+    // so must sniff
+    BOOL f64 = FALSE;
+    return IsWow64Process(GetCurrentProcess(), &f64) && f64;
+#else
+    return FALSE; // Win64 does not support Win16
+#endif
+}
+
 VOID _wdbgprintf(LPCWSTR format, ...) {
     WCHAR buffer[0x1000];
     va_list argptr;

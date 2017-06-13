@@ -20,6 +20,8 @@ VOID ResumeAndCloseThreads(HANDLE *lphThreads, SIZE_T dwSize);
 
 BOOL WindowsVersionCompare(BYTE Operator, DWORD dwMajorVersion, DWORD dwMinorVersion, WORD wServicePackMajor, WORD wServicePackMinor, DWORD dwTypeMask);
 
+BOOL Is64BitWindows(void);
+
 VOID _wdbgprintf(LPCWSTR format, ...);
 VOID _dbgprintf(LPCSTR format, ...);
 //#ifdef _DEBUG
