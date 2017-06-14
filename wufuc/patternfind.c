@@ -1,21 +1,20 @@
 #include <Windows.h>
 #include "patternfind.h"
 
-/* 
-    Work in progress. Ported to C from x64dbg's patternfind.cpp:
-        https://github.com/x64dbg/x64dbg/blob/development/src/dbg/patternfind.cpp
-     x64dbg license (GPL-3.0):
-        https://github.com/x64dbg/x64dbg/blob/development/LICENSE 
-*/
+/*  Work in progress. Ported to C from x64dbg's patternfind.cpp:
+      <https://github.com/x64dbg/x64dbg/blob/development/src/dbg/patternfind.cpp>
 
-int hexchtoint(CHAR ch) {
+    x64dbg license (GPL-3.0):
+      <https://github.com/x64dbg/x64dbg/blob/development/LICENSE> */
+
+int hexchtoint(CHAR c) {
     int result = -1;
-    if (ch >= '0' && ch <= '9') {
-        result = ch - '0';
-    } else if (ch >= 'A' && ch <= 'F') {
-        result = ch - 'A' + 10;
-    } else if (ch >= 'a' && ch <= 'f') {
-        result = ch - 'a' + 10;
+    if (c >= '0' && c <= '9') {
+        result = c - '0';
+    } else if (c >= 'A' && c <= 'F') {
+        result = c - 'A' + 10;
+    } else if (c >= 'a' && c <= 'f') {
+        result = c - 'a' + 10;
     }
     return result;
 }
@@ -43,11 +42,11 @@ BOOL patterntransform(LPCSTR patterntext, LPPATTERNBYTE pattern, SIZE_T *pattern
     cb = formathexpattern(patterntext, formattext, cb);
 
     if (cb % 2) {
-        formattext[++cb] = '?';
+        formattext[cb++] = '?';
     }
     formattext[cb] = '\0';
 
-    for (SIZE_T i = 0, j = 0, k = 0; i < cb; i++, j ^= 1, k = (i - j) / 2) {
+    for (SIZE_T i = 0, j = 0, k = 0; i < cb; i++, j ^= 1, k = (i - j) >> 1) {
         if (formattext[i] == '?') {
             pattern[k].nibble[j].wildcard = TRUE;
         } else {
@@ -56,7 +55,7 @@ BOOL patterntransform(LPCSTR patterntext, LPPATTERNBYTE pattern, SIZE_T *pattern
         }
     }
     free(formattext);
-    *patternsize = cb / 2;
+    *patternsize = cb >> 1;
     return TRUE;
 }
 

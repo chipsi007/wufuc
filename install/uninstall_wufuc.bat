@@ -34,17 +34,21 @@ if /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
         goto :is_x64
     )
     if /I "%PROCESSOR_ARCHITECTURE%"=="x86" (
-        set "WINDOWS_ARCHITECTURE=x86"
-        set "wufuc_dll=%~dp0wufuc32.dll"
-        goto :confirmation
+        goto :is_x86
     )
 )
 goto :die
+
+:is_x86
+set "WINDOWS_ARCHITECTURE=x86"
+set "wufuc_dll=%~dp0wufuc32.dll"
+goto :get_ver
 
 :is_x64
 set "WINDOWS_ARCHITECTURE=x64"
 set "wufuc_dll=%~dp0wufuc64.dll"
 
+:get_ver
 for /f "tokens=*" %%i in ('wmic /output:stdout datafile where "name='%wufuc_dll:\=\\%'" get Version /value ^| find "="') do set "%%i"
 title wufuc uninstaller - v%Version%
 

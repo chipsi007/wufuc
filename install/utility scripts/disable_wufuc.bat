@@ -34,17 +34,19 @@ if /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
         goto :is_x64
     )
     if /I "%PROCESSOR_ARCHITECTURE%"=="x86" (
-        set "WINDOWS_ARCHITECTURE=x86"
-        set "wufuc_dll=%~dp0..\wufuc32.dll"
-        goto :confirmation
+        goto :is_x86
     )
 )
 goto :die
 
+:is_x86
+set "wufuc_dll=%~dp0..\wufuc32.dll"
+goto :disable
+
 :is_x64
-set "WINDOWS_ARCHITECTURE=x64"
 set "wufuc_dll=%~dp0..\wufuc64.dll"
 
+:disable
 set "wufuc_task=wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307}"
 rundll32 "%wufuc_dll%",Rundll32Unload
 net start Schedule

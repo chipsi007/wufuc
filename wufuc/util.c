@@ -22,7 +22,7 @@ VOID DetourIAT(HMODULE hModule, LPSTR lpFuncName, LPVOID *lpOldAddress, LPVOID l
 }
 
 LPVOID *FindIAT(HMODULE hModule, LPSTR lpFunctionName) {
-    SIZE_T hm = (SIZE_T)hModule;
+    uintptr_t hm = (uintptr_t)hModule;
 
     for (PIMAGE_IMPORT_DESCRIPTOR iid = (PIMAGE_IMPORT_DESCRIPTOR)(hm + ((PIMAGE_NT_HEADERS)(hm + ((PIMAGE_DOS_HEADER)hm)->e_lfanew))
         ->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress); iid->Name; iid++) {

@@ -36,30 +36,34 @@ if /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
         goto :is_x64
     )
     if /I "%PROCESSOR_ARCHITECTURE%"=="x86" (
-        set "WINDOWS_ARCHITECTURE=x86"
-        set "wufuc_dll=%~dp0wufuc32.dll"
-        goto :check_ver
+        goto :is_x86
     )
 )
 goto :unsupported_os
+
+:is_x86
+set "WINDOWS_ARCHITECTURE=x86"
+set "wufuc_dll=%~dp0wufuc32.dll"
+goto :get_ver
 
 :is_x64
 set "WINDOWS_ARCHITECTURE=x64"
 set "wufuc_dll=%~dp0wufuc64.dll"
 
+:get_ver
 for /f "tokens=*" %%i in ('wmic /output:stdout datafile where "name='%wufuc_dll:\=\\%'" get Version /value ^| find "="') do set "%%i"
 title wufuc installer - v%Version%
 
 :check_ver
 wmic /output:stdout os get version | findstr "^6\.1\." >nul && (
     set "WINDOWS_VER=6.1"
-    set "SUPPORTED_HOTFIXES=KB4019265 KB4019264 KB4015552 KB4015549 KB4015546 KB4012218"
+    set "SUPPORTED_HOTFIXES=KB4022722 KB4022719 KB4019265 KB4019264 KB4015552 KB4015549 KB4015546 KB4012218"
     echo Detected supported operating system: Windows 7 %WINDOWS_ARCHITECTURE%
     goto :check_hotfix
 )
 wmic /output:stdout os get version | findstr "^6\.3\." >nul && (
     set "WINDOWS_VER=8.1"
-    set "SUPPORTED_HOTFIXES=KB4019217 KB4019215 KB4015553 KB4015550 KB4015547 KB4012219"
+    set "SUPPORTED_HOTFIXES=KB4022726 KB4022717 KB4019217 KB4019215 KB4015553 KB4015550 KB4015547 KB4012219"
     echo Detected supported operating system: Windows 8.1 %WINDOWS_ARCHITECTURE%
     goto :check_hotfix
 )

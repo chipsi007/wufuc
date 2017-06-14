@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <Windows.h>
 #include <Psapi.h>
 #include <TlHelp32.h>
@@ -64,61 +65,57 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
     CloseHandle(hEvent);
     _tdbgprintf(_T("See ya!"));
     FreeLibraryAndExitThread(HINST_THISCOMPONENT, 0);
-    return 0;
 }
 
 BOOL PatchWUAgentHMODULE(HMODULE hModule) {
-    LPSTR lpszPattern;
-    SIZE_T n1, n2;
-#ifdef _WIN64
-    lpszPattern = "FFF3 4883EC?? 33DB 391D???????? 7508 8B05????????";
-    n1 = 10;
-    n2 = 18;
-#elif defined(_WIN32)
-    if (WindowsVersionCompare(VER_EQUAL, 6, 1, 0, 0, VER_MAJORVERSION | VER_MINORVERSION)) {
-        lpszPattern = "833D????????00 743E E8???????? A3????????";
-        n1 = 2;
-        n2 = 15;
+    LPSTR pattern;
+    SIZE_T offset00, offset01;
+    if (Is64BitWindows()) {
+        pattern = "FFF3 4883EC?? 33DB 391D???????? 7508 8B05????????";
+        offset00 = 10;
+        offset01 = 18;
+    } else if (WindowsVersionCompare(VER_EQUAL, 6, 1, 0, 0, VER_MAJORVERSION | VER_MINORVERSION)) {
+        pattern = "833D????????00 743E E8???????? A3????????";
+        offset00 = 2;
+        offset01 = 15;
     } else if (WindowsVersionCompare(VER_EQUAL, 6, 3, 0, 0, VER_MAJORVERSION | VER_MINORVERSION)) {
-        lpszPattern = "8BFF 51 833D????????00 7507 A1????????";
-        n1 = 5;
-        n2 = 13;
+        pattern = "8BFF 51 833D????????00 7507 A1????????";
+        offset00 = 5;
+        offset01 = 13;
+    } else {
+        return FALSE;
     }
-#else
-    return FALSE;
-#endif
 
     MODULEINFO modinfo;
     GetModuleInformation(GetCurrentProcess(), hModule, &modinfo, sizeof(MODULEINFO));
 
-    SIZE_T rva = patternfind(modinfo.lpBaseOfDll, modinfo.SizeOfImage, 0, lpszPattern);
+    SIZE_T rva = patternfind(modinfo.lpBaseOfDll, modinfo.SizeOfImage, 0, pattern);
     if (rva == -1) {
         _tdbgprintf(_T("No pattern match!"));
         return FALSE;
     }
-    
-    SIZE_T fpIsDeviceServiceable = (SIZE_T)modinfo.lpBaseOfDll + rva;
-    _tdbgprintf(_T("Pattern match at offset %p."), fpIsDeviceServiceable);
-
+    uintptr_t baseAddress = (uintptr_t)modinfo.lpBaseOfDll;
+    uintptr_t fpIsDeviceServiceable = baseAddress + rva;
+    _tdbgprintf(_T("Found address of IsDeviceServiceable. (%p)"), fpIsDeviceServiceable);
     BOOL result = FALSE;
-
-    DWORD flOldProtect;
-    DWORD flNewProtect = PAGE_READWRITE;
-    BOOL *lpbNotRunOnce = (BOOL *)(fpIsDeviceServiceable + n1 + sizeof(DWORD) + *(DWORD *)(fpIsDeviceServiceable + n1));
-    if (*lpbNotRunOnce) {
-        VirtualProtect(lpbNotRunOnce, sizeof(BOOL), flNewProtect, &flOldProtect);
-        *lpbNotRunOnce = FALSE;
-        VirtualProtect(lpbNotRunOnce, sizeof(BOOL), flOldProtect, &flNewProtect);
-        _tdbgprintf(_T("Wrote value %d to address %p."), *lpbNotRunOnce, lpbNotRunOnce);
+    LPBOOL lpbFirstRun, lpbIsCPUSupportedResult;
+    if (Is64BitWindows()) {
+        lpbFirstRun = (LPBOOL)(fpIsDeviceServiceable + offset00 + sizeof(uint32_t) + *(uint32_t *)(fpIsDeviceServiceable + offset00));
+        lpbIsCPUSupportedResult = (LPBOOL)(fpIsDeviceServiceable + offset01 + sizeof(uint32_t) + *(uint32_t *)(fpIsDeviceServiceable + offset01));
+    } else {
+        lpbFirstRun = (LPBOOL)(*(uintptr_t *)(fpIsDeviceServiceable + offset00));
+        lpbIsCPUSupportedResult = (LPBOOL)(*(uintptr_t *)(fpIsDeviceServiceable + offset01));
+    }
+    
+    if (*lpbFirstRun) {
+        *lpbFirstRun = FALSE;
+        _tdbgprintf(_T("Changed first run to FALSE. (%p=%08x)"), lpbFirstRun, *lpbFirstRun);
         result = TRUE;
     }
-
-    BOOL *lpbCachedResult = (BOOL *)(fpIsDeviceServiceable + n2 + sizeof(DWORD) + *(DWORD *)(fpIsDeviceServiceable + n2));
-    if (!*lpbCachedResult) {
-        VirtualProtect(lpbCachedResult, sizeof(BOOL), flNewProtect, &flOldProtect);
-        *lpbCachedResult = TRUE;
-        VirtualProtect(lpbCachedResult, sizeof(BOOL), flOldProtect, &flNewProtect);
-        _tdbgprintf(_T("Wrote value %d to address %p."), *lpbCachedResult, lpbCachedResult);
+    if (!*lpbIsCPUSupportedResult) {
+        *lpbIsCPUSupportedResult = TRUE;
+        _tdbgprintf(_T("Changed cached result to TRUE. (%p=%08x)."), 
+            lpbIsCPUSupportedResult, *lpbIsCPUSupportedResult);
         result = TRUE;
     }
     return result;
