@@ -1,14 +1,34 @@
-# wufuc [![a.k.a. kb4012218-19](https://img.shields.io/badge/a.k.a.-kb4012218--19-blue.svg)](../../tree/old-kb4012218-19) [![Build status](https://ci.appveyor.com/api/projects/status/0s2unkpokttyslf0?svg=true)](https://ci.appveyor.com/project/zeffy/wufuc) [![Issue Stats](https://img.shields.io/issuestats/i/github/expressjs/express.svg)](../../issues)
+# wufuc [![](https://img.shields.io/badge/formerly-kb4012218--19-blue.svg)](../../tree/old-kb4012218-19 "formerly kb4012218-19") [![](https://ci.appveyor.com/api/projects/status/0s2unkpokttyslf0?svg=true)](https://ci.appveyor.com/project/zeffy/wufuc "AppVeyor build status")
 
 <a href='https://pledgie.com/campaigns/34055'><img alt='Click here to lend your support to: wufuc - Help support development and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/34055.png?skin_name=chrome' border='0' ></a>
 
 Disables the "Unsupported Hardware" message in Windows Update, and allows you to continue installing updates on Windows 7 and 8.1 systems with Intel Kaby Lake, AMD Ryzen, or other unsupported processors.
 
-## Downloads [![Github All Releases](https://img.shields.io/github/downloads/zeffy/wufuc/total.svg)](../../releases)
+## Downloads [![](https://img.shields.io/github/downloads/zeffy/wufuc/total.svg)](../../releases "Total downloads")
 
 ### You can get the latest stable version [here](../../releases/latest)!
 
 If you are feeling brave, you can try the latest unstable builds [here](https://ci.appveyor.com/project/zeffy/wufuc). **Use these at your own risk!**
+
+## Reporting an issue [![](http://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](http://isitmaintained.com/project/zeffy/wufuc "Average time to resolve an issue")
+
+There isn't really a way for wufuc to directly interact with your desktop, because it runs outside the context of a normal user session. Therefore you must first download and run another program called [DebugView](https://technet.microsoft.com/en-us/sysinternals/debugview.aspx) to display wufuc's debug messages. These logs are absolutely crucial if you want me to be able to resolve your issue as quickly as possible, so please include them if you can.
+
+#### The best way to get a log of the entire life-cycle of wufuc is to do the following:
+
+1. Disable wufuc by running `disable_wufuc.bat` as administrator.
+2. Start `Dbgview.exe` as administrator and check `Capture -> Capture Global Win32`.
+3. Enable wufuc by running `enable_wufuc.bat` as administrator.
+4. Output will be shown in DebugView, copy/paste this text into your issue.
+
+#### Other helpful information to include when reporting issues:
+
+- What happened? What did you expect to happen instead?
+- What version of wufuc are you using?
+- What version of Windows are you using? x86 or x64?
+- Were there any errors reporting during installation? What were they?
+- What is the file version or SHA-1 hash of `C:\Windows\System32\wuaueng.dll`?
+- Any other information you feel is relevant to your issue.
 
 ## Preface
 
@@ -37,12 +57,14 @@ My patch takes advantage of this result caching behavior by setting the "hasn't 
 - Once injected, it applies a hook to `LoadLibraryEx` that automatically patches `wuaueng.dll` when it is loaded.
 - Any previously loaded `wuaueng.dll` is also patched.
 
-### Several improvements over my xdelta3/batch script method:
+### Several improvements over my batchfile method:
 
 - **No system files are modified!**
 - Heuristic-based patching, which means it will usually keep working even after updates.		
 - C is best language.		
 - No external dependencies.
+
+## Q & A
 
 ### How to install/uninstall?
 
@@ -63,14 +85,3 @@ If you run into problems, try doing a full uninstall/reinstall.
 ### How do I remove your old patch and use this instead?
 
 I've included a utility script called `repair_wuaueng.dll.bat`. When you run it, it will initiate an `sfc` scan and revert any changes made to `wuaueng.dll`.
-
-### How to see wufuc's debugging message output?
-
-You will need to download [DebugView](https://technet.microsoft.com/en-us/sysinternals/debugview.aspx) to do this.
-
-The best way to get a log of the entire life-cycle of wufuc is to do the following:
-
-1. Disable wufuc by running `disable_wufuc.bat` as administrator.
-2. Start `Dbgview.exe` as administrator and check `Capture -> Capture Global Win32`.
-3. Enable wufuc by running `enable_wufuc.bat` as administrator.
-4. Output will be shown in DebugView.
