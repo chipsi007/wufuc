@@ -19,7 +19,8 @@ There isn't really a way for wufuc to directly interact with your desktop, becau
 1. Disable wufuc by running `disable_wufuc.bat` as administrator.
 2. Start `Dbgview.exe` as administrator and check `Capture -> Capture Global Win32`.
 3. Enable wufuc by running `enable_wufuc.bat` as administrator.
-4. Output will be shown in DebugView, copy/paste this text into your issue.
+4. Start the `wuauserv` service if it isn't already running.
+5. Output will be shown in DebugView, copy/paste this text into your issue.
 
 #### Other helpful information to include when reporting issues:
 
