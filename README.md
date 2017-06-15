@@ -10,7 +10,7 @@ Disables the "Unsupported Hardware" message in Windows Update, and allows you to
 
 If you are feeling brave, you can try the latest unstable builds [here](https://ci.appveyor.com/project/zeffy/wufuc). **Use these at your own risk!**
 
-## Reporting an issue [![](http://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](http://isitmaintained.com/project/zeffy/wufuc "Average time to resolve an issue")
+## Reporting an issue [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc "Average time to resolve an issue")
 
 There isn't really a way for wufuc to directly interact with your desktop, because it runs outside the context of a normal user session. Therefore you must first download and run another program called [DebugView](https://technet.microsoft.com/en-us/sysinternals/debugview.aspx) to display wufuc's debug messages. These logs are absolutely crucial if you want me to be able to resolve your issue as quickly as possible, so please include them if you can.
 
