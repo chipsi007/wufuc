@@ -8,13 +8,9 @@ platform:
 - x86
 - x64
 environment:
-    _VERSION: '%APPVEYOR_BUILD_VERSION%-%APPVEYOR_REPO_COMMIT:~0,8%'
-    _VERSION2: '%APPVEYOR_BUILD_VERSION:.=,%'
-    _ZIPFILE: '%APPVEYOR_BUILD_FOLDER%\%APPVEYOR_PROJECT_NAME%_v%_VERSION%_%PLATFORM%.zip'
-build_script:
-- cmd: >-
-    msbuild "%APPVEYOR_BUILD_FOLDER%\%APPVEYOR_PROJECT_NAME%.sln" /verbosity:minimal /logger:"%PROGRAMFILES%\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:_VERSION="%_VERSION%" /p:_VERSION2="%_VERSION2%"
-
+    BUILD_VERSION: '%APPVEYOR_BUILD_VERSION%-%APPVEYOR_REPO_COMMIT:~0,8%'
+    BUILD_VERSION_COMMA_SEP: '%APPVEYOR_BUILD_VERSION:.=,%'
+    BUILD_ZIPFILE: '%APPVEYOR_BUILD_FOLDER%\%APPVEYOR_PROJECT_NAME%_v%BUILD_VERSION%_%PLATFORM%.zip'
 after_build:
 - cmd: >-
 
@@ -24,9 +20,9 @@ after_build:
     
     for /R %%G in (*.bat) do unix2dos "%%G"
     
-    7z a "%_ZIPFILE%" "..\install"
+    7z a "%BUILD_ZIPFILE%" "..\install"
     
-    7z rn "%_ZIPFILE%" "install" "%APPVEYOR_PROJECT_NAME%"
+    7z rn "%BUILD_ZIPFILE%" "install" "%APPVEYOR_PROJECT_NAME%"
 
 artifacts:
 - path: '*.zip'
