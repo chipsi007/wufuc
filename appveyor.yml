@@ -7,15 +7,20 @@ configuration: Release
 platform:
 - x86
 - x64
+build:
+  verbosity: detailed
 environment:
     BUILD_VERSION: '%APPVEYOR_BUILD_VERSION%-%APPVEYOR_REPO_COMMIT:~0,8%'
     BUILD_VERSION_COMMA_SEP: '%APPVEYOR_BUILD_VERSION:.=,%'
     BUILD_ZIPFILE: '%APPVEYOR_BUILD_FOLDER%\%APPVEYOR_PROJECT_NAME%_v%BUILD_VERSION%_%PLATFORM%.zip'
+before_build:
+- cmd: >-
+    echo %BUILD_VERSION% ............ %BUILD_VERSION_COMMA_SEP%
+
 after_build:
 - cmd: >-
-
-    copy /Y "LICENSE" "install\"
-
+    copy /Y "LICENSE" "install\COPYING.txt"
+    
     cd "%APPVEYOR_BUILD_FOLDER%\install"
     
     for /R %%G in (*.bat) do unix2dos "%%G"
