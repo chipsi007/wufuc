@@ -8,7 +8,7 @@ platform:
 - x86
 - x64
 build:
-  verbosity: detailed
+  verbosity: minimal
 before_build:
 - cmd: >-
     set "BUILD_VERSION=%APPVEYOR_BUILD_VERSION%-%APPVEYOR_REPO_COMMIT:~0,8%"
