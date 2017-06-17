@@ -180,6 +180,7 @@
     <ClCompile Include="patternfind.c" />
     <ClCompile Include="rundll32.c" />
     <ClCompile Include="service.c" />
+    <ClCompile Include="shared.c" />
     <ClCompile Include="util.c" />
   </ItemGroup>
   <ItemGroup>
@@ -187,6 +188,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h" />
+    <ClInclude Include="shared.h" />
     <ClInclude Include="patternfind.h" />
     <ClInclude Include="service.h" />
     <ClInclude Include="shellapihelper.h" />

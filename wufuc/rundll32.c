@@ -3,11 +3,10 @@
 #include <tchar.h>
 #include "service.h"
 #include "util.h"
+#include "shared.h"
 
 void CALLBACK Rundll32Entry(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow) {
-    if (!WindowsVersionCompare(VER_EQUAL, 6, 1, 0, 0, VER_MAJORVERSION | VER_MINORVERSION)
-        && !WindowsVersionCompare(VER_EQUAL, 6, 3, 0, 0, VER_MAJORVERSION | VER_MINORVERSION)) {
-
+    if (!g_IsWindows7 && !g_IsWindows8Point1) {
         return;
     }
 

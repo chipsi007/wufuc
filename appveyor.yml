@@ -7,22 +7,26 @@ configuration: Release
 platform:
 - x86
 - x64
-build:
-  verbosity: minimal
+environment:
+    _VERSION: '%APPVEYOR_BUILD_VERSION%-%APPVEYOR_BUILD_VERSION%-%APPVEYOR_REPO_COMMIT:~0,8%'
+    _VERSION2: '%APPVEYOR_BUILD_VERSION:.=,%'
+    _ZIPFILE: '%APPVEYOR_BUILD_FOLDER%\%APPVEYOR_PROJECT_NAME%_v%_VERSION%_%PLATFORM%.zip'
+build_script:
+- cmd: >-
+    msbuild "%APPVEYOR_BUILD_FOLDER%\%APPVEYOR_PROJECT_NAME%.sln" /verbosity:minimal /logger:"%PROGRAMFILES%\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:_VERSION="%_VERSION%" /p:_VERSION2="%_VERSION2%"
+
 after_build:
 - cmd: >-
 
-    set "ZIP_NAME=..\%APPVEYOR_PROJECT_NAME%_v%APPVEYOR_BUILD_VERSION%-%APPVEYOR_REPO_COMMIT:~0,8%_%PLATFORM%.zip"
+    copy /Y "COPYING.txt" "install\"
 
     cd "%APPVEYOR_BUILD_FOLDER%\install"
     
-    unix2dos "COPYING.txt"
-    
     for /R %%G in (*.bat) do unix2dos "%%G"
     
-    7z a "%ZIP_NAME%" "..\install"
+    7z a "%_ZIPFILE%" "..\install"
     
-    7z rn "%ZIP_NAME%" "install" "wufuc"
+    7z rn "%_ZIPFILE%" "install" "%APPVEYOR_PROJECT_NAME%"
 
 artifacts:
 - path: '*.zip'

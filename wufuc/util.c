@@ -1,25 +1,9 @@
 #include <Windows.h>
 #include <stdio.h>
-#include <TlHelp32.h>
 #include <tchar.h>
+#include <TlHelp32.h>
 #include "util.h"
-
-VOID DetourIAT(HMODULE hModule, LPSTR lpFuncName, LPVOID *lpOldAddress, LPVOID lpNewAddress) {
-    LPVOID *lpAddress = FindIAT(hModule, lpFuncName);
-    if (!lpAddress || *lpAddress == lpNewAddress) {
-        return;
-    }
-
-    DWORD flOldProtect;
-    DWORD flNewProtect = PAGE_READWRITE;
-    VirtualProtect(lpAddress, sizeof(LPVOID), flNewProtect, &flOldProtect);
-    if (lpOldAddress) {
-        *lpOldAddress = *lpAddress;
-    }
-    _dbgprintf("Detoured %s from %p to %p.", lpFuncName, *lpAddress, lpNewAddress);
-    *lpAddress = lpNewAddress;
-    VirtualProtect(lpAddress, sizeof(LPVOID), flOldProtect, &flNewProtect);
-}
+#include "shared.h"
 
 LPVOID *FindIAT(HMODULE hModule, LPSTR lpFunctionName) {
     uintptr_t hm = (uintptr_t)hModule;
@@ -36,6 +20,23 @@ LPVOID *FindIAT(HMODULE hModule, LPSTR lpFunctionName) {
         }
     }
     return NULL;
+}
+
+VOID DetourIAT(HMODULE hModule, LPSTR lpFuncName, LPVOID *lpOldAddress, LPVOID lpNewAddress) {
+    LPVOID *lpAddress = FindIAT(hModule, lpFuncName);
+    if (!lpAddress || *lpAddress == lpNewAddress) {
+        return;
+    }
+
+    DWORD flOldProtect;
+    DWORD flNewProtect = PAGE_READWRITE;
+    VirtualProtect(lpAddress, sizeof(LPVOID), flNewProtect, &flOldProtect);
+    if (lpOldAddress) {
+        *lpOldAddress = *lpAddress;
+    }
+    _dbgprintf("Detoured %s from %p to %p.", lpFuncName, *lpAddress, lpNewAddress);
+    *lpAddress = lpNewAddress;
+    VirtualProtect(lpAddress, sizeof(LPVOID), flOldProtect, &flNewProtect);
 }
 
 VOID SuspendProcessThreads(DWORD dwProcessId, DWORD dwThreadId, HANDLE *lphThreads, SIZE_T dwSize, SIZE_T *lpcb) {
@@ -68,7 +69,7 @@ VOID ResumeAndCloseThreads(HANDLE *lphThreads, SIZE_T cb) {
     _tdbgprintf(_T("Resumed %d other threads."), cb);
 }
 
-BOOL WindowsVersionCompare(BYTE Operator, DWORD dwMajorVersion, DWORD dwMinorVersion, WORD wServicePackMajor, WORD wServicePackMinor, DWORD dwTypeMask) {
+BOOL CompareWindowsVersion(BYTE Operator, DWORD dwMajorVersion, DWORD dwMinorVersion, WORD wServicePackMajor, WORD wServicePackMinor, DWORD dwTypeMask) {
     OSVERSIONINFOEX osvi;
     ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
     osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
@@ -86,16 +87,12 @@ BOOL WindowsVersionCompare(BYTE Operator, DWORD dwMajorVersion, DWORD dwMinorVer
     return VerifyVersionInfo(&osvi, dwTypeMask, dwlConditionMask);
 }
 
-BOOL Is64BitWindows(void) {
-#if defined(_WIN64)
-    return TRUE;  // 64-bit programs run only on Win64
-#elif defined(_WIN32)
-    // 32-bit programs run on both 32-bit and 64-bit Windows
-    // so must sniff
-    BOOL f64 = FALSE;
-    return IsWow64Process(GetCurrentProcess(), &f64) && f64;
+BOOL IsOperatingSystemSupported(LPBOOL lpbIsWindows7, LPBOOL lpbIsWindows8Point1) {
+#if !defined(_AMD64_) && !defined(_X86_)
+    return FALSE;
 #else
-    return FALSE; // Win64 does not support Win16
+    return (*lpbIsWindows7 = CompareWindowsVersion(VER_EQUAL, 6, 1, 0, 0, VER_MAJORVERSION | VER_MINORVERSION))
+        || (*lpbIsWindows8Point1 = CompareWindowsVersion(VER_EQUAL, 6, 3, 0, 0, VER_MAJORVERSION | VER_MINORVERSION));
 #endif
 }
 

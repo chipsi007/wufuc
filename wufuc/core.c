@@ -1,12 +1,12 @@
-#include <stdint.h>
 #include <Windows.h>
-#include <Psapi.h>
-#include <TlHelp32.h>
+#include <stdint.h>
 #include <tchar.h>
+#include <Psapi.h>
 #include <sddl.h>
 #include "service.h"
-#include "util.h"
 #include "patternfind.h"
+#include "util.h"
+#include "shared.h"
 #include "core.h"
 
 DWORD WINAPI NewThreadProc(LPVOID lpParam) {
@@ -23,8 +23,8 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
     }
 
     SECURITY_ATTRIBUTES sa;
-    sa.nLength = sizeof(sa);
-    ConvertStringSecurityDescriptorToSecurityDescriptor(_T("D:PAI(A;;FA;;;BA)"), SDDL_REVISION_1, &(sa.lpSecurityDescriptor), NULL);
+    sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+    ConvertStringSecurityDescriptorToSecurityDescriptor(_T("D:PAI(A;;FA;;;BA)"), SDDL_REVISION_1, &sa.lpSecurityDescriptor, NULL);
     sa.bInheritHandle = FALSE;
 
     HANDLE hEvent = CreateEvent(&sa, TRUE, FALSE, _T("Global\\wufuc_UnloadEvent"));
@@ -70,21 +70,23 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
 BOOL PatchWUAgentHMODULE(HMODULE hModule) {
     LPSTR pattern;
     SIZE_T offset00, offset01;
-    if (Is64BitWindows()) {
+#ifdef _AMD64_
         pattern = "FFF3 4883EC?? 33DB 391D???????? 7508 8B05????????";
         offset00 = 10;
         offset01 = 18;
-    } else if (WindowsVersionCompare(VER_EQUAL, 6, 1, 0, 0, VER_MAJORVERSION | VER_MINORVERSION)) {
+#elif defined(_X86_)
+    if (g_IsWindows7) {
         pattern = "833D????????00 743E E8???????? A3????????";
         offset00 = 2;
         offset01 = 15;
-    } else if (WindowsVersionCompare(VER_EQUAL, 6, 3, 0, 0, VER_MAJORVERSION | VER_MINORVERSION)) {
+    } else if (g_IsWindows8Point1) {
         pattern = "8BFF 51 833D????????00 7507 A1????????";
         offset00 = 5;
         offset01 = 13;
     } else {
         return FALSE;
     }
+#endif
 
     MODULEINFO modinfo;
     GetModuleInformation(GetCurrentProcess(), hModule, &modinfo, sizeof(MODULEINFO));
@@ -99,14 +101,14 @@ BOOL PatchWUAgentHMODULE(HMODULE hModule) {
     _tdbgprintf(_T("Found address of IsDeviceServiceable. (%p)"), fpIsDeviceServiceable);
     BOOL result = FALSE;
     LPBOOL lpbFirstRun, lpbIsCPUSupportedResult;
-    if (Is64BitWindows()) {
+#ifdef _WIN64
         lpbFirstRun = (LPBOOL)(fpIsDeviceServiceable + offset00 + sizeof(uint32_t) + *(uint32_t *)(fpIsDeviceServiceable + offset00));
         lpbIsCPUSupportedResult = (LPBOOL)(fpIsDeviceServiceable + offset01 + sizeof(uint32_t) + *(uint32_t *)(fpIsDeviceServiceable + offset01));
-    } else {
+#elif defined(_WIN32)
         lpbFirstRun = (LPBOOL)(*(uintptr_t *)(fpIsDeviceServiceable + offset00));
         lpbIsCPUSupportedResult = (LPBOOL)(*(uintptr_t *)(fpIsDeviceServiceable + offset01));
-    }
-    
+#endif
+
     if (*lpbFirstRun) {
         *lpbFirstRun = FALSE;
         _tdbgprintf(_T("Changed first run to FALSE. (%p=%08x)"), lpbFirstRun, *lpbFirstRun);
@@ -114,7 +116,7 @@ BOOL PatchWUAgentHMODULE(HMODULE hModule) {
     }
     if (!*lpbIsCPUSupportedResult) {
         *lpbIsCPUSupportedResult = TRUE;
-        _tdbgprintf(_T("Changed cached result to TRUE. (%p=%08x)."), 
+        _tdbgprintf(_T("Changed cached result to TRUE. (%p=%08x)."),
             lpbIsCPUSupportedResult, *lpbIsCPUSupportedResult);
         result = TRUE;
     }

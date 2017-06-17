@@ -1,7 +1,7 @@
 #include <Windows.h>
 #include "patternfind.h"
 
-/*  Work in progress. Ported to C from x64dbg's patternfind.cpp:
+/*  Ported to C from x64dbg's patternfind.cpp:
       <https://github.com/x64dbg/x64dbg/blob/development/src/dbg/patternfind.cpp>
 
     x64dbg license (GPL-3.0):
@@ -82,36 +82,36 @@ SIZE_T patternfind(LPCBYTE data, SIZE_T datasize, SIZE_T startindex, LPCSTR patt
     return result;
 }
 
-//VOID patternwritebyte(LPBYTE byte, LPPATTERNBYTE pbyte) {
-//    BYTE n1 = (*byte >> 4) & 0xf;
-//    BYTE n2 = *byte & 0xf;
-//    if (!pbyte->nibble[0].wildcard) {
-//        n1 = pbyte->nibble[0].data;
-//    }
-//    if (!pbyte->nibble[1].wildcard) {
-//        n2 = pbyte->nibble[1].data;
-//    }
-//    *byte = ((n1 << 4) & 0xf0) | (n2 & 0xf);
-//}
-//
-//VOID patternwrite(LPBYTE data, SIZE_T datasize, LPCSTR pattern) {
-//    SIZE_T writepatternsize = strlen(pattern);
-//    if (writepatternsize > datasize) {
-//        writepatternsize = datasize;
-//    }
-//    LPPATTERNBYTE writepattern = calloc(writepatternsize, sizeof(PATTERNBYTE));
-//    if (!patterntransform(pattern, writepattern, &writepatternsize)) {
-//        return;
-//    }
-//    for (size_t i = 0; i < writepatternsize; i++) {
-//        patternwritebyte(&data[i], &writepattern[i]);
-//    }
-//}
-//
-//SIZE_T patternsnr(LPBYTE data, SIZE_T datasize, SIZE_T startindex, LPCSTR searchpattern, LPCSTR replacepattern) {
-//    SIZE_T result = patternfind(data, datasize, startindex, searchpattern, NULL, 0);
-//    if (result == -1)
-//        return result;
-//    patternwrite(data + result, datasize - result, replacepattern);
-//    return result;
-//}
+VOID patternwritebyte(LPBYTE byte, LPPATTERNBYTE pbyte) {
+    BYTE n1 = (*byte >> 4) & 0xf;
+    BYTE n2 = *byte & 0xf;
+    if (!pbyte->nibble[0].wildcard) {
+        n1 = pbyte->nibble[0].data;
+    }
+    if (!pbyte->nibble[1].wildcard) {
+        n2 = pbyte->nibble[1].data;
+    }
+    *byte = ((n1 << 4) & 0xf0) | (n2 & 0xf);
+}
+
+VOID patternwrite(LPBYTE data, SIZE_T datasize, LPCSTR pattern) {
+    SIZE_T writepatternsize = strlen(pattern);
+    if (writepatternsize > datasize) {
+        writepatternsize = datasize;
+    }
+    LPPATTERNBYTE writepattern = calloc(writepatternsize, sizeof(PATTERNBYTE));
+    if (!patterntransform(pattern, writepattern, &writepatternsize)) {
+        return;
+    }
+    for (size_t i = 0; i < writepatternsize; i++) {
+        patternwritebyte(&data[i], &writepattern[i]);
+    }
+}
+
+SIZE_T patternsnr(LPBYTE data, SIZE_T datasize, SIZE_T startindex, LPCSTR searchpattern, LPCSTR replacepattern) {
+    SIZE_T result = patternfind(data, datasize, startindex, searchpattern);
+    if (result == -1)
+        return result;
+    patternwrite(data + result, datasize - result, replacepattern);
+    return result;
+}
