@@ -18,7 +18,7 @@ build_script:
 after_build:
 - cmd: >-
 
-    copy /Y "COPYING.txt" "install\"
+    copy /Y "LICENSE" "install\"
 
     cd "%APPVEYOR_BUILD_FOLDER%\install"
     
