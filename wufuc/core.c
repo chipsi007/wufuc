@@ -101,10 +101,10 @@ BOOL PatchWUAgentHMODULE(HMODULE hModule) {
     _tdbgprintf(_T("Found address of IsDeviceServiceable. (%p)"), fpIsDeviceServiceable);
     BOOL result = FALSE;
     LPBOOL lpbFirstRun, lpbIsCPUSupportedResult;
-#ifdef _WIN64
+#ifdef _AMD64_
         lpbFirstRun = (LPBOOL)(fpIsDeviceServiceable + offset00 + sizeof(uint32_t) + *(uint32_t *)(fpIsDeviceServiceable + offset00));
         lpbIsCPUSupportedResult = (LPBOOL)(fpIsDeviceServiceable + offset01 + sizeof(uint32_t) + *(uint32_t *)(fpIsDeviceServiceable + offset01));
-#elif defined(_WIN32)
+#elif defined(_X86_)
         lpbFirstRun = (LPBOOL)(*(uintptr_t *)(fpIsDeviceServiceable + offset00));
         lpbIsCPUSupportedResult = (LPBOOL)(*(uintptr_t *)(fpIsDeviceServiceable + offset01));
 #endif
