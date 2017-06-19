@@ -34,24 +34,22 @@ if /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
         goto :is_x64
     )
     if /I "%PROCESSOR_ARCHITECTURE%"=="x86" (
-        set "WINDOWS_ARCHITECTURE=x86"
-        set "wufuc_dll=%~dp0wufuc32.dll"
-        goto :confirmation
+        goto :is_x86
     )
 )
 goto :die
 
+:is_x86
+set "wufuc_dll=%~dp0..\wufuc32.dll"
+goto :disable
+
 :is_x64
-set "WINDOWS_ARCHITECTURE=x64"
 set "wufuc_dll=%~dp0..\wufuc64.dll"
 
-:confirmation
-set /p CONTINUE=Enter 'Y' if you want to disable wufuc: 
-if /I not "%CONTINUE%"=="Y" goto :cancel
-echo.
-
+:disable
 set "wufuc_task=wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307}"
 rundll32 "%wufuc_dll%",Rundll32Unload
+net start Schedule
 schtasks /Change /TN "%wufuc_task%" /DISABLE
 
 echo.
@@ -59,12 +57,5 @@ echo Disabled wufuc! You will still be able to check for updates until you resta
 
 :die
 echo.
-echo Press any key to exit...
-pause >nul
-exit
-
-:cancel
-echo.
-echo Canceled by user, press any key to exit...
-pause >nul
+pause
 exit

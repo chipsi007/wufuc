@@ -1,9 +1,26 @@
 #include <Windows.h>
 #include <stdio.h>
-#include <VersionHelpers.h>
-#include <TlHelp32.h>
 #include <tchar.h>
+#include <TlHelp32.h>
 #include "util.h"
+#include "shared.h"
+
+LPVOID *FindIAT(HMODULE hModule, LPSTR lpFunctionName) {
+    uintptr_t hm = (uintptr_t)hModule;
+
+    for (PIMAGE_IMPORT_DESCRIPTOR iid = (PIMAGE_IMPORT_DESCRIPTOR)(hm + ((PIMAGE_NT_HEADERS)(hm + ((PIMAGE_DOS_HEADER)hm)->e_lfanew))
+        ->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress); iid->Name; iid++) {
+
+        LPVOID *p;
+        for (SIZE_T i = 0; *(p = i + (LPVOID *)(hm + iid->FirstThunk)); i++) {
+            LPSTR fn = (LPSTR)(hm + *(i + (SIZE_T *)(hm + iid->OriginalFirstThunk)) + 2);
+            if (!((uintptr_t)fn & IMAGE_ORDINAL_FLAG) && !_stricmp(lpFunctionName, fn)) {
+                return p;
+            }
+        }
+    }
+    return NULL;
+}
 
 VOID DetourIAT(HMODULE hModule, LPSTR lpFuncName, LPVOID *lpOldAddress, LPVOID lpNewAddress) {
     LPVOID *lpAddress = FindIAT(hModule, lpFuncName);
@@ -20,88 +37,6 @@ VOID DetourIAT(HMODULE hModule, LPSTR lpFuncName, LPVOID *lpOldAddress, LPVOID l
     _dbgprintf("Detoured %s from %p to %p.", lpFuncName, *lpAddress, lpNewAddress);
     *lpAddress = lpNewAddress;
     VirtualProtect(lpAddress, sizeof(LPVOID), flOldProtect, &flNewProtect);
-}
-
-LPVOID *FindIAT(HMODULE hModule, LPSTR lpFunctionName) {
-    SIZE_T hm = (SIZE_T)hModule;
-
-    for (PIMAGE_IMPORT_DESCRIPTOR iid = (PIMAGE_IMPORT_DESCRIPTOR)(hm + ((PIMAGE_NT_HEADERS)(hm + ((PIMAGE_DOS_HEADER)hm)->e_lfanew))
-        ->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress); iid->Name; iid++) {
-
-        LPVOID *p;
-        for (SIZE_T i = 0; *(p = i + (LPVOID *)(hm + iid->FirstThunk)); i++) {
-            LPSTR fn = (LPSTR)(hm + *(i + (SIZE_T *)(hm + iid->OriginalFirstThunk)) + 2);
-            if (!((uintptr_t)fn & IMAGE_ORDINAL_FLAG) && !_stricmp(lpFunctionName, fn)) {
-                return p;
-            }
-        }
-    }
-    return NULL;
-}
-
-BOOL FindPattern(LPCBYTE pvData, SIZE_T nNumberOfBytes, LPSTR lpszPattern, SIZE_T nStart, SIZE_T *lpOffset) {
-    SIZE_T length = strlen(lpszPattern);
-    SIZE_T nBytes;
-    if (length % 2 || (nBytes = length / 2) > nNumberOfBytes) {
-        return FALSE;
-    }
-
-    LPBYTE lpBytes = malloc(nBytes * sizeof(BYTE));
-    BOOL *lpbwc = malloc(nBytes * sizeof(BOOL));
-
-    LPSTR p = lpszPattern;
-    BOOL valid = TRUE;
-    for (SIZE_T i = 0; i < nBytes; i++) {
-        if ((lpbwc[i] = strncmp(p, "??", 2)) && sscanf_s(p, "%2hhx", &lpBytes[i]) != 1) {
-            valid = FALSE;
-            break;
-        }
-        p += 2;
-    }
-    BOOL result = FALSE;
-    if (valid) {
-        for (SIZE_T i = nStart; i < nNumberOfBytes - nStart - (nBytes - 1); i++) {
-            BOOL found = TRUE;
-            for (SIZE_T j = 0; j < nBytes; j++) {
-                if (lpbwc[j] && pvData[i + j] != lpBytes[j]) {
-                    found = FALSE;
-                    break;
-                }
-            }
-            if (found) {
-                *lpOffset = i;
-                result = TRUE;
-                break;
-            }
-        }
-    }
-    free(lpBytes);
-    free(lpbwc);
-    return result;
-}
-
-BOOL InjectLibrary(DWORD dwProcessId, LPCTSTR lpLibFileName, DWORD cb) {
-    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwProcessId);
-    LPVOID lpBaseAddress = VirtualAllocEx(hProcess, NULL, cb, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-    if (!WriteProcessMemory(hProcess, lpBaseAddress, lpLibFileName, cb, NULL)) {
-        return FALSE;
-    }
-    HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, dwProcessId);
-    MODULEENTRY32 me;
-    me.dwSize = sizeof(me);
-
-    Module32First(hSnap, &me);
-    do {
-        if (!_tcsicmp(me.szModule, _T("kernel32.dll"))) {
-            break;
-        }
-    } while (Module32Next(hSnap, &me));
-    CloseHandle(hSnap);
-
-    HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)GetProcAddress(me.hModule, _CRT_STRINGIZE(LoadLibrary)), lpBaseAddress, 0, NULL);
-    CloseHandle(hThread);
-    CloseHandle(hProcess);
-    return TRUE;
 }
 
 VOID SuspendProcessThreads(DWORD dwProcessId, DWORD dwThreadId, HANDLE *lphThreads, SIZE_T dwSize, SIZE_T *lpcb) {
@@ -123,7 +58,7 @@ VOID SuspendProcessThreads(DWORD dwProcessId, DWORD dwThreadId, HANDLE *lphThrea
     CloseHandle(hSnap);
 
     *lpcb = count;
-    _tdbgprintf(_T("Suspended other threads."));
+    _tdbgprintf(_T("Suspended %d other threads."), count);
 }
 
 VOID ResumeAndCloseThreads(HANDLE *lphThreads, SIZE_T cb) {
@@ -131,19 +66,34 @@ VOID ResumeAndCloseThreads(HANDLE *lphThreads, SIZE_T cb) {
         ResumeThread(lphThreads[i]);
         CloseHandle(lphThreads[i]);
     }
-    _tdbgprintf(_T("Resumed threads."));
+    _tdbgprintf(_T("Resumed %d other threads."), cb);
 }
 
-BOOL IsWindows7Or8Point1(void) {
-    return IsWindows7() || IsWindows8Point1();
+BOOL CompareWindowsVersion(BYTE Operator, DWORD dwMajorVersion, DWORD dwMinorVersion, WORD wServicePackMajor, WORD wServicePackMinor, DWORD dwTypeMask) {
+    OSVERSIONINFOEX osvi;
+    ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+    osvi.dwMajorVersion = dwMajorVersion;
+    osvi.dwMinorVersion = dwMinorVersion;
+    osvi.wServicePackMajor = wServicePackMajor;
+    osvi.wServicePackMinor = wServicePackMinor;
+
+    DWORDLONG dwlConditionMask = 0;
+    VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, Operator);
+    VER_SET_CONDITION(dwlConditionMask, VER_MINORVERSION, Operator);
+    VER_SET_CONDITION(dwlConditionMask, VER_SERVICEPACKMAJOR, Operator);
+    VER_SET_CONDITION(dwlConditionMask, VER_SERVICEPACKMINOR, Operator);
+
+    return VerifyVersionInfo(&osvi, dwTypeMask, dwlConditionMask);
 }
 
-BOOL IsWindows7(void) {
-    return IsWindows7OrGreater() && !IsWindows8OrGreater();
-}
-
-BOOL IsWindows8Point1(void) {
-    return IsWindows8Point1OrGreater() && !IsWindows10OrGreater();
+BOOL IsOperatingSystemSupported(LPBOOL lpbIsWindows7, LPBOOL lpbIsWindows8Point1) {
+#if !defined(_AMD64_) && !defined(_X86_)
+    return FALSE;
+#else
+    return (*lpbIsWindows7 = CompareWindowsVersion(VER_EQUAL, 6, 1, 0, 0, VER_MAJORVERSION | VER_MINORVERSION))
+        || (*lpbIsWindows8Point1 = CompareWindowsVersion(VER_EQUAL, 6, 3, 0, 0, VER_MAJORVERSION | VER_MINORVERSION));
+#endif
 }
 
 VOID _wdbgprintf(LPCWSTR format, ...) {

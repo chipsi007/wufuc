@@ -36,30 +36,34 @@ if /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
         goto :is_x64
     )
     if /I "%PROCESSOR_ARCHITECTURE%"=="x86" (
-        set "WINDOWS_ARCHITECTURE=x86"
-        set "wufuc_dll=%~dp0wufuc32.dll"
-        goto :check_ver
+        goto :is_x86
     )
 )
 goto :unsupported_os
+
+:is_x86
+set "WINDOWS_ARCHITECTURE=x86"
+set "wufuc_dll=%~dp0wufuc32.dll"
+goto :get_ver
 
 :is_x64
 set "WINDOWS_ARCHITECTURE=x64"
 set "wufuc_dll=%~dp0wufuc64.dll"
 
+:get_ver
 for /f "tokens=*" %%i in ('wmic /output:stdout datafile where "name='%wufuc_dll:\=\\%'" get Version /value ^| find "="') do set "%%i"
 title wufuc installer - v%Version%
 
 :check_ver
 wmic /output:stdout os get version | findstr "^6\.1\." >nul && (
     set "WINDOWS_VER=6.1"
-    set "SUPPORTED_HOTFIXES=KB4019265 KB4019264 KB4015552 KB4015549 KB4015546 KB4012218"
+    set "SUPPORTED_HOTFIXES=KB4022722 KB4022719 KB4019265 KB4019264 KB4015552 KB4015549 KB4015546 KB4012218"
     echo Detected supported operating system: Windows 7 %WINDOWS_ARCHITECTURE%
     goto :check_hotfix
 )
 wmic /output:stdout os get version | findstr "^6\.3\." >nul && (
     set "WINDOWS_VER=8.1"
-    set "SUPPORTED_HOTFIXES=KB4019217 KB4019215 KB4015553 KB4015550 KB4015547 KB4012219"
+    set "SUPPORTED_HOTFIXES=KB4022726 KB4022717 KB4019217 KB4019215 KB4015553 KB4015550 KB4015547 KB4012219"
     echo Detected supported operating system: Windows 8.1 %WINDOWS_ARCHITECTURE%
     goto :check_hotfix
 )
@@ -83,22 +87,17 @@ for %%a in (%SUPPORTED_HOTFIXES%) do (
         goto :confirmation
     )
 )
-
+wmic /output:stdout qfe get /value 2>&1 | find "No Instance(s) Available" >nul && (
+    echo WARNING - wmic qfe is broken, can't check installed updates...
+    goto :confirmation
+)
 echo.
-echo WARNING - Detected that no supported updates are installed! 
+echo WARNING - Detected that no supported updates are installed.
 echo.
-echo This can be a false warning, sometimes it is caused by the WMI 
-echo Win32_QuickFixEngineering class being broken. If you are certain
-echo that you need wufuc, then you can continue ^(there should be no 
-echo side effects even if you don't need it^).
-echo.
-echo This warning could also mean that a new update came out and the 
-echo installer script's list of updates hasn't been updated yet. If 
-echo this is the case and you know which update it is, feel free to
-echo create an issue.  https://github.com/zeffy/wufuc/issues
-
-set /p CONTINUE=Enter 'Y' if you still want to continue: 
-if /I not "%CONTINUE%"=="Y" goto :cancel
+echo   This warning could also mean that a new update came out and the
+echo   wufuc installer script's list of updates hasn't been updated yet. 
+echo   If this is definitely the case and you know which update it is,
+echo   feel free to create an issue.  https://github.com/zeffy/wufuc/issues
 
 :confirmation
 echo.
@@ -106,13 +105,15 @@ echo wufuc disables the "Unsupported Hardware" message in Windows Update,
 echo and allows you to continue installing updates on Windows 7 and 8.1
 echo systems with Intel Kaby Lake, AMD Ryzen, or other unsupported processors.
 echo.
-
+echo Please be absolutely sure you really need wufuc before continuing.
+echo.
 set /p CONTINUE=Enter 'Y' if you want to install wufuc: 
 if /I not "%CONTINUE%"=="Y" goto :cancel
 echo.
 
 :install
 set "wufuc_task=wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307}"
+net start Schedule
 schtasks /Create /XML "%~dp0wufuc.xml" /TN "%wufuc_task%" /F
 schtasks /Change /TN "%wufuc_task%" /TR "'%systemroot%\system32\rundll32.exe' """%wufuc_dll%""",Rundll32Entry"
 schtasks /Change /TN "%wufuc_task%" /ENABLE
