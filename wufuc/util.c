@@ -96,7 +96,7 @@ BOOL IsOperatingSystemSupported(LPBOOL lpbIsWindows7, LPBOOL lpbIsWindows8Point1
 #endif
 }
 
-VOID _wdbgprintf(LPCWSTR format, ...) {
+VOID wdbgprintf(LPCWSTR format, ...) {
     WCHAR buffer[0x1000];
     va_list argptr;
     va_start(argptr, format);
@@ -105,7 +105,7 @@ VOID _wdbgprintf(LPCWSTR format, ...) {
     OutputDebugStringW(buffer);
 }
 
-VOID _dbgprintf(LPCSTR format, ...) {
+VOID dbgprintf(LPCSTR format, ...) {
     CHAR buffer[0x1000];
     va_list argptr;
     va_start(argptr, format);

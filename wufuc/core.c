@@ -111,13 +111,12 @@ BOOL PatchWUAgentHMODULE(HMODULE hModule) {
 
     if (*lpbFirstRun) {
         *lpbFirstRun = FALSE;
-        _tdbgprintf(_T("Changed first run to FALSE. (%p=%08x)"), lpbFirstRun, *lpbFirstRun);
+        _tdbgprintf(_T("Unset first run var. (%p=%08x)"), lpbFirstRun, *lpbFirstRun);
         result = TRUE;
     }
     if (!*lpbIsCPUSupportedResult) {
         *lpbIsCPUSupportedResult = TRUE;
-        _tdbgprintf(_T("Changed cached result to TRUE. (%p=%08x)."),
-            lpbIsCPUSupportedResult, *lpbIsCPUSupportedResult);
+        _tdbgprintf(_T("Set cached result. (%p=%08x)"), lpbIsCPUSupportedResult, *lpbIsCPUSupportedResult);
         result = TRUE;
     }
     return result;

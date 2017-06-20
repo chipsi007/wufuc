@@ -12,8 +12,8 @@ VOID ResumeAndCloseThreads(HANDLE *lphThreads, SIZE_T dwSize);
 BOOL CompareWindowsVersion(BYTE Operator, DWORD dwMajorVersion, DWORD dwMinorVersion, WORD wServicePackMajor, WORD wServicePackMinor, DWORD dwTypeMask);
 BOOL IsOperatingSystemSupported(LPBOOL lpbIsWindows7, LPBOOL lpbIsWindows8Point1);
 
-VOID _wdbgprintf(LPCWSTR format, ...);
-VOID _dbgprintf(LPCSTR format, ...);
+VOID wdbgprintf(LPCWSTR format, ...);
+VOID dbgprintf(LPCSTR format, ...);
 
 #define DETOUR_IAT(x, y) \
     LPVOID _LPORIGINAL##y; \
@@ -21,6 +21,15 @@ VOID _dbgprintf(LPCSTR format, ...);
 #define RESTORE_IAT(x, y) \
     DetourIAT(x, #y, NULL, _LPORIGINAL##y)
 
+#define STRINGIZEW_(x) L#x
+#define STRINGIZEW(x) STRINGIZEW_(x)
+#define __LINEWSTR__ STRINGIZEW(__LINE__)
+#define _wdbgprintf(format, ...) wdbgprintf(__FILEW__ L"(" __LINEWSTR__ L"): " format, ##__VA_ARGS__)
+
+#define STRINGIZE_(x) #x
+#define STRINGIZE(x) STRINGIZE_(x)
+#define __LINESTR__ STRINGIZE(__LINE__)
+#define _dbgprintf(format, ...) dbgprintf(__FILE__ "(" __LINESTR__ "): " format, ##__VA_ARGS__)
 #ifdef UNICODE
 #define _tdbgprintf  _wdbgprintf
 #else

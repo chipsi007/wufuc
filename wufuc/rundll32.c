@@ -51,7 +51,7 @@ void CALLBACK Rundll32Entry(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int n
                     }
                 } while (Module32Next(hSnap, &me));
 
-                HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)GetProcAddress(me.hModule, _CRT_STRINGIZE(LoadLibrary)), lpBaseAddress, 0, NULL);
+                HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)GetProcAddress(me.hModule, STRINGIZE(LoadLibrary)), lpBaseAddress, 0, NULL);
                 CloseHandle(hThread);
             }
             CloseHandle(hSnap);
