@@ -12,21 +12,25 @@ If you are feeling brave, you can try the latest unstable builds [here](https://
 
 ## Reporting an issue [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc "Average time to resolve an issue")
 
-There isn't really a way for wufuc to directly interact with your desktop, because it runs outside the context of a normal user session. Therefore you must first download and run another program called [DebugView](https://technet.microsoft.com/en-us/sysinternals/debugview.aspx) to display wufuc's debug messages. These logs are absolutely crucial if you want me to be able to resolve your issue as quickly as possible, so please include them if you can.
+#### Before you create an issue, please make sure of the following:
+
+- Are you using the latest version?
+- If you previously used the old batchfile patches, did you revert it by running `repair_wuaueng.dll.bat`?
+- Have you tried restarting your computer?
+
+There isn't really a way for wufuc to directly interact with your desktop, because it runs outside the context of a normal user session. Therefore you must first download and run another program called [DebugView](https://technet.microsoft.com/en-us/sysinternals/debugview.aspx) (from Microsoft) to display wufuc's debug messages. These logs are absolutely crucial if you want me to be able to resolve your issue as quickly as possible, so please include them if you can.
 
 #### The best way to get a log of the entire life-cycle of wufuc is to do the following:
 
-1. Disable wufuc by running `disable_wufuc.bat` as administrator.
-2. Start `Dbgview.exe` as administrator and check `Capture -> Capture Global Win32`.
-3. Enable wufuc by running `enable_wufuc.bat` as administrator.
-4. Start the `wuauserv` service if it isn't already running.
-5. Output will be shown in DebugView, copy/paste this text into your issue.
+1. Start `Dbgview.exe` as administrator and check `Capture -> Capture Global Win32`.
+2. Restart wufuc and `wuauserv` by running `debugview_helper.bat` as administrator.
+3. Output will be shown in DebugView, copy/paste this text into your issue.
 
 #### Other helpful information to include when reporting issues:
 
 - What happened? What did you expect to happen instead?
-- What version of wufuc are you using?
-- What version of Windows are you using? x86 or x64?
+- What build are you using? Stable release or unstable AppVeyor builds?
+- What version of Windows are you using? Windows 7 or 8.1? x64 or x86?
 - Were there any errors reporting during installation? What were they?
 - What is the file version or SHA-1 hash of `C:\Windows\System32\wuaueng.dll`?
 - Any other information you feel is relevant to your issue.
@@ -61,7 +65,7 @@ My patch takes advantage of this result caching behavior by setting the "hasn't 
 ### Several improvements over my batchfile method:
 
 - **No system files are modified!**
-- Heuristic-based patching, which means it will usually keep working even after updates.		
+- Heuristic-based patching, which means it will usually keep working even after new updates come out.		
 - C is best language.		
 - No external dependencies.
 
@@ -77,11 +81,9 @@ To uninstall run `uninstall_wufuc.bat` as administrator.
 
 Unless otherwise noted, you should only have to:
 
-- Run `disable_wufuc.bat` as administrator.
+- Run `uninstall_wufuc.bat` as administrator.
 - Copy the new files into the install folder, overwriting the old ones.
 - Run the new `install_wufuc.bat` as administrator.
-
-If you run into problems, try doing a full uninstall/reinstall.
 
 ### How do I remove your old patch and use this instead?
 
