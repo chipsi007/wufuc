@@ -1,16 +1,16 @@
-# wufuc [![](https://img.shields.io/badge/formerly-kb4012218--19-blue.svg)](../../tree/old-kb4012218-19 "formerly kb4012218-19") [![](https://ci.appveyor.com/api/projects/status/0s2unkpokttyslf0?svg=true)](https://ci.appveyor.com/project/zeffy/wufuc "AppVeyor build status")
+# wufuc [![](https://ci.appveyor.com/api/projects/status/0s2unkpokttyslf0?svg=true)](https://ci.appveyor.com/project/zeffy/wufuc) [![Click here to tip wufuc on Gratipay!](https://img.shields.io/gratipay/team/wufuc.svg)](https://gratipay.com/wufuc/)
 
-<a href='https://pledgie.com/campaigns/34055'><img alt='Click here to lend your support to: wufuc - Help support development and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/34055.png?skin_name=chrome' border='0' ></a>
+[![Click here to lend your support to wufuc and make a donation at pledgie.com !](https://pledgie.com/campaigns/34055.png)](https://pledgie.com/campaigns/34055)
 
 Disables the "Unsupported Hardware" message in Windows Update, and allows you to continue installing updates on Windows 7 and 8.1 systems with Intel Kaby Lake, AMD Ryzen, or other unsupported processors.
 
-## Downloads [![](https://img.shields.io/github/downloads/zeffy/wufuc/total.svg)](../../releases "Total downloads")
+## Downloads [![](https://img.shields.io/github/downloads/zeffy/wufuc/total.svg)](../../releases)
 
 ### You can get the latest stable version [here](../../releases/latest)!
 
 If you are feeling brave, you can try the latest unstable builds [here](https://ci.appveyor.com/project/zeffy/wufuc). **Use these at your own risk!**
 
-## Reporting an issue [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc "Average time to resolve an issue")
+## Reporting an issue [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
 
 #### Before you create an issue, please make sure of the following:
 
@@ -51,11 +51,11 @@ There have even been people with older Intel and AMD systems who have been locke
 
 If you are interested, you can read my original write up on discovering the CPU check [here](../../tree/old-kb4012218-19).
 
+## How it works
+
 Basically, inside a file called `wuaueng.dll` there are two functions: [`IsDeviceServiceable(void)`](https://gist.github.com/zeffy/e5ec266952932bc905eb0cbc6ed72185) and [`IsCPUSupported(void)`](https://gist.github.com/zeffy/1a8f8984d2bec97ae24af63a76278694). `IsDeviceServiceable(void)` is essentially a wrapper around `IsCPUSupported(void)` that caches the result it recieves and recycles it on subsequent calls. 
 
 My patch takes advantage of this result caching behavior by setting the "hasn't run once" value to `FALSE` and the cached result to `TRUE`.
-
-## How it works
 
 - At system boot the wufuc scheduled task runs as the `NT AUTHORITY\SYSTEM` user.
 - `wufuc` determines what service host group process the Windows Update service runs in (typically `netsvcs`), and injects itself into it.
