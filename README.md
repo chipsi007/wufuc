@@ -12,28 +12,7 @@ If you are feeling brave, you can try the latest unstable builds [here](https://
 
 ## Reporting an issue [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
 
-#### Before you create an issue, please make sure of the following:
-
-- Are you using the latest version?
-- If you previously used the old batchfile patches, did you revert it by running `repair_wuaueng.dll.bat`?
-- Have you tried restarting your computer?
-
-There isn't really a way for wufuc to directly interact with your desktop, because it runs outside the context of a normal user session. Therefore you must first download and run another program called [DebugView](https://technet.microsoft.com/en-us/sysinternals/debugview.aspx) (from Microsoft) to display wufuc's debug messages. These logs are absolutely crucial if you want me to be able to resolve your issue as quickly as possible, so please include them if you can.
-
-#### The best way to get a log of the entire life-cycle of wufuc is to do the following:
-
-1. Start `Dbgview.exe` as administrator and check `Capture -> Capture Global Win32`.
-2. Restart wufuc and `wuauserv` by running `debugview_helper.bat` as administrator.
-3. Output will be shown in DebugView, copy/paste this text into your issue.
-
-#### Other helpful information to include when reporting issues:
-
-- What happened? What did you expect to happen instead?
-- What build are you using? Stable release or unstable AppVeyor builds?
-- What version of Windows are you using? Windows 7 or 8.1? x64 or x86?
-- Were there any errors reporting during installation? What were they?
-- What is the file version or SHA-1 hash of `C:\Windows\System32\wuaueng.dll`?
-- Any other information you feel is relevant to your issue.
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Preface
 
