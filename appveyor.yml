@@ -2,6 +2,7 @@ version: 0.6.1.{build}
 skip_commits:
   files:
     - README.md
+    - CONTRIBUTING.md
 image: Visual Studio 2017
 configuration: Release
 platform:
