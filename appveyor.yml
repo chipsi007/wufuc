@@ -1,4 +1,4 @@
-version: 0.6.1.{build}
+version: 0.7.0.{build}
 skip_commits:
   files:
     - README.md
@@ -20,15 +20,15 @@ before_build:
 
 after_build:
 - cmd: >-
-    copy /Y "LICENSE" "install\COPYING.txt"
+    copy /Y "LICENSE" "setup-batch\COPYING.txt"
     
-    cd "%APPVEYOR_BUILD_FOLDER%\install"
+    cd "%APPVEYOR_BUILD_FOLDER%\setup-batch"
     
     for /R %%G in (*.bat) do unix2dos "%%G"
     
-    7z a "%BUILD_ZIPFILE%" "..\install"
+    7z a "%BUILD_ZIPFILE%" "..\setup-batch"
     
-    7z rn "%BUILD_ZIPFILE%" "install" "%APPVEYOR_PROJECT_NAME%"
+    7z rn "%BUILD_ZIPFILE%" "setup-batch" "%APPVEYOR_PROJECT_NAME%"
 
 artifacts:
 - path: '*.zip'
