@@ -55,13 +55,13 @@ for /f "tokens=*" %%i in ('wmic /output:stdout datafile where "name='%wufuc_dll:
 title wufuc installer - v%Version%
 
 :check_ver
-wmic /output:stdout os get version | findstr "^6\.1\." >nul && (
+ver | findstr " 6\.1\." >nul && (
     set "WINDOWS_VER=6.1"
     set "SUPPORTED_HOTFIXES=KB4022722 KB4022719 KB4019265 KB4019264 KB4015552 KB4015549 KB4015546 KB4012218"
     echo Detected supported operating system: Windows 7 %WINDOWS_ARCHITECTURE%
     goto :check_hotfix
 )
-wmic /output:stdout os get version | findstr "^6\.3\." >nul && (
+ver | findstr " 6\.3\." >nul && (
     set "WINDOWS_VER=8.1"
     set "SUPPORTED_HOTFIXES=KB4022726 KB4022717 KB4019217 KB4019215 KB4015553 KB4015550 KB4015547 KB4012219"
     echo Detected supported operating system: Windows 8.1 %WINDOWS_ARCHITECTURE%
@@ -69,15 +69,22 @@ wmic /output:stdout os get version | findstr "^6\.3\." >nul && (
 )
 
 :unsupported_os
-echo Detected that you are using an unsupported operating system.
+echo WARNING - Detected that you are using an unsupported operating system.
+echo.
+echo The ver command says that you are using:
+ver
 echo.
 echo This patch only works on the following versions of Windows:
 echo.
-echo - Windows 7 (x64 and x86)
-echo - Windows 8.1 (x64 and x86)
-echo - Windows Server 2008 R2
-echo - Windows Server 2012 R2
-goto :die
+echo   - Windows 7   (x64 / x86) [6.1.xxxx]
+echo   - Windows Server 2008 R2  [6.1.xxxx]
+echo   - Windows 8.1 (x64 / x86) [6.3.xxxx]
+echo   - Windows Server 2012 R2  [6.3.xxxx]
+echo.
+echo If you're absolutely certain that you are using a supported operating system,
+echo and that this warning is a mistake, you may continue with the patching process 
+echo at your own peril.
+goto :confirmation
 
 :check_hotfix
 for %%a in (%SUPPORTED_HOTFIXES%) do (
