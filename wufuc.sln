@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "SetupWufuc", "SetupWufuc\SetupWufuc.wixproj", "{2761679F-06D6-4AB0-BA47-01F1BD7BF55F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -30,6 +32,20 @@ Global
 		{00F96695-CE41-4C2F-A344-6219DFB4F887}.Release|x64.Build.0 = Release|x64
 		{00F96695-CE41-4C2F-A344-6219DFB4F887}.Release|x86.ActiveCfg = Release|Win32
 		{00F96695-CE41-4C2F-A344-6219DFB4F887}.Release|x86.Build.0 = Release|Win32
+		{00F96695-CE41-4C2F-A344-6219DFB4F887}.Release|x86.Deploy.0 = Release|Win32
+		{2761679F-06D6-4AB0-BA47-01F1BD7BF55F}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{2761679F-06D6-4AB0-BA47-01F1BD7BF55F}.Debug|Win32.ActiveCfg = Debug|x86
+		{2761679F-06D6-4AB0-BA47-01F1BD7BF55F}.Debug|Win32.Build.0 = Debug|x86
+		{2761679F-06D6-4AB0-BA47-01F1BD7BF55F}.Debug|x64.ActiveCfg = Debug|x86
+		{2761679F-06D6-4AB0-BA47-01F1BD7BF55F}.Debug|x86.ActiveCfg = Debug|x86
+		{2761679F-06D6-4AB0-BA47-01F1BD7BF55F}.Debug|x86.Build.0 = Debug|x86
+		{2761679F-06D6-4AB0-BA47-01F1BD7BF55F}.Release|Any CPU.ActiveCfg = Release|x64
+		{2761679F-06D6-4AB0-BA47-01F1BD7BF55F}.Release|Win32.ActiveCfg = Release|x86
+		{2761679F-06D6-4AB0-BA47-01F1BD7BF55F}.Release|Win32.Build.0 = Release|x86
+		{2761679F-06D6-4AB0-BA47-01F1BD7BF55F}.Release|x64.ActiveCfg = Release|x64
+		{2761679F-06D6-4AB0-BA47-01F1BD7BF55F}.Release|x64.Build.0 = Release|x64
+		{2761679F-06D6-4AB0-BA47-01F1BD7BF55F}.Release|x86.ActiveCfg = Release|x86
+		{2761679F-06D6-4AB0-BA47-01F1BD7BF55F}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

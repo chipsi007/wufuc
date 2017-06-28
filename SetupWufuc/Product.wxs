@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?define ProductName = "Wufuc - Windows Update fixer" ?>
+  <?define ProductFullVersion = "!(bind.FileVersion.LibraryFile)" ?>
+  <?define ProductAuthor = "Jeffy" ?>
+  <?define ProductAppFolder = "InstallLocation" ?>
+  <?if $(var.Platform) = x64 ?>
+    <?define ProductDisplayName = "$(var.ProductName) 64-bit" ?>
+    <?define ProductId = "C8BE2142-DBD1-45BD-B564-7EE5035E05E5" ?>
+    <?define ProductUpgradeCode = "CC5091C5-2A7A-41F6-8B64-F036D9553A30" ?>
+    <?define Win64 = "yes" ?>
+    <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+    <?define WindowsSystemFolder = "System64Folder" ?>
+  <?else ?>
+    <?define ProductDisplayName = "$(var.ProductName)" ?>
+    <?define ProductId = "C8BE2142-DBD1-45BD-B532-7EE5035E05E5" ?>
+    <?define ProductUpgradeCode = "CC5091C5-2A7A-41F6-8B32-F036D9553A30" ?>
+    <?define Win64 = "no" ?>
+    <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+    <?define WindowsSystemFolder = "SystemFolder" ?>
+  <?endif ?>
+	
+  <Product 
+    Id="$(var.ProductId)" 
+    Name="$(var.ProductName)" 
+    Language="1033" 
+    Version="$(var.ProductFullVersion)" 
+    Manufacturer="$(var.ProductAuthor)" 
+    UpgradeCode="$(var.ProductUpgradeCode)">
+		<Package
+      InstallerVersion="200"
+      Compressed="yes"
+      InstallScope="perMachine"
+      Manufacturer="$(var.ProductAuthor)"
+      Platform="$(var.Platform)" />
+
+    <PropertyRef Id="WIX_ACCOUNT_LOCALSERVICE" />
+    <?if $(var.Platform) = x86 ?>
+      <Condition Message="This application can not be installed on x64 machine.">
+        <![CDATA[Not VersionNT64]]>
+      </Condition>
+    <?endif ?>
+
+    <Condition Message="This application is only supported on Windows 7, 8.1, 2008 R2 or 2012 R2.">
+      <![CDATA[Installed OR (VersionNT = 601) OR (VersionNT = 603)]]>
+    </Condition>
+    <Media Id="1" Cabinet="media.cab" EmbedCab="yes" />
+    
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+    <Property Id="APPLICATIONFOLDER" Secure="yes">
+      <RegistrySearch
+        Id='AppFolderRegistrySearch'
+        Type='raw'
+        Root='HKLM'
+        Key='Software\Microsoft\Windows\CurrentVersion\Uninstall\[WIX_UPGRADE_DETECTED]'
+        Name='$(var.ProductAppFolder)'
+        Win64='$(var.Win64)' />
+    </Property>
+
+    <Property Id="ApplicationFolderName" Value="$(var.ProductName)" />
+
+    <Property Id="WixAppFolder" Value="WixPerMachineFolder" />
+    <WixVariable Id="WixUISupportPerUser" Value="0" />
+    
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <!-- Program files -->
+      <Directory Id="$(var.PlatformProgramFilesFolder)" >
+        <Directory Id="APPLICATIONFOLDER" Name="$(var.ProductName)" />
+      </Directory>
+
+      <!-- Start menu (shortcuts) -->
+      <Directory Id="ProgramMenuFolder" >
+        <Directory Id="ShortcutsFolder" Name="$(var.ProductName)"/>
+      </Directory>
+
+      <Directory Id="SystemFolder" />
+    </Directory>
+
+    <DirectoryRef Id="APPLICATIONFOLDER">
+      <!-- Readme file -->
+      <Component
+        Id="TextComponent"
+        Guid="1ACD536E-FFCC-47D4-8D3B-8D91D236EE45"
+        Win64="$(var.Win64)">
+
+        <File
+          Id="ReadmeFile"
+          Name="readme.txt"
+          Source="$(var.SolutionDir)README.md"
+          KeyPath="yes">
+        </File>
+      </Component>
+
+      <!-- Shared library -->
+      <Component
+        Id="LibraryComponent"
+        Guid="551F05C0-9A41-49FF-A967-6ACB9E7BC200"
+        Win64="$(var.Win64)">
+
+        <File
+          Id="LibraryFile"
+          Name="$(var.wufuc.TargetFileName)"
+          Source="$(var.wufuc.TargetPath)"
+          KeyPath="yes"
+          Vital="yes"
+          Checksum="yes"
+			/>
+      </Component>
+    </DirectoryRef>
+
+    <!-- Start menu program shortcuts -->
+    <DirectoryRef Id="ShortcutsFolder">
+
+      <!-- Shortcuts for readme file and uninstaller -->
+      <Component
+        Id="ShortcutsComponent"
+        Guid="480D426B-6954-4C78-BFB3-A3C95E48BB15"
+        Win64="$(var.Win64)">
+
+        <Shortcut
+          Id="ReadmeShortcut"
+          Name="ReadMe"
+          Description="Help and information"
+          Target="[APPLICATIONFOLDER]readme.txt"
+          WorkingDirectory="APPLICATIONFOLDER"
+			  />
+
+        <Shortcut
+          Id="UninstallShortcut"
+          Name="Uninstall"
+          Description="Uninstall Wufuc"
+          Target="[$(var.WindowsSystemFolder)]msiexec.exe"
+          Arguments="/x [ProductCode]"
+			  />
+
+        <RemoveFolder
+          Id="ShortcutsRemoveFolder"
+          On="uninstall"
+			  />
+
+        <RegistryValue
+          Root="HKCU"
+          Key="Software\$(var.ProductName)"
+          Name="installed"
+          Type="integer"
+          Value="1"
+          KeyPath="yes"
+			  />
+      </Component>
+    </DirectoryRef>
+
+    <!-- Common components -->
+    <ComponentGroup Id="CommonComponentGroup">
+      <ComponentRef Id="ShortcutsComponent"/>
+      <ComponentRef Id="TextComponent"/>
+      <ComponentRef Id="LibraryComponent"/>
+    </ComponentGroup>
+
+
+    <Feature
+      Id="CompleteInstall"
+      Title="Complete Install"
+      Level="1"
+      Description="Installs the $(var.ProductName) Windows service.">
+
+      <ComponentRef Id="ShortcutsComponent"/>
+      <ComponentRef Id="TextComponent"/>
+      <ComponentRef Id="LibraryComponent"/>
+      <ComponentGroupRef Id="CommonComponentGroup"/>
+    </Feature>
+    
+    <SetDirectory Id="APPLICATIONFOLDER" Value="[$(var.PlatformProgramFilesFolder)][ApplicationFolderName]">
+      APPLICATIONFOLDER=""
+    </SetDirectory>
+
+    <!-- Save destination folder in Add/Remove programs (ARP) registry key -->
+    <SetProperty Id="ARPINSTALLLOCATION" Value="[APPLICATIONFOLDER]" After="CostFinalize"	/>
+
+    <CustomAction
+      Id="OverwriteWixSetDefaultPerMachineFolder"
+      Property="WixPerMachineFolder"
+      Value="[APPLICATIONFOLDER]"
+      Execute="immediate"
+	  />
+
+    <!--
+    <CustomAction
+      Id="UnloadDLL"
+      Return="ignore"
+      Property="ARPINSTALLLOCATION"
+      ExeCommand="&quot;[SystemFolder]rundll32&quot; &quot;&quot;&quot;[INSTALLFOLDER]wufuc.dll&quot;&quot;&quot;,Rundll32Unload"
+    />
+    -->
+    <CustomAction
+      Id="CreateScheduledTask"
+      Directory="SystemFolder"
+      ExeCommand="&quot;[SystemFolder]schtasks.exe&quot; /Create /TN wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307} /SC ONSTART /RU &quot;[WIX_ACCOUNT_LOCALSYSTEM]&quot; /TR &quot;[SystemFolder]rundll32 \&quot;\&quot;\&quot;[APPLICATIONFOLDER]wufuc.dll\&quot;\&quot;\&quot;,Rundll32Entry&quot;"
+      Execute="deferred"
+      Impersonate="no"
+    />
+
+    <CustomAction
+      Id="StartScheduledTask"
+      Directory="SystemFolder"
+      ExeCommand="&quot;[SystemFolder]schtasks.exe&quot; /Run /TN wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307}"
+      Execute="deferred"
+      Impersonate="no"
+    />
+
+    <CustomAction
+      Id="RollbackScheduledTask"
+      Directory="SystemFolder"
+      ExeCommand="&quot;[SystemFolder]schtasks.exe&quot; /Delete /TN wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307} /F"
+      Execute="rollback"
+      Impersonate="no"
+    />
+
+    <CustomAction
+      Id="RemoveScheduledTask"
+      Directory="SystemFolder"
+      ExeCommand="&quot;[SystemFolder]schtasks.exe&quot; /Delete /TN wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307} /F"
+      Execute="deferred"
+      Impersonate="no"
+    />
+
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.SolutionDir)LICENSE.rtf" />
+      
+    <InstallUISequence>
+      <Custom Action="OverwriteWixSetDefaultPerMachineFolder" After="WixSetDefaultPerMachineFolder" />
+    </InstallUISequence>
+
+    <InstallExecuteSequence>
+      <Custom Action="OverwriteWixSetDefaultPerMachineFolder" After="WixSetDefaultPerMachineFolder" />
+      <Custom Action="CreateScheduledTask" Before="InstallFinalize">NOT Installed</Custom>
+      <Custom Action="StartScheduledTask" After="CreateScheduledTask">NOT Installed</Custom>
+      <Custom Action="RollbackScheduledTask" Before="CreateScheduledTask">NOT Installed</Custom>
+      <Custom Action="RemoveScheduledTask" Before="InstallFinalize">REMOVE ~= "ALL"</Custom>
+    </InstallExecuteSequence>
+    <UIRef Id="WixUI_Advanced"/>
+
+  </Product>    
+</Wix>
