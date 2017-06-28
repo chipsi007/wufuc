@@ -34,6 +34,7 @@
       Manufacturer="$(var.ProductAuthor)"
       Platform="$(var.Platform)" />
 
+    <PropertyRef Id="WIX_ACCOUNT_LOCALSERVICE" />
     <?if $(var.Platform) = x86 ?>
       <Condition Message="This application can not be installed on x64 machine.">
         <![CDATA[Not VersionNT64]]>
@@ -43,7 +44,6 @@
     <Condition Message="This application is only supported on Windows 7, 8.1, 2008 R2 or 2012 R2.">
       <![CDATA[Installed OR (VersionNT = 601) OR (VersionNT = 603)]]>
     </Condition>
-    
     <Media Id="1" Cabinet="media.cab" EmbedCab="yes" />
     
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
@@ -64,47 +64,20 @@
     <WixVariable Id="WixUISupportPerUser" Value="0" />
     
     <Directory Id="TARGETDIR" Name="SourceDir">
-    <!-- Program files -->
-    <Directory Id="$(var.PlatformProgramFilesFolder)" >
-      <Directory Id="APPLICATIONFOLDER" Name="$(var.ProductName)"/>
-    </Directory>
+      <!-- Program files -->
+      <Directory Id="$(var.PlatformProgramFilesFolder)" >
+        <Directory Id="APPLICATIONFOLDER" Name="$(var.ProductName)" />
+      </Directory>
 
-    <!-- Start menu (shortcuts) -->
-    <Directory Id="ProgramMenuFolder" >
-      <Directory Id="ShortcutsFolder" Name="$(var.ProductName)"/>
-    </Directory>
+      <!-- Start menu (shortcuts) -->
+      <Directory Id="ProgramMenuFolder" >
+        <Directory Id="ShortcutsFolder" Name="$(var.ProductName)"/>
+      </Directory>
+
+      <Directory Id="SystemFolder" />
     </Directory>
 
     <DirectoryRef Id="APPLICATIONFOLDER">
-      <!-- Windows service -->
-      <!--
-      <Component
-        Id="ServiceComponent"
-        Guid="C9E9EA0D-AC74-4833-870E-5BE0D05A15BE"
-        Win64="$(var.Win64)">
-
-        <File
-          Id="ServiceFile"
-          Name="$(var.wufuc.TargetFileName)"
-          Source="$(var.wufuc.TargetPath)"
-			  />
-
-        <ServiceInstall Id="ServiceInstall"
-          Name="WufucSvc"
-          DisplayName="$(var.ProductName) Service"
-          Type="ownProcess"
-          Interactive="no"
-          Start="auto"
-          Vital="yes"
-          ErrorControl="normal"
-          Description="Service to bypass compatibility processor check for updates." />
-        <ServiceControl Id="ServiceControl"
-          Name="WufucSvc"
-          Stop="both"
-          Remove="uninstall"
-          Wait="yes" />
-      </Component>
-      -->
       <!-- Readme file -->
       <Component
         Id="TextComponent"
@@ -136,7 +109,7 @@
       </Component>
     </DirectoryRef>
 
-    <!-- Starte menu program shortcuts -->
+    <!-- Start menu program shortcuts -->
     <DirectoryRef Id="ShortcutsFolder">
 
       <!-- Shortcuts for readme file and uninstaller -->
@@ -201,6 +174,9 @@
       APPLICATIONFOLDER=""
     </SetDirectory>
 
+    <!-- Save destination folder in Add/Remove programs (ARP) registry key -->
+    <SetProperty Id="ARPINSTALLLOCATION" Value="[APPLICATIONFOLDER]" After="CostFinalize"	/>
+
     <CustomAction
       Id="OverwriteWixSetDefaultPerMachineFolder"
       Property="WixPerMachineFolder"
@@ -208,17 +184,49 @@
       Execute="immediate"
 	  />
 
-    <!-- Save destination folder in Add/Remove programs (ARP) registry key -->
-    <SetProperty Id="ARPINSTALLLOCATION" Value="[APPLICATIONFOLDER]" After="CostFinalize"	/>
+    <!--
+    <CustomAction
+      Id="UnloadDLL"
+      Return="ignore"
+      Property="ARPINSTALLLOCATION"
+      ExeCommand="&quot;[SystemFolder]rundll32&quot; &quot;&quot;&quot;[INSTALLFOLDER]wufuc.dll&quot;&quot;&quot;,Rundll32Unload"
+    />
+    -->
+    <CustomAction
+      Id="CreateScheduledTask"
+      Directory="SystemFolder"
+      ExeCommand="&quot;[SystemFolder]schtasks.exe&quot; /Create /TN wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307} /SC ONSTART /RU &quot;[WIX_ACCOUNT_LOCALSYSTEM]&quot; /TR &quot;[SystemFolder]rundll32 \&quot;\&quot;\&quot;[APPLICATIONFOLDER]wufuc.dll\&quot;\&quot;\&quot;,Rundll32Entry&quot;"
+      Execute="deferred"
+      Impersonate="no"
+    />
+
+    <CustomAction
+      Id="RollbackScheduledTask"
+      Directory="SystemFolder"
+      ExeCommand="&quot;[SystemFolder]schtasks.exe&quot; /Delete /TN wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307} /F"
+      Execute="rollback"
+      Impersonate="no"
+    />
+
+    <CustomAction
+      Id="RemoveScheduledTask"
+      Directory="SystemFolder"
+      ExeCommand="&quot;[SystemFolder]schtasks.exe&quot; /Delete /TN wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307} /F"
+      Execute="deferred"
+      Impersonate="no"
+    />
 
     <WixVariable Id="WixUILicenseRtf" Value="$(var.SolutionDir)LICENSE.rtf" />
       
     <InstallUISequence>
       <Custom Action="OverwriteWixSetDefaultPerMachineFolder" After="WixSetDefaultPerMachineFolder" />
     </InstallUISequence>
+
     <InstallExecuteSequence>
       <Custom Action="OverwriteWixSetDefaultPerMachineFolder" After="WixSetDefaultPerMachineFolder" />
-       <DeleteServices>NOT UPGRADINGPRODUCTCODE</DeleteServices>
+      <Custom Action="CreateScheduledTask" Before="InstallFinalize">NOT Installed</Custom>
+      <Custom Action="RollbackScheduledTask" Before="CreateScheduledTask">NOT Installed</Custom>
+      <Custom Action="RemoveScheduledTask" Before="InstallFinalize">REMOVE ~= "ALL"</Custom>
     </InstallExecuteSequence>
     <UIRef Id="WixUI_Advanced"/>
 
