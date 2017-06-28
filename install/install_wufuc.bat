@@ -56,6 +56,10 @@ if not exist "%wufuc_dll%" (
     echo This most likely means you tried to clone the repository.
     echo Please download wufuc from here:  https://github.com/zeffy/wufuc/releases
     echo.
+    echo If you are using an unstable AppVeyor build, it could also mean you
+    echo downloaded the wrong build of wufuc for your operating system. If this
+    echo is the case, you need to download the %WINDOWS_ARCHITECTURE% build instead.
+    echo.
     echo AVG ^(and possibly other AV^) users:
     echo This error could also mean that your anti-virus deleted or quarantined wufuc
     echo in which case, you will need to make an exception and restore it.
