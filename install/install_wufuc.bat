@@ -50,9 +50,33 @@ goto :get_ver
 set "WINDOWS_ARCHITECTURE=x64"
 set "wufuc_dll=%~dp0wufuc64.dll"
 
+if not exist "%wufuc_dll%" (
+    echo ERROR - Could not find %wufuc_dll%!
+    echo.
+    echo This most likely means you tried to clone the repository.
+    echo Please download wufuc from here:  https://github.com/zeffy/wufuc/releases
+    echo.
+    echo AVG ^(and possibly other AV^) users:
+    echo This error could also mean that your anti-virus deleted or quarantined wufuc
+    echo in which case, you will need to make an exception and restore it.
+    goto :die
+)
+
 :get_ver
 for /f "tokens=*" %%i in ('wmic /output:stdout datafile where "name='%wufuc_dll:\=\\%'" get Version /value ^| find "="') do set "%%i"
 title wufuc installer - v%Version%
+
+set "wufuc_xml=%~dp0wufuc.xml"
+
+if not exist "%wufuc_xml%" (
+    echo ERROR - Could not find %wufuc_xml%!
+    echo.
+    echo This most likely means you didn't extract all the files from the archive.
+    echo.
+    echo Please extract all the files from wufuc_v%Version%.zip to a permanent
+    echo location like C:\Program Files\wufuc and try again.
+    goto :die
+)
 
 :check_ver
 ver | findstr " 6\.1\." >nul && (
@@ -76,9 +100,9 @@ ver
 echo.
 echo This patch only works on the following versions of Windows:
 echo.
-echo   - Windows 7   (x64 / x86) [6.1.xxxx]
+echo   - Windows 7   ^(x64 / x86^) [6.1.xxxx]
 echo   - Windows Server 2008 R2  [6.1.xxxx]
-echo   - Windows 8.1 (x64 / x86) [6.3.xxxx]
+echo   - Windows 8.1 ^(x64 / x86^) [6.3.xxxx]
 echo   - Windows Server 2012 R2  [6.3.xxxx]
 echo.
 echo If you're absolutely certain that you are using a supported operating system,
@@ -87,6 +111,7 @@ echo at your own peril.
 goto :confirmation
 
 :check_hotfix
+echo Checking installed updates, please wait...
 for %%a in (%SUPPORTED_HOTFIXES%) do (
     wmic /output:stdout qfe get hotfixid | find "%%a" >nul && (
         set "INSTALLED_HOTFIX=%%a"
@@ -121,7 +146,7 @@ echo.
 :install
 set "wufuc_task=wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307}"
 net start Schedule
-schtasks /Create /XML "%~dp0wufuc.xml" /TN "%wufuc_task%" /F
+schtasks /Create /XML "%wufuc_xml%" /TN "%wufuc_task%" /F
 schtasks /Change /TN "%wufuc_task%" /TR "'%systemroot%\system32\rundll32.exe' """%wufuc_dll%""",Rundll32Entry"
 schtasks /Change /TN "%wufuc_task%" /ENABLE
 rundll32 "%wufuc_dll%",Rundll32Unload
