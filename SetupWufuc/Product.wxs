@@ -201,6 +201,14 @@
     />
 
     <CustomAction
+      Id="StartScheduledTask"
+      Directory="SystemFolder"
+      ExeCommand="&quot;[SystemFolder]schtasks.exe&quot; /Run /TN wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307}"
+      Execute="deferred"
+      Impersonate="no"
+    />
+
+    <CustomAction
       Id="RollbackScheduledTask"
       Directory="SystemFolder"
       ExeCommand="&quot;[SystemFolder]schtasks.exe&quot; /Delete /TN wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307} /F"
@@ -225,6 +233,7 @@
     <InstallExecuteSequence>
       <Custom Action="OverwriteWixSetDefaultPerMachineFolder" After="WixSetDefaultPerMachineFolder" />
       <Custom Action="CreateScheduledTask" Before="InstallFinalize">NOT Installed</Custom>
+      <Custom Action="StartScheduledTask" After="CreateScheduledTask">NOT Installed</Custom>
       <Custom Action="RollbackScheduledTask" Before="CreateScheduledTask">NOT Installed</Custom>
       <Custom Action="RemoveScheduledTask" Before="InstallFinalize">REMOVE ~= "ALL"</Custom>
     </InstallExecuteSequence>
