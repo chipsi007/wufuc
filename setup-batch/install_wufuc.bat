@@ -50,21 +50,22 @@ goto :get_ver
 set "WINDOWS_ARCHITECTURE=x64"
 set "wufuc_dll=%~dp0wufuc64.dll"
 
-if not exist "%wufuc_dll%" (
-    echo ERROR - Could not find %wufuc_dll%!
-    echo.
-    echo This most likely means you tried to clone the repository.
-    echo Please download wufuc from here:  https://github.com/zeffy/wufuc/releases
-    echo.
-    echo If you are using an unstable AppVeyor build, it could also mean you
-    echo downloaded the wrong build of wufuc for your operating system. If this
-    echo is the case, you need to download the %WINDOWS_ARCHITECTURE% build instead.
-    echo.
-    echo AVG ^(and possibly other AV^) users:
-    echo This error could also mean that your anti-virus deleted or quarantined wufuc
-    echo in which case, you will need to make an exception and restore it.
-    goto :die
+if exist "%wufuc_dll%" (
+    goto :get_ver
 )
+echo ERROR - Could not find %wufuc_dll%!
+echo.
+echo This most likely means you tried to clone the repository.
+echo Please download wufuc from here:  https://github.com/zeffy/wufuc/releases
+echo.
+echo If you are using an unstable AppVeyor build, it could also mean you
+echo downloaded the wrong build of wufuc for your operating system. If this
+echo is the case, you need to download the %WINDOWS_ARCHITECTURE% build instead.
+echo.
+echo AVG ^(and possibly other AV^) users:
+echo This error could also mean that your anti-virus deleted or quarantined wufuc
+echo in which case, you will need to make an exception and restore it.
+goto :die
 
 :get_ver
 for /f "tokens=*" %%i in ('wmic /output:stdout datafile where "name='%wufuc_dll:\=\\%'" get Version /value ^| find "="') do set "%%i"
@@ -72,15 +73,16 @@ title wufuc installer - v%Version%
 
 set "wufuc_xml=%~dp0wufuc.xml"
 
-if not exist "%wufuc_xml%" (
-    echo ERROR - Could not find %wufuc_xml%!
-    echo.
-    echo This most likely means you didn't extract all the files from the archive.
-    echo.
-    echo Please extract all the files from wufuc_v%Version%.zip to a permanent
-    echo location like C:\Program Files\wufuc and try again.
-    goto :die
+if exist "%wufuc_xml%" (
+    goto :check_ver
 )
+echo ERROR - Could not find %wufuc_xml%!
+echo.
+echo This most likely means you didn't extract all the files from the archive.
+echo.
+echo Please extract all the files from wufuc_v%Version%.zip to a permanent
+echo location like C:\Program Files\wufuc and try again.
+goto :die
 
 :check_ver
 ver | findstr " 6\.1\." >nul && (
