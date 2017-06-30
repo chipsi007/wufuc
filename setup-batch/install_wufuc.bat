@@ -154,7 +154,11 @@ schtasks /Create /XML "%wufuc_xml%" /TN "%wufuc_task%" /F
 schtasks /Change /TN "%wufuc_task%" /TR "'%systemroot%\system32\rundll32.exe' """%wufuc_dll%""",Rundll32Entry"
 schtasks /Change /TN "%wufuc_task%" /ENABLE
 rundll32 "%wufuc_dll%",Rundll32Unload
+net stop wuauserv
 schtasks /Run /TN "%wufuc_task%"
+
+timeout /nobreak /t 3 >nul
+net start wuauserv
 
 echo.
 echo Installed and started wufuc, you can now continue installing updates! :^)
