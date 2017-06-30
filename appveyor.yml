@@ -6,8 +6,8 @@ skip_commits:
 image: Visual Studio 2017
 configuration: Release
 platform:
-- x86
-- x64
+  - x86
+  - x64
 build:
   verbosity: minimal
 before_build:
@@ -35,4 +35,4 @@ after_build:
     7z rn "%BUILD_ZIPFILE%" "setup-batch" "%APPVEYOR_PROJECT_NAME%"
 
 artifacts:
-- path: '*.zip'
+  - path: '*.zip'
