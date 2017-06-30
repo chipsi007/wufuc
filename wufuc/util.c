@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <stdio.h>
+#include <time.h>
 #include <tchar.h>
 #include <TlHelp32.h>
 #include <Psapi.h>
@@ -124,7 +125,6 @@ BOOL init_log(void) {
     if (!log_fp) {
         return FALSE;
     }
-    setvbuf(log_fp, NULL, _IONBF, 0);
     return TRUE;
 }
 
@@ -136,9 +136,15 @@ VOID close_log(void) {
 
 VOID dwprintf_(LPCWSTR format, ...) {
     if (init_log()) {
+        WCHAR datebuf[9], timebuf[9];
+        _wstrdate_s(datebuf, _countof(datebuf));
+        _wstrtime_s(timebuf, _countof(timebuf));
+        fwprintf_s(log_fp, L"%s %s [%d] ", datebuf, timebuf, GetCurrentProcessId());
+
         va_list argptr;
         va_start(argptr, format);
         vfwprintf_s(log_fp, format, argptr);
         va_end(argptr);
+        fflush(log_fp);
     }
 }
