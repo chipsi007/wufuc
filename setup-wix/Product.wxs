@@ -39,12 +39,12 @@
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
         <Property Id="APPLICATIONFOLDER" Secure="yes">
             <RegistrySearch
-                Id='AppFolderRegistrySearch'
-                Type='raw'
-                Root='HKLM'
-                Key='Software\Microsoft\Windows\CurrentVersion\Uninstall\[WIX_UPGRADE_DETECTED]'
-                Name='$(var.ProductAppFolder)'
-                Win64='$(var.Win64)' />
+                Id="AppFolderRegistrySearch"
+                Type="raw"
+                Root="HKLM"
+                Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[WIX_UPGRADE_DETECTED]"
+                Name="$(var.ProductAppFolder)"
+                Win64="$(var.Win64)" />
         </Property>
         <Property Id="ApplicationFolderName" Value="$(var.ProductName)" />
         <Property Id="WixAppFolder" Value="WixPerMachineFolder" />
