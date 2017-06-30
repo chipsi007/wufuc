@@ -25,8 +25,10 @@ after_build:
     copy /Y "LICENSE" "setup-batch\COPYING.txt"
     
     cd "%APPVEYOR_BUILD_FOLDER%\setup-batch"
+
+    for /R %%i in (*.txt) do unix2dos "%%i"
     
-    for /R %%G in (*.bat) do unix2dos "%%G"
+    for /R %%i in (*.bat) do unix2dos "%%i"
     
     7z a "%BUILD_ZIPFILE%" "..\setup-batch"
     
