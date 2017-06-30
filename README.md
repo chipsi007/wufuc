@@ -34,7 +34,7 @@ If you are interested, you can read my original write up on discovering the CPU 
 
 Basically, inside a file called `wuaueng.dll` there are two functions: [`IsDeviceServiceable(void)`](https://gist.github.com/zeffy/e5ec266952932bc905eb0cbc6ed72185) and [`IsCPUSupported(void)`](https://gist.github.com/zeffy/1a8f8984d2bec97ae24af63a76278694). `IsDeviceServiceable(void)` is essentially a wrapper around `IsCPUSupported(void)` that caches the result it receives and recycles it on subsequent calls. 
 
-My patch takes advantage of this result caching behavior by setting the "hasn't run once" value to `FALSE` and the cached result to `TRUE`.
+My patch takes advantage of this result caching behavior by setting the "first run" value to `FALSE` and the cached result to `TRUE`.
 
 - At system boot the wufuc scheduled task runs as the `NT AUTHORITY\SYSTEM` user.
 - `wufuc` determines what service host group process the Windows Update service runs in (typically `netsvcs`), and injects itself into it.
