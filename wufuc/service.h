@@ -1,6 +1,5 @@
 #pragma once
 
-
 BOOL get_svcdllA(LPCSTR lpServiceName, LPSTR lpServiceDll, DWORD dwSize);
 BOOL get_svcdllW(LPCWSTR lpServiceName, LPWSTR lpServiceDll, DWORD dwSize);
 BOOL get_svcpid(SC_HANDLE hSCManager, LPCTSTR lpServiceName, DWORD *lpdwProcessId);

@@ -3,7 +3,6 @@
 #include <tchar.h>
 #include "service.h"
 #include "util.h"
-#include "shared.h"
 
 void CALLBACK Rundll32Entry(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow) {
     if (!g_IsWindows7 && !g_IsWindows8Point1) {
@@ -58,12 +57,13 @@ void CALLBACK Rundll32Entry(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int n
         }
     }
     CloseHandle(hProcess);
+    close_log();
 }
 
 void CALLBACK Rundll32Unload(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow) {
     HANDLE hEvent = OpenEvent(EVENT_MODIFY_STATE, FALSE, _T("Global\\wufuc_UnloadEvent"));
     if (hEvent) {
-        _tdbgprintf(_T("Setting unload event..."));
+        dwprintf(L"Setting unload event...");
         SetEvent(hEvent);
         CloseHandle(hEvent);
     }

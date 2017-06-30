@@ -1,7 +1,6 @@
 #include <Windows.h>
 #include "core.h"
 #include "util.h"
-#include "shared.h"
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {

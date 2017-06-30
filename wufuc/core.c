@@ -6,7 +6,6 @@
 #include "service.h"
 #include "patternfind.h"
 #include "util.h"
-#include "shared.h"
 #include "core.h"
 
 DWORD WINAPI NewThreadProc(LPVOID lpParam) {
@@ -49,13 +48,13 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
 
     HMODULE hwu = GetModuleHandle(lpServiceDll);
     if (hwu && PatchWUAgentHMODULE(hwu)) {
-        _tdbgprintf(_T("Patched previously loaded Windows Update module!"));
+        dwprintf(L"Patched previously loaded Windows Update module!");
     }
     ResumeAndCloseThreads(lphThreads, cb);
 
     WaitForSingleObject(hEvent, INFINITE);
 
-    _tdbgprintf(_T("Unload event was set."));
+    dwprintf(L"Unload event was set.");
 
     SuspendProcessThreads(dwProcessId, dwThreadId, lphThreads, _countof(lphThreads), &cb);
     RESTORE_IAT(hm, LoadLibraryExA);
@@ -63,7 +62,8 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
     ResumeAndCloseThreads(lphThreads, cb);
 
     CloseHandle(hEvent);
-    _tdbgprintf(_T("See ya!"));
+    dwprintf(L"See ya!");
+    close_log();
     FreeLibraryAndExitThread(HINST_THISCOMPONENT, 0);
 }
 
@@ -93,12 +93,12 @@ BOOL PatchWUAgentHMODULE(HMODULE hModule) {
 
     SIZE_T rva = patternfind(modinfo.lpBaseOfDll, modinfo.SizeOfImage, 0, pattern);
     if (rva == -1) {
-        _tdbgprintf(_T("No pattern match!"));
+        dwprintf(L"No pattern match!");
         return FALSE;
     }
     uintptr_t baseAddress = (uintptr_t)modinfo.lpBaseOfDll;
     uintptr_t fpIsDeviceServiceable = baseAddress + rva;
-    _tdbgprintf(_T("Found address of IsDeviceServiceable. (%p)"), fpIsDeviceServiceable);
+    dwprintf(L"Found address of IsDeviceServiceable. (%p)", fpIsDeviceServiceable);
     BOOL result = FALSE;
     LPBOOL lpbFirstRun, lpbIsCPUSupportedResult;
 #ifdef _AMD64_
@@ -111,12 +111,12 @@ BOOL PatchWUAgentHMODULE(HMODULE hModule) {
 
     if (*lpbFirstRun) {
         *lpbFirstRun = FALSE;
-        _tdbgprintf(_T("Unset first run var. (%p=%08x)"), lpbFirstRun, *lpbFirstRun);
+        dwprintf(L"Unset first run var. (%p=%08x)", lpbFirstRun, *lpbFirstRun);
         result = TRUE;
     }
     if (!*lpbIsCPUSupportedResult) {
         *lpbIsCPUSupportedResult = TRUE;
-        _tdbgprintf(_T("Set cached result. (%p=%08x)"), lpbIsCPUSupportedResult, *lpbIsCPUSupportedResult);
+        dwprintf(L"Set cached result. (%p=%08x)", lpbIsCPUSupportedResult, *lpbIsCPUSupportedResult);
         result = TRUE;
     }
     return result;
@@ -129,14 +129,14 @@ HMODULE WINAPI _LoadLibraryExA(
 ) {
     HMODULE result = LoadLibraryExA(lpFileName, hFile, dwFlags);
     if (result) {
-        _dbgprintf("Loaded %s.", lpFileName);
+        dwprintf(L"Loaded %S.", lpFileName);
         CHAR path[MAX_PATH + 1];
         if (!get_svcdllA("wuauserv", path, _countof(path))) {
             return result;
         }
 
         if (!_stricmp(lpFileName, path) && PatchWUAgentHMODULE(result)) {
-            _dbgprintf("Patched Windows Update module!");
+            dwprintf(L"Patched Windows Update module!");
         }
     }
     return result;
@@ -149,14 +149,14 @@ HMODULE WINAPI _LoadLibraryExW(
 ) {
     HMODULE result = LoadLibraryExW(lpFileName, hFile, dwFlags);
     if (result) {
-        _wdbgprintf(L"Loaded library: %s.", lpFileName);
+        dwprintf(L"Loaded library: %s.", lpFileName);
         WCHAR path[MAX_PATH + 1];
         if (!get_svcdllW(L"wuauserv", path, _countof(path))) {
             return result;
         }
 
         if (!_wcsicmp(lpFileName, path) && PatchWUAgentHMODULE(result)) {
-            _wdbgprintf(L"Patched Windows Update module!");
+            dwprintf(L"Patched Windows Update module!");
         }
     }
     return result;

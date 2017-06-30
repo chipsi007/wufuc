@@ -43,7 +43,11 @@ BOOL get_svcpid(SC_HANDLE hSCManager, LPCTSTR lpServiceName, DWORD *lpdwProcessI
         && lpBuffer.dwProcessId) {
 
         *lpdwProcessId = lpBuffer.dwProcessId;
-        _tdbgprintf(_T("Got pid for service %s: %d."), lpServiceName, *lpdwProcessId);
+#ifdef _UNICODE
+        dwprintf(L"Got pid for service %s: %d.", lpServiceName, *lpdwProcessId);
+#else
+        dwprintf(L"Got pid for service %S: %d.", lpServiceName, *lpdwProcessId);
+#endif
         result = TRUE;
     }
     CloseServiceHandle(hService);
@@ -70,7 +74,11 @@ BOOL get_svcgname(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPTSTR lpGroupNam
         for (int i = 1; i < numArgs; i++) {
             if (!_tcsicmp(*(p++), _T("-k")) && !_tcscpy_s(lpGroupName, dwSize, *p)) {
                 result = TRUE;
-                _tdbgprintf(_T("Got group name of service %s: %s."), lpServiceName, lpGroupName);
+#ifdef _UNICODE
+                dwprintf(L"Got group name of service %s: %s.", lpServiceName, lpGroupName);
+#else
+                dwprintf(L"Got group name of service %S: %S.", lpServiceName, lpGroupName);
+#endif
                 break;
             }
         }
@@ -111,7 +119,11 @@ BOOL get_svcgpid(SC_HANDLE hSCManager, LPTSTR lpServiceGroupName, DWORD *lpdwPro
 
             *lpdwProcessId = dwProcessId;
             result = TRUE;
-            _tdbgprintf(_T("Got pid for service group %s: %d."), lpServiceGroupName, *lpdwProcessId);
+#ifdef _UNICODE
+            dwprintf(L"Got pid for service group %s: %d.", lpServiceGroupName, *lpdwProcessId);
+#else
+            dwprintf(L"Got pid for service group %S: %d.", lpServiceGroupName, *lpdwProcessId);
+#endif
             break;
         }
     }

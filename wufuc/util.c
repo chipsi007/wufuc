@@ -2,8 +2,13 @@
 #include <stdio.h>
 #include <tchar.h>
 #include <TlHelp32.h>
+#include <Psapi.h>
 #include "util.h"
-#include "shared.h"
+
+BOOL g_IsWindows7 = FALSE;
+BOOL g_IsWindows8Point1 = FALSE;
+
+static FILE *log_fp = NULL;
 
 LPVOID *FindIAT(HMODULE hModule, LPSTR lpFunctionName) {
     uintptr_t hm = (uintptr_t)hModule;
@@ -34,7 +39,7 @@ VOID DetourIAT(HMODULE hModule, LPSTR lpFuncName, LPVOID *lpOldAddress, LPVOID l
     if (lpOldAddress) {
         *lpOldAddress = *lpAddress;
     }
-    _dbgprintf("Detoured %s from %p to %p.", lpFuncName, *lpAddress, lpNewAddress);
+    dwprintf(L"Detoured %S from %p to %p.", lpFuncName, *lpAddress, lpNewAddress);
     *lpAddress = lpNewAddress;
     VirtualProtect(lpAddress, sizeof(LPVOID), flOldProtect, &flNewProtect);
 }
@@ -58,7 +63,7 @@ VOID SuspendProcessThreads(DWORD dwProcessId, DWORD dwThreadId, HANDLE *lphThrea
     CloseHandle(hSnap);
 
     *lpcb = count;
-    _tdbgprintf(_T("Suspended %d other threads."), count);
+    dwprintf(L"Suspended %d other threads.", count);
 }
 
 VOID ResumeAndCloseThreads(HANDLE *lphThreads, SIZE_T cb) {
@@ -66,7 +71,7 @@ VOID ResumeAndCloseThreads(HANDLE *lphThreads, SIZE_T cb) {
         ResumeThread(lphThreads[i]);
         CloseHandle(lphThreads[i]);
     }
-    _tdbgprintf(_T("Resumed %d other threads."), cb);
+    dwprintf(L"Resumed %d other threads.", cb);
 }
 
 BOOL CompareWindowsVersion(BYTE Operator, DWORD dwMajorVersion, DWORD dwMinorVersion, WORD wServicePackMajor, WORD wServicePackMinor, DWORD dwTypeMask) {
@@ -96,20 +101,44 @@ BOOL IsOperatingSystemSupported(LPBOOL lpbIsWindows7, LPBOOL lpbIsWindows8Point1
 #endif
 }
 
-VOID wdbgprintf(LPCWSTR format, ...) {
-    WCHAR buffer[0x1000];
-    va_list argptr;
-    va_start(argptr, format);
-    vswprintf_s(buffer, _countof(buffer), format, argptr);
-    va_end(argptr);
-    OutputDebugStringW(buffer);
+BOOL init_log(void) {
+    if (log_fp) {
+        return TRUE;
+    }
+    WCHAR filename[MAX_PATH + 1];
+    GetModuleFileNameW(HINST_THISCOMPONENT, filename, _countof(filename));
+    WCHAR drive[_MAX_DRIVE], dir[_MAX_DIR], fname[_MAX_FNAME];
+    _wsplitpath_s(filename, drive, _countof(drive), dir, _countof(dir), fname, _countof(fname), NULL, 0);
+
+    WCHAR basename[MAX_PATH + 1];
+    GetModuleBaseNameW(GetCurrentProcess(), NULL, basename, _countof(basename));
+    wcscat_s(fname, _countof(fname), L".");
+    wcscat_s(fname, _countof(fname), basename);
+    _wmakepath_s(filename, _countof(filename), drive, dir, fname, L".log");
+
+    HANDLE hFile = CreateFileW(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    LARGE_INTEGER size;
+    GetFileSizeEx(hFile, &size);
+    CloseHandle(hFile);
+    log_fp = _wfsopen(filename, size.QuadPart < (1 << 20) ? L"at" : L"wt", _SH_DENYWR);
+    if (!log_fp) {
+        return FALSE;
+    }
+    setvbuf(log_fp, NULL, _IONBF, 0);
+    return TRUE;
 }
 
-VOID dbgprintf(LPCSTR format, ...) {
-    CHAR buffer[0x1000];
-    va_list argptr;
-    va_start(argptr, format);
-    vsprintf_s(buffer, _countof(buffer), format, argptr);
-    va_end(argptr);
-    OutputDebugStringA(buffer);
+VOID close_log(void) {
+    if (log_fp) {
+        fclose(log_fp);
+    }
+}
+
+VOID dwprintf_(LPCWSTR format, ...) {
+    if (init_log()) {
+        va_list argptr;
+        va_start(argptr, format);
+        vfwprintf_s(log_fp, format, argptr);
+        va_end(argptr);
+    }
 }
