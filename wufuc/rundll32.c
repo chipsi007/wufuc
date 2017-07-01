@@ -59,7 +59,7 @@ void CALLBACK Rundll32Entry(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int n
         return;
     }
     LPVOID lpBaseAddress = VirtualAllocEx(hProcess, NULL, sizeof(lpLibFileName), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-    if (lpBaseAddress && WriteProcessMemory(hProcess, lpBaseAddress, lpLibFileName, _countof(lpLibFileName), NULL)) {
+    if (lpBaseAddress && WriteProcessMemory(hProcess, lpBaseAddress, lpLibFileName, sizeof(lpLibFileName), NULL)) {
 
         HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, 
             (LPTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandle(L"kernel32.dll"), 
