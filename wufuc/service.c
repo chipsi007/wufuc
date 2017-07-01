@@ -9,7 +9,7 @@ BOOL get_svcdllA(LPCSTR lpServiceName, LPSTR lpServiceDll, DWORD dwSize) {
     CHAR lpSubKey[257];
     sprintf_s(lpSubKey, _countof(lpSubKey), "SYSTEM\\CurrentControlSet\\services\\%s\\Parameters", lpServiceName);
     DWORD cb = dwSize;
-    if (RegGetValueA(HKEY_LOCAL_MACHINE, lpSubKey, "ServiceDll", RRF_RT_REG_SZ, NULL, (PVOID)lpServiceDll, &cb)) {
+    if (RegGetValueA(HKEY_LOCAL_MACHINE, lpSubKey, "ServiceDll", RRF_RT_REG_SZ, NULL, lpServiceDll, &cb)) {
         return FALSE;
     }
     dwprintf(L"Service \"%S\" DLL path: %S", lpServiceName, lpServiceDll);
@@ -20,7 +20,7 @@ BOOL get_svcdllW(LPCWSTR lpServiceName, LPWSTR lpServiceDll, DWORD dwSize) {
     WCHAR lpSubKey[257];
     swprintf_s(lpSubKey, _countof(lpSubKey), L"SYSTEM\\CurrentControlSet\\services\\%s\\Parameters", lpServiceName);
     DWORD cb = dwSize;
-    if (RegGetValueW(HKEY_LOCAL_MACHINE, lpSubKey, L"ServiceDll", RRF_RT_REG_SZ, NULL, (PVOID)lpServiceDll, &cb)) {
+    if (RegGetValueW(HKEY_LOCAL_MACHINE, lpSubKey, L"ServiceDll", RRF_RT_REG_SZ, NULL, lpServiceDll, &cb)) {
         return FALSE;
     }
     dwprintf(L"Service \"%s\" DLL path: %s", lpServiceName, lpServiceDll);

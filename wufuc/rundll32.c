@@ -36,7 +36,6 @@ void CALLBACK Rundll32Entry(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int n
     }
     dwprintf(L"Processor: %S", brand + i);
 
-
     SC_HANDLE hSCManager = OpenSCManager(NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_CONNECT);
     if (!hSCManager) {
         return;
