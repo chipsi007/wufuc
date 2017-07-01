@@ -12,7 +12,6 @@
 
 - Navigate to where you installed wufuc, and attach all the `*.log` files to your issue.
 - What build are you using? Stable release or unstable AppVeyor builds?
-- What version of Windows are you using? (e.g., Windows 7 x64)
 - What is the file version and/or SHA-1 hash of `C:\Windows\System32\wuaueng.dll`?
 - Any other information you feel is relevant to your issue.
 
