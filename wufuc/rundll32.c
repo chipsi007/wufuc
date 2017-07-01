@@ -36,6 +36,7 @@ void CALLBACK Rundll32Entry(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int n
     }
     dwprintf(L"Processor: %S", brand + i);
 
+
     SC_HANDLE hSCManager = OpenSCManager(NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_CONNECT);
     if (!hSCManager) {
         return;
@@ -50,34 +51,26 @@ void CALLBACK Rundll32Entry(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int n
     if (!result) {
         return;
     }
-    TCHAR lpLibFileName[MAX_PATH + 1];
+    TCHAR lpLibFileName[MAX_PATH];
     GetModuleFileName(HINST_THISCOMPONENT, lpLibFileName, _countof(lpLibFileName));
 
     HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwProcessId);
     if (!hProcess) {
         return;
     }
-    LPVOID lpBaseAddress = VirtualAllocEx(hProcess, NULL, _countof(lpLibFileName) + 1, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+    LPVOID lpBaseAddress = VirtualAllocEx(hProcess, NULL, sizeof(lpLibFileName), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
     if (lpBaseAddress && WriteProcessMemory(hProcess, lpBaseAddress, lpLibFileName, _countof(lpLibFileName), NULL)) {
 
-        HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, dwProcessId);
-        if (hSnap) {
-            MODULEENTRY32 me;
-            me.dwSize = sizeof(me);
-
-            if (Module32First(hSnap, &me)) {
-                do {
-                    if (!_tcsicmp(me.szModule, _T("kernel32.dll"))) {
-                        break;
-                    }
-                } while (Module32Next(hSnap, &me));
-
-                HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)GetProcAddress(me.hModule, STRINGIZE(LoadLibrary)), lpBaseAddress, 0, NULL);
-                CloseHandle(hThread);
-            }
-            CloseHandle(hSnap);
-        }
+        HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, 
+            (LPTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandle(L"kernel32.dll"), 
+            STRINGIZE(LoadLibrary)), 
+            lpBaseAddress, 0, NULL
+        );
+        WaitForSingleObject(hThread, INFINITE);
+        dwprintf(L"Injected into process: %d", dwProcessId);
+        CloseHandle(hThread);
     }
+    VirtualFreeEx(hProcess, lpBaseAddress, 0, MEM_RELEASE);
     CloseHandle(hProcess);
     close_log();
 }

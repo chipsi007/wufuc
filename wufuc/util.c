@@ -157,12 +157,12 @@ BOOL init_log(void) {
     if (log_fp) {
         return TRUE;
     }
-    WCHAR filename[MAX_PATH + 1];
+    WCHAR filename[MAX_PATH];
     GetModuleFileNameW(HINST_THISCOMPONENT, filename, _countof(filename));
     WCHAR drive[_MAX_DRIVE], dir[_MAX_DIR], fname[_MAX_FNAME];
     _wsplitpath_s(filename, drive, _countof(drive), dir, _countof(dir), fname, _countof(fname), NULL, 0);
 
-    WCHAR basename[MAX_PATH + 1];
+    WCHAR basename[MAX_PATH];
     GetModuleBaseNameW(GetCurrentProcess(), NULL, basename, _countof(basename));
     wcscat_s(fname, _countof(fname), L".");
     wcscat_s(fname, _countof(fname), basename);

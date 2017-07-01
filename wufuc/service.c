@@ -6,27 +6,24 @@
 #include "service.h"
 
 BOOL get_svcdllA(LPCSTR lpServiceName, LPSTR lpServiceDll, DWORD dwSize) {
-    CHAR lpSubKey[MAX_PATH + 1];
+    CHAR lpSubKey[257];
     sprintf_s(lpSubKey, _countof(lpSubKey), "SYSTEM\\CurrentControlSet\\services\\%s\\Parameters", lpServiceName);
-
-    DWORD uBytes = _MAX_PATH + 1;
-    LPBYTE pvData = malloc(uBytes);
-
-    RegGetValueA(HKEY_LOCAL_MACHINE, lpSubKey, "ServiceDll", RRF_RT_REG_EXPAND_SZ | RRF_NOEXPAND, NULL, pvData, &uBytes);
-
-    ExpandEnvironmentStringsA((LPSTR)pvData, lpServiceDll, dwSize);
+    DWORD cb = dwSize;
+    if (RegGetValueA(HKEY_LOCAL_MACHINE, lpSubKey, "ServiceDll", RRF_RT_REG_SZ, NULL, (PVOID)lpServiceDll, &cb)) {
+        return FALSE;
+    }
+    dwprintf(L"Service \"%S\" DLL path: %S", lpServiceName, lpServiceDll);
     return TRUE;
 }
 
 BOOL get_svcdllW(LPCWSTR lpServiceName, LPWSTR lpServiceDll, DWORD dwSize) {
-    WCHAR lpSubKey[MAX_PATH + 1];
+    WCHAR lpSubKey[257];
     swprintf_s(lpSubKey, _countof(lpSubKey), L"SYSTEM\\CurrentControlSet\\services\\%s\\Parameters", lpServiceName);
-
-    DWORD uBytes = _MAX_PATH + 1;
-    LPBYTE pvData = malloc(uBytes);
-    RegGetValueW(HKEY_LOCAL_MACHINE, lpSubKey, L"ServiceDll", RRF_RT_REG_EXPAND_SZ | RRF_NOEXPAND, NULL, pvData, &uBytes);
-
-    ExpandEnvironmentStringsW((LPWSTR)pvData, lpServiceDll, dwSize);
+    DWORD cb = dwSize;
+    if (RegGetValueW(HKEY_LOCAL_MACHINE, lpSubKey, L"ServiceDll", RRF_RT_REG_SZ, NULL, (PVOID)lpServiceDll, &cb)) {
+        return FALSE;
+    }
+    dwprintf(L"Service \"%s\" DLL path: %s", lpServiceName, lpServiceDll);
     return TRUE;
 }
 
@@ -59,6 +56,7 @@ BOOL get_svcgname(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPTSTR lpGroupNam
     if (!get_svcpath(hSCManager, lpServiceName, lpBinaryPathName, _countof(lpBinaryPathName))) {
         return FALSE;
     }
+    
     int numArgs;
     LPWSTR *argv = CommandLineToArgv(lpBinaryPathName, &numArgs);
     if (numArgs < 3) {
@@ -105,7 +103,7 @@ BOOL get_svcpath(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPTSTR lpBinaryPat
 }
 
 BOOL get_svcgpid(SC_HANDLE hSCManager, LPTSTR lpServiceGroupName, DWORD *lpdwProcessId) {
-    DWORD uBytes = 0x100000;
+    DWORD uBytes = 1 << 20;
     LPBYTE pvData = malloc(uBytes);
     RegGetValue(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Svchost"),
         lpServiceGroupName, RRF_RT_REG_MULTI_SZ, NULL, pvData, &uBytes);

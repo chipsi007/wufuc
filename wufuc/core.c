@@ -43,7 +43,7 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
     DETOUR_IAT(hm, LoadLibraryExA);
     DETOUR_IAT(hm, LoadLibraryExW);
 
-    TCHAR lpServiceDll[MAX_PATH + 1];
+    TCHAR lpServiceDll[MAX_PATH];
     get_svcdll(_T("wuauserv"), lpServiceDll, _countof(lpServiceDll));
 
     HMODULE hwu = GetModuleHandle(lpServiceDll);
@@ -130,7 +130,7 @@ HMODULE WINAPI _LoadLibraryExA(
     HMODULE result = LoadLibraryExA(lpFileName, hFile, dwFlags);
     if (result) {
         dwprintf(L"Loaded library: %S", lpFileName);
-        CHAR path[MAX_PATH + 1];
+        CHAR path[MAX_PATH];
         if (!get_svcdllA("wuauserv", path, _countof(path))) {
             return result;
         }
@@ -149,7 +149,7 @@ HMODULE WINAPI _LoadLibraryExW(
     HMODULE result = LoadLibraryExW(lpFileName, hFile, dwFlags);
     if (result) {
         dwprintf(L"Loaded library: %s", lpFileName);
-        WCHAR path[MAX_PATH + 1];
+        WCHAR path[MAX_PATH];
         if (!get_svcdllW(L"wuauserv", path, _countof(path))) {
             return result;
         }
