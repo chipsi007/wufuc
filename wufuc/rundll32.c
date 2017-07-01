@@ -1,19 +1,41 @@
 #include <Windows.h>
 #include <TlHelp32.h>
 #include <tchar.h>
+#include <VersionHelpers.h>
 #include "service.h"
 #include "util.h"
 
 void CALLBACK Rundll32Entry(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow) {
-    if (!g_IsWindows7 && !g_IsWindows8Point1) {
-        return;
-    }
-
     HANDLE hEvent = OpenEvent(SYNCHRONIZE, FALSE, _T("Global\\wufuc_UnloadEvent"));
     if (hEvent) {
         CloseHandle(hEvent);
         return;
     }
+
+    LPWSTR osname;
+    if (IsWindows7()) {
+        if (IsWindowsServer()) {
+            osname = L"Windows Server 2008 R2";
+        } else {
+            osname = L"Windows 7";
+        }
+    } else if (IsWindows8Point1()) {
+        if (IsWindowsServer()) {
+            osname = L"Windows Server 2012 R2";
+        } else {
+            osname = L"Windows 8.1";
+        }
+    }
+    dwprintf(L"Operating System: %s %d-bit", osname, sizeof(uintptr_t) * 8);
+
+    char brand[0x31];
+    get_cpuid_brand(brand);
+    SIZE_T i = 0;
+    while (i < _countof(brand) && isspace(*(brand + i))) {
+        i++;
+    }
+    dwprintf(L"Processor: %S", brand + i);
+
     SC_HANDLE hSCManager = OpenSCManager(NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_CONNECT);
     if (!hSCManager) {
         return;

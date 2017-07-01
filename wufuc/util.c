@@ -1,13 +1,20 @@
 #include <Windows.h>
 #include <stdio.h>
-#include <time.h>
+#include <stdint.h>
+#include <intrin.h> 
 #include <tchar.h>
 #include <TlHelp32.h>
 #include <Psapi.h>
 #include "util.h"
 
-BOOL g_IsWindows7 = FALSE;
-BOOL g_IsWindows8Point1 = FALSE;
+static BOOL checkedIsWindows7 = FALSE;
+static BOOL isWindows7 = FALSE;
+static BOOL checkedIsWindows8Point1 = FALSE;
+static BOOL isWindows8Point1 = FALSE;
+
+static LPFN_ISWOW64PROCESS fnIsWow64Process = NULL;
+static BOOL checkedIsWow64 = FALSE;
+static BOOL isWow64 = FALSE;
 
 static FILE *log_fp = NULL;
 
@@ -40,7 +47,7 @@ VOID DetourIAT(HMODULE hModule, LPSTR lpFuncName, LPVOID *lpOldAddress, LPVOID l
     if (lpOldAddress) {
         *lpOldAddress = *lpAddress;
     }
-    dwprintf(L"Detoured %S from %p to %p.", lpFuncName, *lpAddress, lpNewAddress);
+    dwprintf(L"Modified %S import address: %p => %p", lpFuncName, *lpAddress, lpNewAddress);
     *lpAddress = lpNewAddress;
     VirtualProtect(lpAddress, sizeof(LPVOID), flOldProtect, &flNewProtect);
 }
@@ -64,7 +71,7 @@ VOID SuspendProcessThreads(DWORD dwProcessId, DWORD dwThreadId, HANDLE *lphThrea
     CloseHandle(hSnap);
 
     *lpcb = count;
-    dwprintf(L"Suspended %d other threads.", count);
+    dwprintf(L"Suspended %d other threads", count);
 }
 
 VOID ResumeAndCloseThreads(HANDLE *lphThreads, SIZE_T cb) {
@@ -72,7 +79,7 @@ VOID ResumeAndCloseThreads(HANDLE *lphThreads, SIZE_T cb) {
         ResumeThread(lphThreads[i]);
         CloseHandle(lphThreads[i]);
     }
-    dwprintf(L"Resumed %d other threads.", cb);
+    dwprintf(L"Resumed %d other threads", cb);
 }
 
 BOOL CompareWindowsVersion(BYTE Operator, DWORD dwMajorVersion, DWORD dwMinorVersion, WORD wServicePackMajor, WORD wServicePackMinor, DWORD dwTypeMask) {
@@ -93,13 +100,57 @@ BOOL CompareWindowsVersion(BYTE Operator, DWORD dwMajorVersion, DWORD dwMinorVer
     return VerifyVersionInfo(&osvi, dwTypeMask, dwlConditionMask);
 }
 
-BOOL IsOperatingSystemSupported(LPBOOL lpbIsWindows7, LPBOOL lpbIsWindows8Point1) {
+BOOL IsWindows7(void) {
+    if (!checkedIsWindows7) {
+        isWindows7 = CompareWindowsVersion(VER_EQUAL, 6, 1, 0, 0, VER_MAJORVERSION | VER_MINORVERSION);
+        checkedIsWindows7 = TRUE;
+    }
+    return isWindows7;
+}
+
+BOOL IsWindows8Point1(void) {
+    if (!checkedIsWindows8Point1) {
+        isWindows8Point1 = CompareWindowsVersion(VER_EQUAL, 6, 3, 0, 0, VER_MAJORVERSION | VER_MINORVERSION);
+        checkedIsWindows8Point1 = TRUE;
+    }
+    return isWindows8Point1;
+}
+
+BOOL IsOperatingSystemSupported(void) {
 #if !defined(_AMD64_) && !defined(_X86_)
     return FALSE;
 #else
-    return (*lpbIsWindows7 = CompareWindowsVersion(VER_EQUAL, 6, 1, 0, 0, VER_MAJORVERSION | VER_MINORVERSION))
-        || (*lpbIsWindows8Point1 = CompareWindowsVersion(VER_EQUAL, 6, 3, 0, 0, VER_MAJORVERSION | VER_MINORVERSION));
+    return IsWindows7() || IsWindows8Point1();
 #endif
+}
+
+BOOL IsWow64(void) {
+    if (!checkedIsWow64) {
+        if (!fnIsWow64Process) {
+            fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(GetModuleHandle(_T("kernel32.dll")), "IsWow64Process");
+        }
+        if (fnIsWow64Process && fnIsWow64Process(GetCurrentProcess(), &isWow64)) {
+            checkedIsWow64 = TRUE;
+        }
+    }
+    return isWow64;
+}
+
+void get_cpuid_brand(char* brand) {
+    int info[4];
+    __cpuidex(info, 0x80000000, 0);
+    if (info[0] < 0x80000004) {
+        brand[0] = '\0';
+        return;
+    }
+    uint32_t *char_as_int = (uint32_t *)brand;
+    for (int op = 0x80000002; op <= 0x80000004; op++) {
+        __cpuidex(info, op, 0);
+        *(char_as_int++) = info[0];
+        *(char_as_int++) = info[1];
+        *(char_as_int++) = info[2];
+        *(char_as_int++) = info[3];
+    }
 }
 
 BOOL init_log(void) {

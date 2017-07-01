@@ -54,7 +54,7 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
 
     WaitForSingleObject(hEvent, INFINITE);
 
-    dwprintf(L"Unload event was set.");
+    dwprintf(L"Unloading...");
 
     SuspendProcessThreads(dwProcessId, dwThreadId, lphThreads, _countof(lphThreads), &cb);
     RESTORE_IAT(hm, LoadLibraryExA);
@@ -62,7 +62,7 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
     ResumeAndCloseThreads(lphThreads, cb);
 
     CloseHandle(hEvent);
-    dwprintf(L"See ya!");
+    dwprintf(L"Bye bye!");
     close_log();
     FreeLibraryAndExitThread(HINST_THISCOMPONENT, 0);
 }
@@ -75,11 +75,11 @@ BOOL PatchWUAgentHMODULE(HMODULE hModule) {
         offset00 = 10;
         offset01 = 18;
 #elif defined(_X86_)
-    if (g_IsWindows7) {
+    if (IsWindows7()) {
         pattern = "833D????????00 743E E8???????? A3????????";
         offset00 = 2;
         offset01 = 15;
-    } else if (g_IsWindows8Point1) {
+    } else if (IsWindows8Point1()) {
         pattern = "8BFF 51 833D????????00 7507 A1????????";
         offset00 = 5;
         offset01 = 13;
@@ -97,13 +97,13 @@ BOOL PatchWUAgentHMODULE(HMODULE hModule) {
         return FALSE;
     }
     uintptr_t baseAddress = (uintptr_t)modinfo.lpBaseOfDll;
-    uintptr_t fpIsDeviceServiceable = baseAddress + rva;
-    dwprintf(L"Found address of IsDeviceServiceable. (%p)", fpIsDeviceServiceable);
+    uintptr_t lpfnIsDeviceServiceable = baseAddress + rva;
+    dwprintf(L"Address of wuaueng.dll!IsDeviceServiceable: %p", lpfnIsDeviceServiceable);
     BOOL result = FALSE;
     LPBOOL lpbFirstRun, lpbIsCPUSupportedResult;
 #ifdef _AMD64_
-        lpbFirstRun = (LPBOOL)(fpIsDeviceServiceable + offset00 + sizeof(uint32_t) + *(uint32_t *)(fpIsDeviceServiceable + offset00));
-        lpbIsCPUSupportedResult = (LPBOOL)(fpIsDeviceServiceable + offset01 + sizeof(uint32_t) + *(uint32_t *)(fpIsDeviceServiceable + offset01));
+        lpbFirstRun = (LPBOOL)(lpfnIsDeviceServiceable + offset00 + sizeof(uint32_t) + *(uint32_t *)(lpfnIsDeviceServiceable + offset00));
+        lpbIsCPUSupportedResult = (LPBOOL)(lpfnIsDeviceServiceable + offset01 + sizeof(uint32_t) + *(uint32_t *)(lpfnIsDeviceServiceable + offset01));
 #elif defined(_X86_)
         lpbFirstRun = (LPBOOL)(*(uintptr_t *)(fpIsDeviceServiceable + offset00));
         lpbIsCPUSupportedResult = (LPBOOL)(*(uintptr_t *)(fpIsDeviceServiceable + offset01));
@@ -111,12 +111,12 @@ BOOL PatchWUAgentHMODULE(HMODULE hModule) {
 
     if (*lpbFirstRun) {
         *lpbFirstRun = FALSE;
-        dwprintf(L"Unset first run var. (%p=%08x)", lpbFirstRun, *lpbFirstRun);
+        dwprintf(L"Patched FirstRun variable: %p = %08x", lpbFirstRun, *lpbFirstRun);
         result = TRUE;
     }
     if (!*lpbIsCPUSupportedResult) {
         *lpbIsCPUSupportedResult = TRUE;
-        dwprintf(L"Set cached result. (%p=%08x)", lpbIsCPUSupportedResult, *lpbIsCPUSupportedResult);
+        dwprintf(L"Patched cached wuaueng.dll!IsCPUSupported result: %p = %08x", lpbIsCPUSupportedResult, *lpbIsCPUSupportedResult);
         result = TRUE;
     }
     return result;
@@ -129,12 +129,11 @@ HMODULE WINAPI _LoadLibraryExA(
 ) {
     HMODULE result = LoadLibraryExA(lpFileName, hFile, dwFlags);
     if (result) {
-        dwprintf(L"Loaded %S.", lpFileName);
+        dwprintf(L"Loaded library: %S", lpFileName);
         CHAR path[MAX_PATH + 1];
         if (!get_svcdllA("wuauserv", path, _countof(path))) {
             return result;
         }
-
         if (!_stricmp(lpFileName, path) && PatchWUAgentHMODULE(result)) {
             dwprintf(L"Patched Windows Update module!");
         }
@@ -149,12 +148,11 @@ HMODULE WINAPI _LoadLibraryExW(
 ) {
     HMODULE result = LoadLibraryExW(lpFileName, hFile, dwFlags);
     if (result) {
-        dwprintf(L"Loaded library: %s.", lpFileName);
+        dwprintf(L"Loaded library: %s", lpFileName);
         WCHAR path[MAX_PATH + 1];
         if (!get_svcdllW(L"wuauserv", path, _countof(path))) {
             return result;
         }
-
         if (!_wcsicmp(lpFileName, path) && PatchWUAgentHMODULE(result)) {
             dwprintf(L"Patched Windows Update module!");
         }

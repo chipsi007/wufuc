@@ -44,9 +44,9 @@ BOOL get_svcpid(SC_HANDLE hSCManager, LPCTSTR lpServiceName, DWORD *lpdwProcessI
 
         *lpdwProcessId = lpBuffer.dwProcessId;
 #ifdef _UNICODE
-        dwprintf(L"Got pid for service %s: %d.", lpServiceName, *lpdwProcessId);
+        dwprintf(L"Service \"%s\" process ID: %d", lpServiceName, *lpdwProcessId);
 #else
-        dwprintf(L"Got pid for service %S: %d.", lpServiceName, *lpdwProcessId);
+        dwprintf(L"Service \"%S\" process ID: %d", lpServiceName, *lpdwProcessId);
 #endif
         result = TRUE;
     }
@@ -75,9 +75,9 @@ BOOL get_svcgname(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPTSTR lpGroupNam
             if (!_tcsicmp(*(p++), _T("-k")) && !_tcscpy_s(lpGroupName, dwSize, *p)) {
                 result = TRUE;
 #ifdef _UNICODE
-                dwprintf(L"Got group name of service %s: %s.", lpServiceName, lpGroupName);
+                dwprintf(L"Service \"%s\" group name: %s", lpServiceName, lpGroupName);
 #else
-                dwprintf(L"Got group name of service %S: %S.", lpServiceName, lpGroupName);
+                dwprintf(L"Service \"%S\" group name: %S", lpServiceName, lpGroupName);
 #endif
                 break;
             }
@@ -120,9 +120,9 @@ BOOL get_svcgpid(SC_HANDLE hSCManager, LPTSTR lpServiceGroupName, DWORD *lpdwPro
             *lpdwProcessId = dwProcessId;
             result = TRUE;
 #ifdef _UNICODE
-            dwprintf(L"Got pid for service group %s: %d.", lpServiceGroupName, *lpdwProcessId);
+            dwprintf(L"Service group \"%s\" process ID: %d", lpServiceGroupName, *lpdwProcessId);
 #else
-            dwprintf(L"Got pid for service group %S: %d.", lpServiceGroupName, *lpdwProcessId);
+            dwprintf(L"Service group \"%S\" process ID: %d", lpServiceGroupName, *lpdwProcessId);
 #endif
             break;
         }

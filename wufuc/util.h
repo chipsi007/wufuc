@@ -3,8 +3,7 @@
 EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 #define HINST_THISCOMPONENT ((HINSTANCE)&__ImageBase)
 
-extern BOOL g_IsWindows7;
-extern BOOL g_IsWindows8Point1;
+typedef BOOL(WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
 
 LPVOID *FindIAT(HMODULE hModule, LPSTR lpFuncName);
 VOID DetourIAT(HMODULE hModule, LPSTR lpFuncName, LPVOID *lpOldAddress, LPVOID lpNewAddress);
@@ -13,7 +12,12 @@ VOID SuspendProcessThreads(DWORD dwProcessId, DWORD dwThreadId, HANDLE *lphThrea
 VOID ResumeAndCloseThreads(HANDLE *lphThreads, SIZE_T dwSize);
 
 BOOL CompareWindowsVersion(BYTE Operator, DWORD dwMajorVersion, DWORD dwMinorVersion, WORD wServicePackMajor, WORD wServicePackMinor, DWORD dwTypeMask);
-BOOL IsOperatingSystemSupported(LPBOOL lpbIsWindows7, LPBOOL lpbIsWindows8Point1);
+BOOL IsWindows7(void);
+BOOL IsWindows8Point1(void);
+BOOL IsOperatingSystemSupported(void);
+BOOL IsWow64(void);
+
+void get_cpuid_brand(char *brand);
 
 VOID dwprintf_(LPCWSTR format, ...);
 
