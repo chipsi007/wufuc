@@ -105,8 +105,8 @@ BOOL PatchWUAgentHMODULE(HMODULE hModule) {
         lpbFirstRun = (LPBOOL)(lpfnIsDeviceServiceable + offset00 + sizeof(uint32_t) + *(uint32_t *)(lpfnIsDeviceServiceable + offset00));
         lpbIsCPUSupportedResult = (LPBOOL)(lpfnIsDeviceServiceable + offset01 + sizeof(uint32_t) + *(uint32_t *)(lpfnIsDeviceServiceable + offset01));
 #elif defined(_X86_)
-        lpbFirstRun = (LPBOOL)(*(uintptr_t *)(fpIsDeviceServiceable + offset00));
-        lpbIsCPUSupportedResult = (LPBOOL)(*(uintptr_t *)(fpIsDeviceServiceable + offset01));
+        lpbFirstRun = (LPBOOL)(*(uintptr_t *)(lpfnIsDeviceServiceable + offset00));
+        lpbIsCPUSupportedResult = (LPBOOL)(*(uintptr_t *)(lpfnIsDeviceServiceable + offset01));
 #endif
 
     if (*lpbFirstRun) {
