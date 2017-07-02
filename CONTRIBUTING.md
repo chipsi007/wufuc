@@ -1,5 +1,7 @@
 # Contributing guidelines
 
+**English** | [русский](CONTRIBUTING.ru-RU.md)
+
 ## Reporting an issue [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
 
 #### Before you create an issue, please make sure of the following:
