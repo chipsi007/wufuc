@@ -1,69 +1,69 @@
 # wufuc [![](https://ci.appveyor.com/api/projects/status/0s2unkpokttyslf0?svg=true)](https://ci.appveyor.com/project/zeffy/wufuc) [![Click here to tip wufuc on Gratipay!](https://img.shields.io/gratipay/team/wufuc.svg)](https://gratipay.com/wufuc/)
 
-[![Click here to lend your support to wufuc and make a donation at pledgie.com !](https://pledgie.com/campaigns/34055.png)](https://pledgie.com/campaigns/34055)
+[![Нажмите сюда, чтоюы поддержать wufuc пожертвованием на pledgie.com !](https://pledgie.com/campaigns/34055.png)](https://pledgie.com/campaigns/34055)
 
-Disables the "Unsupported Hardware" message in Windows Update, and allows you to continue installing updates on Windows 7 and 8.1 systems with Intel Kaby Lake, AMD Ryzen, or other unsupported processors.
+Отключает сообщение "Оборудование не поддерживается" в Windows Update, и позволяет продолжать устанавливать обновления на системах Windows 7 и 8.1 с процессорами Intel Kaby Lake, AMD Ryzen, и другими не поддерживаемыми.
 
-## Downloads [![](https://img.shields.io/github/downloads/zeffy/wufuc/total.svg)](../../releases)
+## Загрузки [![](https://img.shields.io/github/downloads/zeffy/wufuc/total.svg)](../../releases)
 
-### You can get the latest stable version [here](../../releases/latest)!
+### Последний стабильный релиз можно скачать [здесь](../../releases/latest)!
 
-If you are feeling brave, you can try the latest unstable builds [here](https://ci.appveyor.com/project/zeffy/wufuc). **Use these at your own risk!**
+Храбрецы могут попробовать последний нестабильный билд [отсюда](https://ci.appveyor.com/project/zeffy/wufuc). **Использовать на свой собственный страх и риск!**
 
-## Reporting an issue [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
+## Как сообщить об ошибке [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+Смотри в [CONTRIBUTING.md](CONTRIBUTING.ru-RU.md).
 
-## Preface
+## Предисловие
 
-The changelog for Windows updates KB4012218 and KB4012219 included the following:
+Список изменений для обновлений Windows KB4012218 и KB4012219 включает следующее:
 
-> Enabled detection of processor generation and hardware support when PC tries to scan or download updates through Windows Update.
+> Включено распознавание поддержки поколения процессоров и оборудования когда ПК пытается скачать обновления через Windows Update.
 
-These updates marked the implementation of a [policy change](https://blogs.windows.com/windowsexperience/2016/01/15/windows-10-embracing-silicon-innovation/) they announced some time ago, where Microsoft stated that they would not be supporting Windows 7 or 8.1 on next-gen Intel, AMD and Qualcomm processors.
+Эти обновления знаменуют [смену политики](https://blogs.windows.com/windowsexperience/2016/01/15/windows-10-embracing-silicon-innovation/), анонсированную некоторое время назад, где Microsoft объявила, что больше не будет поддерживать Windows 7 или 8.1 для следующих поколений процессоров Intel, AMD и Qualcomm.
 
-It is essentially a big middle finger to anyone who decides to not "upgrade" to the steaming pile of :shit: known as Windows 10, especially considering the extended support periods for Windows 7 and 8.1 won't be ending until January 4, 2020 and January 10, 2023 respectively.
+По существу, это то же, что показать средний палец всем, кто решит не "обновляться" до вонючей кучи :shit: , известной как Windows 10, особенно учитывая то, что расширенный период поддержки для Windows 7 не закончится до 4 января 2020 и для Windows 8.1 - до 10 января 2023.
 
-This has even affected people with older Intel and AMD processors! I've received user reports of the [Intel Atom Z530](../../issues/7), [Intel Core i5-M 560](../../issues/23), [Intel Core i5-4300M](../../issues/24), [Intel Atom D525](../../issues/34), [Intel Pentium B940](../../issues/63), and [AMD FX-8350](../../issues/32) all being blocked from receiving updates.
+Это затронуло даже людей с более старыми процессорами Intel и AMD! Я видел сообщения от пользователей [Intel Atom Z530](../../issues/7), [Intel Core i5-M 560](../../issues/23), [Intel Core i5-4300M](../../issues/24), [Intel Atom D525](../../issues/34), [Intel Pentium B940](../../issues/63), и [AMD FX-8350](../../issues/32) - на всех них было заблокировано получение обновлений.
 
-## Bad Microsoft!
+## Плохая Microsoft!
 
-If you are interested, you can read my original write up on discovering the CPU check [here](../../tree/old-kb4012218-19).
+Если вам интересно, можете прочитать мою оригинальную записку об обнаружении проверки на тип процессора [тут](../../tree/old-kb4012218-19).
 
-## How it works
+## Как работает этот патчер
 
-Basically, inside a file called `wuaueng.dll` there are two functions: [`IsDeviceServiceable(void)`](https://gist.github.com/zeffy/e5ec266952932bc905eb0cbc6ed72185) and [`IsCPUSupported(void)`](https://gist.github.com/zeffy/1a8f8984d2bec97ae24af63a76278694). `IsDeviceServiceable(void)` is essentially a wrapper around `IsCPUSupported(void)` that caches the result it receives and recycles it on subsequent calls. 
+Вкратце, в файле под названием `wuaueng.dll` есть 2 функции: [`IsDeviceServiceable(void)`](https://gist.github.com/zeffy/e5ec266952932bc905eb0cbc6ed72185) и [`IsCPUSupported(void)`](https://gist.github.com/zeffy/1a8f8984d2bec97ae24af63a76278694). `IsDeviceServiceable(void)` по сути просто обертка над `IsCPUSupported(void)`, которая кэширует полученный результат и переиспользует его при последующих вызовах. 
 
-My patch takes advantage of this result caching behavior by setting the "first run" value to `FALSE` and the cached result to `TRUE`.
+Мой патчер пользуется этим, устанавливая флаг "первый запуск" в `FALSE` и кэшированный результат в `TRUE`.
 
-- At system boot the wufuc scheduled task runs as the `NT AUTHORITY\SYSTEM` user.
-- `wufuc` determines what service host group process the Windows Update service runs in (typically `netsvcs`), and injects itself into it.
-- Once injected, it applies a hook to `LoadLibraryEx` that automatically patches `wuaueng.dll` when it is loaded.
-- Any previously loaded `wuaueng.dll` is also patched.
+- При старте системы назначенное задание wufuc запускается от имени пользователя `NT AUTHORITY\SYSTEM`.
+- `wufuc` определяет группу служб, под которой выполняется процесс Windows Update (обычно `netsvcs`), и внедряется в неё.
+- После внедрения применяется перехват `LoadLibraryEx`, который автоматчиески патчит `wuaueng.dll` при загрузке.
+- Любая загруженная до этого `wuaueng.dll` тоже патчится.
 
-### Several improvements over my batchfile method:
+### Несколько преимуществ перед методом batch-файла:
 
-- **No system files are modified!**
-- Heuristic-based patching, which means it will usually keep working even after new updates come out.		
-- C is best language.		
-- No external dependencies.
+- **Нет модификаций в системных файлах!**
+- Эвристический патчер - продолжит работать (я надеюсь) даже после выхода новых обновлений.
+- C - лучший язык!
+- Нет внешних зависимостей.
 
-## Q & A
+## Вопросы и ответы
 
-### How to install/uninstall?
+### Как установить/удалить?
 
-Just download the [latest release](../../releases/latest), and extract the `wufuc` folder to a permanent location (like `C:\Program Files\wufuc`) and then run `install_wufuc.bat` as administrator. 
+Просто скачайте [последний релиз](../../releases/latest), распакуйте папку `wufuc` куда-нибудь в надежное место (наподобие `C:\Program Files\wufuc`) и запустите `install_wufuc.bat` от имени Администратора.
 
-To uninstall run `uninstall_wufuc.bat` as administrator.
+Для удаления запустите `uninstall_wufuc.bat` от имени Администратора.
 
-### How to update when a new version comes out?
+### Как обновиться на новую версию?
 
-Unless otherwise noted, you should only have to:
+Если не указано иного, всё просто:
 
-- Run `uninstall_wufuc.bat` as administrator.
-- Copy the new files into the install folder, overwriting the old ones.
-- Run the new `install_wufuc.bat` as administrator.
+- Запустите `uninstall_wufuc.bat` от имени Администратора.
+- Скопируйте новые файлы в папку установки, перезаписывая поверх старых.
+- Запустите новый `install_wufuc.bat` от имени Администратора.
 
-### How do I remove your old patch and use this instead?
+### Как удалить ваш старый патчер и воспользоваться этим?
 
-I've included a utility script called `repair_wuaueng.dll.bat`. When you run it, it will initiate an `sfc` scan and revert any changes made to `wuaueng.dll`.
+Я включил в дистрибутив вспомогательный скрипт `repair_wuaueng.dll.bat`. Он запустит сканирование `sfc` и откатит любые изменения, сделанные в `wuaueng.dll`.
