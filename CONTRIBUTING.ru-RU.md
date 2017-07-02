@@ -1,21 +1,21 @@
-# Contributing guidelines
+# Инструкция для тех, кто желает помочь, внести вклад
 
-## Reporting an issue [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
+## Сообщайте об ошибках [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
 
-#### Before you create an issue, please make sure of the following:
+#### Перед созданием баг-репорта убедитесь, что:
 
-- Are you using at least the [latest stable version](../../releases/latest)?
-- If you previously used any of the old batchfile patches, did you revert it by running `repair_wuaueng.dll.bat`?
-- Have you tried restarting your computer?
+- Вы используете [последнюю стабильную версию](../../releases/latest);
+- Если вы пользовались предыдущей версией (.bat-патчером), убедитесь, что вы откатили его, запустив `repair_wuaueng.dll.bat`;
+- Вы пытались перезагружать компьютер.
 
-#### After you've confirmed those things, please create an issue and include the following information:
+#### После проверки и подтверждения вышеизложенных пунктов, создавайте баг-репорт и включите в него следующую информацию:
 
-- Navigate to where you installed wufuc, and attach all the `*.log` files to your issue.
-- What build are you using? Stable release or unstable AppVeyor builds?
-- What is the file version and/or SHA-1 hash of `C:\Windows\System32\wuaueng.dll`?
-- Any other information you feel is relevant to your issue.
+- Зайдите в папку установки wufuc, и прикрепите все `*.log`-файлы к репорту.
+- Какой билд вы используете? Стабильный релиз или нестабильный билд с AppVeyor?
+- Какая версия и/или SHA-1 хеш-сумма файла `C:\Windows\System32\wuaueng.dll`?
+- Любую другую информацию, которая может относиться к вопросу.
 
-## Closure policy
+## Политика закрытия репортов
 
-- Issues that don't have the information requested above (when applicable) will be closed immediately and the poster directed to the contributing guidelines.
-- Issues that go a week without a response from original poster are subject to closure at my discretion.
+- Сообщения без запрошенной информации (см. выше) будут закрыты немедленно и докладчик будет направлен сюда, читать эту инструкцию.
+- Сообщения, висящие без ответа от оригинального докладчика более недели подлежат закрытию на моё усмотрение.
