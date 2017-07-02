@@ -22,6 +22,7 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
     }
 
     SECURITY_ATTRIBUTES sa;
+    ZeroMemory(&sa, sizeof(SECURITY_ATTRIBUTES));
     sa.nLength = sizeof(SECURITY_ATTRIBUTES);
     ConvertStringSecurityDescriptorToSecurityDescriptor(_T("D:PAI(A;;FA;;;BA)"), SDDL_REVISION_1, &sa.lpSecurityDescriptor, NULL);
     sa.bInheritHandle = FALSE;

@@ -50,15 +50,19 @@ void CALLBACK Rundll32Entry(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int n
     if (!result) {
         return;
     }
-    TCHAR lpLibFileName[MAX_PATH];
-    GetModuleFileName(HINST_THISCOMPONENT, lpLibFileName, _countof(lpLibFileName));
 
     HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwProcessId);
     if (!hProcess) {
         return;
     }
-    LPVOID lpBaseAddress = VirtualAllocEx(hProcess, NULL, sizeof(lpLibFileName), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-    if (lpBaseAddress && WriteProcessMemory(hProcess, lpBaseAddress, lpLibFileName, sizeof(lpLibFileName), NULL)) {
+    
+    TCHAR lpLibFileName[MAX_PATH];
+    GetModuleFileName(HINST_THISCOMPONENT, lpLibFileName, _countof(lpLibFileName));
+
+    SIZE_T size = (_tcslen(lpLibFileName) + 1) * sizeof(TCHAR);
+
+    LPVOID lpBaseAddress = VirtualAllocEx(hProcess, NULL, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+    if (lpBaseAddress && WriteProcessMemory(hProcess, lpBaseAddress, lpLibFileName, size, NULL)) {
 
         HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, 
             (LPTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandle(L"kernel32.dll"), 

@@ -63,6 +63,7 @@ SIZE_T patternfind(LPCBYTE data, SIZE_T datasize, SIZE_T startindex, LPCSTR patt
     SIZE_T result = -1;
     SIZE_T searchpatternsize = strlen(pattern);
     LPPATTERNBYTE searchpattern = calloc(searchpatternsize, sizeof(PATTERNBYTE));
+    
     if (patterntransform(pattern, searchpattern, &searchpatternsize)) {
         for (SIZE_T i = startindex, j = 0; i < datasize; i++) //search for the pattern
         {
@@ -79,6 +80,7 @@ SIZE_T patternfind(LPCBYTE data, SIZE_T datasize, SIZE_T startindex, LPCSTR patt
             }
         }
     }
+    free(searchpattern);
     return result;
 }
 
@@ -100,12 +102,12 @@ VOID patternwrite(LPBYTE data, SIZE_T datasize, LPCSTR pattern) {
         writepatternsize = datasize;
     }
     LPPATTERNBYTE writepattern = calloc(writepatternsize, sizeof(PATTERNBYTE));
-    if (!patterntransform(pattern, writepattern, &writepatternsize)) {
-        return;
+    if (patterntransform(pattern, writepattern, &writepatternsize)) {
+        for (size_t i = 0; i < writepatternsize; i++) {
+            patternwritebyte(&data[i], &writepattern[i]);
+        }
     }
-    for (size_t i = 0; i < writepatternsize; i++) {
-        patternwritebyte(&data[i], &writepattern[i]);
-    }
+    free(writepattern);
 }
 
 SIZE_T patternsnr(LPBYTE data, SIZE_T datasize, SIZE_T startindex, LPCSTR searchpattern, LPCSTR replacepattern) {
