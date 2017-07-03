@@ -12,6 +12,11 @@ Disables the "Unsupported Hardware" message in Windows Update, and allows you to
 
 If you are feeling brave, you can try the latest unstable builds [here](https://ci.appveyor.com/project/zeffy/wufuc). **Use these at your own risk!**
 
+## Sponsors
+
+### [Advanced Installer](http://www.advancedinstaller.com/)
+The installer packages are created with Advanced Installer on an open source license. Advanced Installer's intuitive and friendly user interface allowed me to quickly create a feature complete installer with minimal effort. [Check it out!](http://www.advancedinstaller.com/)
+
 ## Reporting an issue [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
