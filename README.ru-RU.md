@@ -20,7 +20,7 @@
 
 ## Как сообщить об ошибке [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
 
-Смотри в [CONTRIBUTING.md](CONTRIBUTING.ru-RU.md).
+Смотри в [CONTRIBUTING.ru-RU.md](CONTRIBUTING.ru-RU.md).
 
 ## Предисловие
 
