@@ -12,6 +12,12 @@
 
 Храбрецы могут попробовать последний нестабильный билд [отсюда](https://ci.appveyor.com/project/zeffy/wufuc). **Использовать на свой собственный страх и риск!**
 
+## Спонсоры
+
+### [Advanced Installer](http://www.advancedinstaller.com/)
+
+Пакеты установщика создаются с помощью Advanced Installer по лицензии с открытым исходным кодом. Интуитивно понятный и удобный пользовательский интерфейс Advanced Installer позволил мне быстро создать полную установку с минимальными усилиями. [Проверьте это!](http://www.advancedinstaller.com/) 
+
 ## Как сообщить об ошибке [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
 
 Смотри в [CONTRIBUTING.md](CONTRIBUTING.ru-RU.md).
