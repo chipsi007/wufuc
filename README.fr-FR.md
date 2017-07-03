@@ -20,7 +20,7 @@ Les packages d'installation ont été créés avec Advanced Installer avec une l
 
 ## Reporter un problème [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
 
-Voir [CONTRIBUTING.md](CONTRIBUTING.fr-FR.md).
+Voir [CONTRIBUTING.fr-FR.md](CONTRIBUTING.fr-FR.md).
 
 ## Préface
 
@@ -40,7 +40,7 @@ Si vous êtes intéressés, vous pouvez lire mon écrit originel sur la découve
 
 ## Comment ça marche
 
-De manière basique, dans le fichier `wuaueng.dll` il y a deux fonctions `IsDeviceServiceable(void)`](https://gist.github.com/zeffy/e5ec266952932bc905eb0cbc6ed72185) et [`IsCPUSupported(void)`](https://gist.github.com/zeffy/1a8f8984d2bec97ae24af63a76278694). `IsDeviceServiceable(void)` est un wrapper au dessus de `IsCPUSupported(void)` qui met en cache le résultat qu'il reçoit et le réutilise pour les appels suivants.
+De manière basique, dans le fichier `wuaueng.dll` il y a deux fonctions [`IsDeviceServiceable(void)`](https://gist.github.com/zeffy/e5ec266952932bc905eb0cbc6ed72185) et [`IsCPUSupported(void)`](https://gist.github.com/zeffy/1a8f8984d2bec97ae24af63a76278694). `IsDeviceServiceable(void)` est un wrapper au dessus de `IsCPUSupported(void)` qui met en cache le résultat qu'il reçoit et le réutilise pour les appels suivants.
 
 Mon patch tire avantage de comportement à mettre en cache le résultat en assignant la valeur de la "première exécution" à `FALSE` et le résultat en cache à `TRUE`.
 
