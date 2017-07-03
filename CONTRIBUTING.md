@@ -1,13 +1,13 @@
 # Contributing guidelines
 
-**English** | [русский](CONTRIBUTING.ru-RU.md)
+**English** | [русский](CONTRIBUTING.ru-RU.md) | [Français](CONTRIBUTING.fr-FR.md)
 
 ## Reporting an issue [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
 
 #### Before you create an issue, please make sure of the following:
 
 - Are you using at least the [latest stable version](../../releases/latest)?
-- If you previously used any of the old batchfile patches, did you revert it by running `repair_wuaueng.dll.bat`?
+- If you previously used any of the old batchfile patches (versions < 0.6), did you revert it by running `repair_wuaueng.dll.bat`?
 - Have you tried restarting your computer?
 
 #### After you've confirmed those things, please create an issue and include the following information:
