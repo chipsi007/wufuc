@@ -20,7 +20,7 @@ before_build:
 
 after_build:
 - cmd: >-
-    copy /Y "wufuc\bin\%CONFIGURATION%\%PLATFORM%\wufuc.dll" "setup-batch\"
+    copy /Y "wufuc\bin\%CONFIGURATION%\%PLATFORM%\wufuc*.dll" "setup-batch\"
 
     copy /Y "LICENSE" "setup-batch\COPYING.txt"
     

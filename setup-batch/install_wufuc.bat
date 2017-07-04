@@ -43,13 +43,14 @@ goto :unsupported_os
 
 :is_x86
 set "WINDOWS_ARCHITECTURE=x86"
+set "wufuc_dll=%~dp0wufuc32.dll"
 goto :dll_exists
 
 :is_x64
 set "WINDOWS_ARCHITECTURE=x64"
+set "wufuc_dll=%~dp0wufuc64.dll"
 
 :dll_exists
-set "wufuc_dll=%~dp0wufuc.dll"
 if exist "%wufuc_dll%" (
     goto :get_ver
 )

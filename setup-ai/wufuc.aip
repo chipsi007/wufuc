@@ -9,7 +9,7 @@
     <ROW Property="AI_CLEAN_RESOURCES_UNINSTALL" Value="1"/>
     <ROW Property="AI_CLEAN_RESOURCES_USER_PROMPT_BASIC_UI" Value="1"/>
     <ROW Property="AI_CLEAN_RESOURCES_USER_PROMPT_FULL_UI" Value="1"/>
-    <ROW Property="AI_PROPPATH_PERBUILD_wufuc.dll" Value="..\wufuc\bin\Release\x64\wufuc.dll" MultiBuildValue="MsiBuild:..\wufuc\bin\Release\x86\wufuc.dll"/>
+    <ROW Property="AI_PROPPATH_PERBUILD_wufuc.dll" Value="..\wufuc\bin\Release\x64\wufuc64.dll" MultiBuildValue="MsiBuild:..\wufuc\bin\Release\x86\wufuc32.dll"/>
     <ROW Property="AI_ThemeStyle" Value="default" MultiBuildValue="DefaultBuild:classic#MsiBuild:classic" MsiKey="AI_ThemeStyle"/>
     <ROW Property="ALLUSERS" Value="1"/>
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
@@ -60,8 +60,8 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
     <ROW File="LICENSE" Component_="LICENSE" FileName="COPYING.txt" Attributes="0" SourcePath="..\LICENSE" SelfReg="false"/>
-    <ROW File="disable_wufuc.bat" Component_="disable_wufuc.bat" FileName="DISABL~1.BAT|disable_wufuc.bat" Attributes="0" SourcePath="..\setup-batch\Helper Scripts\disable_wufuc.bat" SelfReg="false" NextFile="enable_wufuc.bat"/>
-    <ROW File="enable_wufuc.bat" Component_="enable_wufuc.bat" FileName="ENABLE~1.BAT|enable_wufuc.bat" Attributes="0" SourcePath="..\setup-batch\Helper Scripts\enable_wufuc.bat" SelfReg="false" NextFile="LICENSE"/>
+    <ROW File="disable_wufuc.bat" Component_="disable_wufuc.bat" FileName="DISABL~1.BAT|disable_wufuc.bat" Attributes="0" SourcePath="Helper Scripts\disable_wufuc.bat" SelfReg="false" NextFile="enable_wufuc.bat"/>
+    <ROW File="enable_wufuc.bat" Component_="enable_wufuc.bat" FileName="ENABLE~1.BAT|enable_wufuc.bat" Attributes="0" SourcePath="Helper Scripts\enable_wufuc.bat" SelfReg="false" NextFile="LICENSE"/>
     <ROW File="wufuc.dll" Component_="wufuc.dll" FileName="wufuc.dll" Attributes="512" SourcePath="&lt;AI_APPPATH_PERBUILD_wufuc.dll&gt;" SelfReg="false" NextFile="disable_wufuc.bat"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.AiRemoveFileComponent">
