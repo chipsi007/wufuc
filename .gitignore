@@ -251,5 +251,6 @@ paket-files/
 .idea/
 *.sln.iml
 
-# MSI
-SetupWufuc/msi/
+# Advanced Installer
+**/*-cache/
+**/*-SetupFiles/

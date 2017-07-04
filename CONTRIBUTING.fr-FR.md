@@ -7,7 +7,6 @@
 #### Avant de créer un ticket d'issue, veuillez vous assurer d'avoir vérifié les points suivants :
 
 - Utilisez-vous bien la [dernière version stable](../../releases/latest)?
-- Si vous avez utilisé l'une des versions < 0.6, avez-vous restauré l'état initial du système en exécutant `repair_wuaueng.dll.bat` ?
 - Avez-vous essayé de redémarrer l'ordinateur ?
 
 #### Après avoir confirmé ces éléments, veuillez créer un ticket en incluant les informations suivantes :
