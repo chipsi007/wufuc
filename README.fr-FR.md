@@ -1,6 +1,6 @@
 # wufuc [![](https://ci.appveyor.com/api/projects/status/0s2unkpokttyslf0?svg=true)](https://ci.appveyor.com/project/zeffy/wufuc) [![Cliquez pour laisser un pourboire à wufuc sur Gratipay!](https://img.shields.io/gratipay/team/wufuc.svg)](https://gratipay.com/wufuc/)
 
-[English](README.md) | [русский](README.ru-RU.md) | **Français**
+[English](README.md) | [русский](README.ru-RU.md) | **Français** | [Deutsch](README.de-DE.md) | [Magyar](README.hu-HU.md)
 
 [![Cliquez ici pour témoigner votre support à wufuc et faire une donation sur pledgie.com !](https://pledgie.com/campaigns/34055.png)](https://pledgie.com/campaigns/34055)
 
