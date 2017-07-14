@@ -32,7 +32,7 @@ Ces updates ont marqué l'implémentation d'un [changement de politique](https:/
 
 C'est un majestueux doigt d'honneur à tous ceux qui ont décidé de ne pas "upgrader" vers la bouse connue sous le nom de Windows 10, en particulier en considérant que le support étendu de Windows 7 et Windows 8.1 ne se terminera pas avant le 4 janvier 2020 et 10 janvier 2023 respectivement.
 
-Cela affecte également des gens avec des processeurs Intel et AMD plus vieux ! J'ai reçu des rapports d'utilisateurs pour [Intel Atom Z530](../../issues/7), [Intel Core i5-M 560](../../issues/23), [Intel Core i5-4300M](../../issues/24), [Intel Atom D525](../../issues/34), [Intel Pentium B940](../../issues/63), et [AMD FX-8350](../../issues/32), tous empêchés de recevoir des updates.
+Cela affecte également des gens avec des processeurs Intel et AMD plus vieux ! J'ai reçu des rapports d'utilisateurs pour [Intel Atom Z530](../../issues/7), [Intel Core i5-M 560](../../issues/23), [Intel Core i5-4300M](../../issues/24), [Intel Atom D525](../../issues/34), [Intel Pentium B940](../../issues/63), [AMD FX-8350](../../issues/32), et [AMD Turion 64 Mobile Technology ML-34](../../issues/80), tous empêchés de recevoir des updates.
 
 ## Méchant Microsoft !
 
