@@ -2,21 +2,21 @@
 
 **English** | [русский](CONTRIBUTING.ru-RU.md) | [Français](CONTRIBUTING.fr-FR.md) | [Deutsch](CONTRIBUTING.de-DE.md) | [Magyar](CONTRIBUTING.de-HU.md)
 
-## Reporting an issue [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
+## Reportando problemas [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
 
-#### Before you create an issue, please make sure of the following:
+#### Antes de criar um tópico de dúvidas, por favor verifique se:
 
-- Are you using at least the [latest stable version](../../releases/latest)?
-- Have you tried restarting your computer?
+- você está utilizando a última versão [latest stable version](../../releases/latest)?
+- você já tentou reiniciar o seu PC?
 
-#### After you've confirmed those things, please create an issue and include the following information:
+#### Depois de confirmar os dois passos acima, por favor crie um tópico de dúvidas incluindo as seguintes informações:
 
-- Navigate to where you installed wufuc, and attach all the `*.log` files to your issue.
-- What build are you using? Stable release or unstable AppVeyor builds?
-- What is the file version and/or SHA-1 hash of `C:\Windows\System32\wuaueng.dll`?
-- Any other information you feel is relevant to your issue.
+- Acesse a pasta onde você instalou o wufuc, e anexe todos os arquivos `*.log` no seu tópico.
+- Que versão você está utilizando? A versão estável ou instável?
+- Qual a versão do arquivo e/ou SHA-1 hash do `C:\Windows\System32\wuaueng.dll`?
+- Qualquer outra informação relevante que você acha que deve incluir.
 
-## Closure policy
+## Política de encerramento
 
-- Issues that don't have the information requested above (when applicable) will be closed immediately and the poster directed to the contributing guidelines.
-- Issues that go a week without a response from original poster are subject to closure at my discretion.
+- Os tópicos de dúvidas que não tem as informações requisitadas acima (quando aplicável) será fechado imediatamente e o autor será direcionado para as normas de contribuição.
+- Os tópicos que ficarem 1 semana sem responsta do autor original, será fechado a meu critério.
