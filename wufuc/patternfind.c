@@ -7,7 +7,7 @@
     x64dbg license (GPL-3.0):
       <https://github.com/x64dbg/x64dbg/blob/development/LICENSE> */
 
-int hexchtoint(CHAR c) {
+static int hexchtoint(CHAR c) {
     int result = -1;
     if (c >= '0' && c <= '9') {
         result = c - '0';
@@ -19,7 +19,7 @@ int hexchtoint(CHAR c) {
     return result;
 }
 
-SIZE_T formathexpattern(LPCSTR patterntext, LPSTR formattext, SIZE_T formattextsize) {
+static SIZE_T formathexpattern(LPCSTR patterntext, LPSTR formattext, SIZE_T formattextsize) {
     SIZE_T len = strlen(patterntext);
     SIZE_T result = 0;
     for (SIZE_T i = 0; i < len && (!formattext || result < formattextsize); i++) {
