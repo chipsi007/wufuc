@@ -13,9 +13,9 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
 
     TCHAR lpBinaryPathName[0x8000];
     get_svcpath(hSCManager, _T("wuauserv"), lpBinaryPathName, _countof(lpBinaryPathName));
+    CloseServiceHandle(hSCManager);
 
     BOOL result = _tcsicmp(GetCommandLine(), lpBinaryPathName);
-    CloseServiceHandle(hSCManager);
 
     if (result) {
         return 0;
@@ -44,11 +44,8 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
     DETOUR_IAT(hm, LoadLibraryExA);
     DETOUR_IAT(hm, LoadLibraryExW);
 
-    TCHAR lpServiceDll[MAX_PATH];
-    get_svcdll(_T("wuauserv"), lpServiceDll, _countof(lpServiceDll));
-
-    HMODULE hwu = GetModuleHandle(lpServiceDll);
-    if (hwu && PatchWUAgentHMODULE(hwu)) {
+    HMODULE hwu = GetModuleHandle(get_wuauservdll());
+    if (hwu && PatchWU(hwu)) {
         dwprintf(L"Patched previously loaded Windows Update module!");
     }
     ResumeAndCloseThreads(lphThreads, cb);
@@ -68,7 +65,7 @@ DWORD WINAPI NewThreadProc(LPVOID lpParam) {
     FreeLibraryAndExitThread(HINST_THISCOMPONENT, 0);
 }
 
-BOOL PatchWUAgentHMODULE(HMODULE hModule) {
+BOOL PatchWU(HMODULE hModule) {
     LPSTR pattern;
     SIZE_T offset00, offset01;
 #ifdef _AMD64_
@@ -131,11 +128,7 @@ HMODULE WINAPI _LoadLibraryExA(
     HMODULE result = LoadLibraryExA(lpFileName, hFile, dwFlags);
     if (result) {
         dwprintf(L"Loaded library: %S", lpFileName);
-        CHAR path[MAX_PATH];
-        if (!get_svcdllA("wuauserv", path, _countof(path))) {
-            return result;
-        }
-        if (!_stricmp(lpFileName, path) && PatchWUAgentHMODULE(result)) {
+        if (!_stricmp(lpFileName, get_wuauservdllA()) && PatchWU(result)) {
             dwprintf(L"Patched Windows Update module!");
         }
     }
@@ -150,11 +143,7 @@ HMODULE WINAPI _LoadLibraryExW(
     HMODULE result = LoadLibraryExW(lpFileName, hFile, dwFlags);
     if (result) {
         dwprintf(L"Loaded library: %s", lpFileName);
-        WCHAR path[MAX_PATH];
-        if (!get_svcdllW(L"wuauserv", path, _countof(path))) {
-            return result;
-        }
-        if (!_wcsicmp(lpFileName, path) && PatchWUAgentHMODULE(result)) {
+        if (!_wcsicmp(lpFileName, get_wuauservdllW()) && PatchWU(result)) {
             dwprintf(L"Patched Windows Update module!");
         }
     }
