@@ -17,7 +17,7 @@
     <ROW Property="ARPURLINFOABOUT" Value="https://github.com/zeffy/wufuc"/>
     <ROW Property="ARPURLUPDATEINFO" Value="https://github.com/zeffy/wufuc/releases"/>
     <ROW Property="Manufacturer" Value="zeffy"/>
-    <ROW Property="ProductCode" Value="1028:{B7F26089-5C8E-4DE8-A356-067770635396} 1030:{6028AE21-CE9D-4280-B66C-C3D8A9AB8359} 1031:{D8CE187D-F692-494F-8456-9A3F9D547477} 1033:{8739556C-AC5C-4384-889C-BCB102BA186F} 1035:{BE9A37E3-83BD-4C32-A4DE-9B292FD55596} 1036:{7A3E194D-D7EA-404F-AAE8-B2818AA73492} 1038:{9ABBEAB4-182C-4B3A-8BF7-82C0D39F530B} 1040:{2924EB49-DF9A-4B7D-917A-5547026E91F2} 1041:{D3B280FA-562F-4AD0-A974-E11BD2E4D623} 1042:{BBC862ED-A70C-43FE-B35B-3FD2CEC4604C} 1043:{441DF8E7-B329-4CE9-ADC5-DE4613368B7F} 1045:{93C6F7E2-D92C-42B0-A162-3A972FDCEBF6} 1049:{E20AD331-486C-439D-B061-2DA0D0B8C62F} 1060:{7E4E1C6A-EC43-457E-8517-70219F42F73B} 2052:{EDFDA57E-ADF7-402D-AAE0-AA167FD4322C} 3082:{C874AEC9-CEFE-4534-A160-A9B132011C56} " Type="16"/>
+    <ROW Property="ProductCode" Value="1028:{B7F26089-5C8E-4DE8-A356-067770635396} 1030:{6028AE21-CE9D-4280-B66C-C3D8A9AB8359} 1031:{D8CE187D-F692-494F-8456-9A3F9D547477} 1033:{8739556C-AC5C-4384-889C-BCB102BA186F} 1035:{BE9A37E3-83BD-4C32-A4DE-9B292FD55596} 1036:{7A3E194D-D7EA-404F-AAE8-B2818AA73492} 1038:{9ABBEAB4-182C-4B3A-8BF7-82C0D39F530B} 1040:{2924EB49-DF9A-4B7D-917A-5547026E91F2} 1041:{D3B280FA-562F-4AD0-A974-E11BD2E4D623} 1042:{BBC862ED-A70C-43FE-B35B-3FD2CEC4604C} 1043:{441DF8E7-B329-4CE9-ADC5-DE4613368B7F} 1045:{93C6F7E2-D92C-42B0-A162-3A972FDCEBF6} 1046:{B8F6F881-5F3F-44EC-8C7A-F23309068F74} 1049:{E20AD331-486C-439D-B061-2DA0D0B8C62F} 1060:{7E4E1C6A-EC43-457E-8517-70219F42F73B} 2052:{EDFDA57E-ADF7-402D-AAE0-AA167FD4322C} 3082:{C874AEC9-CEFE-4534-A160-A9B132011C56} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="wufuc"/>
     <ROW Property="ProductVersion" Value="0.7.0.62" Type="32" TargetFile="wufuc.dll"/>
@@ -71,8 +71,8 @@
     <ROW Name="AI_APPPATH_PERBUILD_wufuc.dll" Path="[|AI_PROPPATH_PERBUILD_wufuc.dll]" Type="2" Content="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
-    <ROW BuildKey="DefaultBuild" BuildName="x64" BuildOrder="1" BuildType="1" PackageFileName="wufuc_setup_x64" Languages="en;zh;zh_TW;fr;ja;ko;pl;ru;es;it;de;fi;nl;hu;da;sl" LangOpt="1" InstallationType="4" UseLargeSchema="true" MsiPackageType="x64"/>
-    <ROW BuildKey="MsiBuild" BuildName="x86" BuildOrder="2" BuildType="1" PackageFileName="wufuc_setup_x86" Languages="en;zh;zh_TW;fr;ja;ko;pl;ru;es;it;de;fi;nl;hu;da;sl" LangOpt="1" InstallationType="4" UseLargeSchema="true"/>
+    <ROW BuildKey="DefaultBuild" BuildName="x64" BuildOrder="1" BuildType="1" PackageFileName="wufuc_setup_x64" Languages="en;zh;zh_TW;fr;ja;ko;pl;ru;es;it;de;fi;nl;hu;da;sl;pt_BR" LangOpt="1" InstallationType="4" UseLargeSchema="true" MsiPackageType="x64"/>
+    <ROW BuildKey="MsiBuild" BuildName="x86" BuildOrder="2" BuildType="1" PackageFileName="wufuc_setup_x86" Languages="en;zh;zh_TW;fr;ja;ko;pl;ru;es;it;de;fi;nl;hu;da;sl;pt_BR" LangOpt="1" InstallationType="4" UseLargeSchema="true"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
     <ROW Path="&lt;AI_DICTS&gt;ui.ail"/>
@@ -92,6 +92,7 @@
     <ROW Path="&lt;AI_DICTS&gt;ui_hu.ail"/>
     <ROW Path="&lt;AI_DICTS&gt;ui_da.ail"/>
     <ROW Path="&lt;AI_DICTS&gt;ui_sl.ail"/>
+    <ROW Path="&lt;AI_DICTS&gt;ui_pt_BR.ail"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.FragmentComponent">
     <ROW Fragment="CommonUI.aip" Path="&lt;AI_FRAGS&gt;CommonUI.aip"/>
