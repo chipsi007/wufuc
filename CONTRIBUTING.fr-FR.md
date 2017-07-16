@@ -1,6 +1,6 @@
 # Directives de contribution
 
-[English](CONTRIBUTING.md) | [русский](CONTRIBUTING.ru-RU.md) | **Français**  | [Deutsch](CONTRIBUTING.de-DE.md) | [Magyar](CONTRIBUTING.hu-HU.md) | [Portugese (Brazil)](CONTRIBUTING.pt-BR.md)
+[English](CONTRIBUTING.md) | [русский](CONTRIBUTING.ru-RU.md) | **Français**  | [Deutsch](CONTRIBUTING.de-DE.md) | [Magyar](CONTRIBUTING.hu-HU.md) | [Portuguese (Brazil)](CONTRIBUTING.pt-BR.md)
 
 ## Reporter un problème [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
 
