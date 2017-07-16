@@ -1,6 +1,6 @@
 # Hozzájárulási irányelvek
 
-[English](CONTRIBUTING.md) | [русский](CONTRIBUTING.ru-RU.md) | [Français](CONTRIBUTING.fr-FR.md) | [Deutsch](CONTRIBUTING.de-DE.md) | **Magyar**
+[English](CONTRIBUTING.md) | [русский](CONTRIBUTING.ru-RU.md) | [Français](CONTRIBUTING.fr-FR.md) | [Deutsch](CONTRIBUTING.de-DE.md) | **Magyar** | [Portugese (Brazil)](CONTRIBUTING.pt-BR.md)
 
 ## Hiba jelentése [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
 
