@@ -1,8 +1,8 @@
-# wufuc [![](https://ci.appveyor.com/api/projects/status/0s2unkpokttyslf0?svg=true)](https://ci.appveyor.com/project/zeffy/wufuc) [![Cliquez pour laisser un pourboire à wufuc sur Gratipay!](https://img.shields.io/gratipay/team/wufuc.svg)](https://gratipay.com/wufuc/)
+# wufuc [![](https://ci.appveyor.com/api/projects/status/0s2unkpokttyslf0?svg=true)](https://ci.appveyor.com/project/zeffy/wufuc)
 
 [English](README.md) | [русский](README.ru-RU.md) | **Français** | [Deutsch](README.de-DE.md) | [Magyar](README.hu-HU.md) | [Portuguese (Brazil)](README.pt-BR.md)
 
-[![Cliquez ici pour témoigner votre support à wufuc et faire une donation sur pledgie.com !](https://pledgie.com/campaigns/34055.png)](https://pledgie.com/campaigns/34055)
+[![Cliquez ici pour témoigner votre support à wufuc et faire une donation sur pledgie.com !](https://pledgie.com/campaigns/34055.png)](https://pledgie.com/campaigns/34055) <a href='https://gratipay.com/wufuc/'><img height=37 alt='Cliquez pour laisser un pourboire à wufuc sur Gratipay!' src='https://raw.githubusercontent.com/Cam/gratipay-badge/master/dist/gratipay.png' /></a>
 
 Ce projet désactive le message de popup "Unsupported Hardware" pendant les mises à jour Windows, et permet de continuer à installer des updates sur les systèmes Windows 7 et 8.1, équipés de processeurs Intel Kaby Lake, AMD Ryzen, ou tout autre processor non supporté.
 

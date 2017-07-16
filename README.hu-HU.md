@@ -1,8 +1,8 @@
-﻿# wufuc [![](https://ci.appveyor.com/api/projects/status/0s2unkpokttyslf0?svg=true)](https://ci.appveyor.com/project/zeffy/wufuc) [![Click here to tip wufuc on Gratipay!](https://img.shields.io/gratipay/team/wufuc.svg)](https://gratipay.com/wufuc/)
+﻿# wufuc [![](https://ci.appveyor.com/api/projects/status/0s2unkpokttyslf0?svg=true)](https://ci.appveyor.com/project/zeffy/wufuc)
 
 [English](README.md) | [русский](README.ru-RU.md) | [Français](README.fr-FR.md) | [Deutsch](README.de-DE.md) | **Magyar** | [Portuguese (Brazil)](README.pt-BR.md)
 
-[![Kattints ide hogy támogassad a wufuc-ot a pledgie.com-on !](https://pledgie.com/campaigns/34055.png)](https://pledgie.com/campaigns/34055)
+[![Kattints ide hogy támogassad a wufuc-ot a pledgie.com-on !](https://pledgie.com/campaigns/34055.png)](https://pledgie.com/campaigns/34055) <a href='https://gratipay.com/wufuc/'><img height=37 alt='Click here to tip wufuc on Gratipay!' src='https://raw.githubusercontent.com/Cam/gratipay-badge/master/dist/gratipay.png' /></a>
 
 Kikapcsolja az "Windows Update Unsupported Hardware/Nem támogatott hardver" jelentését, és lehetővé teszi a frissítések telepítését Intel Kaby Lake, AMD Ryzen, vagy más nem támogatott processzoros Windows 7 és 8.1 rendszereken.
 
