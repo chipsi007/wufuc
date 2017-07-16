@@ -19,7 +19,7 @@ O instalador dos pacotes foram criados com Advanced Installer com a licença de 
 
 ## Reportando problemas [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
 
-Leia [CONTRIBUTING.md](CONTRIBUTING.md).
+Leia [CONTRIBUTING.pt-BR.md](CONTRIBUTING.pt-BR.md).
 
 ## Prefácio
 
