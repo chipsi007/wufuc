@@ -2,7 +2,7 @@
 
 [English](README.md) | [русский](README.ru-RU.md) | [Français](README.fr-FR.md) | **Deutsch** | [Magyar](README.hu-HU.md) | [Portuguese (Brazil)](README.pt-BR.md)
 
-[![Klicke hier um wufuc zu unterstützen und um eine Spende zu tätigen - auf pledgie.com !](https://pledgie.com/campaigns/34055.png)](https://pledgie.com/campaigns/34055) <a href='https://gratipay.com/wufuc/'><img height=37 alt='Click here to tip wufuc on Gratipay!' src='https://raw.githubusercontent.com/Cam/gratipay-badge/master/dist/gratipay.png' /></a>
+[![Klicke hier um wufuc zu unterstützen und um eine Spende zu tätigen - auf pledgie.com !](https://pledgie.com/campaigns/34055.png)](https://pledgie.com/campaigns/34055) <a href='https://gratipay.com/wufuc/'><img height=37 alt='Click here to tip wufuc on Gratipay!' src='https://cdn.rawgit.com/zeffy/gratipay-badge/master/dist/gratipay.svg' /></a>
 
 Das Tool schaltet die "Unsupported Hardware" Nachricht in Windows Update ab, und erlaub dir auf Windows 7 und 8.1 Systemen mit Intel Kaby Lake, AMD Ryzen, oder anderen nicht unterstützten Processoren weiter updates zu installieren.
 

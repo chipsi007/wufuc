@@ -2,7 +2,7 @@
 
 [English](README.md) | [русский](README.ru-RU.md) | [Français](README.fr-FR.md) | [Deutsch](README.de-DE.md) | **Magyar** | [Portuguese (Brazil)](README.pt-BR.md)
 
-[![Kattints ide hogy támogassad a wufuc-ot a pledgie.com-on !](https://pledgie.com/campaigns/34055.png)](https://pledgie.com/campaigns/34055) <a href='https://gratipay.com/wufuc/'><img height=37 alt='Click here to tip wufuc on Gratipay!' src='https://raw.githubusercontent.com/Cam/gratipay-badge/master/dist/gratipay.png' /></a>
+[![Kattints ide hogy támogassad a wufuc-ot a pledgie.com-on !](https://pledgie.com/campaigns/34055.png)](https://pledgie.com/campaigns/34055) <a href='https://gratipay.com/wufuc/'><img height=37 alt='Click here to tip wufuc on Gratipay!' src='https://cdn.rawgit.com/zeffy/gratipay-badge/master/dist/gratipay.svg' /></a>
 
 Kikapcsolja az "Windows Update Unsupported Hardware/Nem támogatott hardver" jelentését, és lehetővé teszi a frissítések telepítését Intel Kaby Lake, AMD Ryzen, vagy más nem támogatott processzoros Windows 7 és 8.1 rendszereken.
 

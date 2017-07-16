@@ -2,7 +2,7 @@
 
 [English](README.md) | **русский** | [Français](README.fr-FR.md) | [Deutsch](README.de-DE.md) | [Magyar](README.hu-HU.md) | [Portuguese (Brazil)](README.pt-BR.md)
 
-[![Нажмите сюда, чтоюы поддержать wufuc пожертвованием на pledgie.com !](https://pledgie.com/campaigns/34055.png)](https://pledgie.com/campaigns/34055) <a href='https://gratipay.com/wufuc/'><img height=37 alt='Click here to tip wufuc on Gratipay!' src='https://raw.githubusercontent.com/Cam/gratipay-badge/master/dist/gratipay.png' /></a>
+[![Нажмите сюда, чтоюы поддержать wufuc пожертвованием на pledgie.com !](https://pledgie.com/campaigns/34055.png)](https://pledgie.com/campaigns/34055) <a href='https://gratipay.com/wufuc/'><img height=37 alt='Click here to tip wufuc on Gratipay!' src='https://cdn.rawgit.com/zeffy/gratipay-badge/master/dist/gratipay.svg' /></a>
 
 Отключает сообщение "Оборудование не поддерживается" в Windows Update, и позволяет продолжать устанавливать обновления на системах Windows 7 и 8.1 с процессорами Intel Kaby Lake, AMD Ryzen, и другими не поддерживаемыми.
 

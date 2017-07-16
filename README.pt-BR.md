@@ -2,7 +2,7 @@
 
 [English](README.md) | [русский](README.ru-RU.md) | [Français](README.fr-FR.md) | [Deutsch](README.de-DE.md) | [Magyar](README.hu-HU.md) | **Portuguese (Brazil)**
 
-[![Click here to lend your support to wufuc and make a donation at pledgie.com !](https://pledgie.com/campaigns/34055.png)](https://pledgie.com/campaigns/34055) <a href='https://gratipay.com/wufuc/'><img height=37 alt='Click here to tip wufuc on Gratipay!' src='https://raw.githubusercontent.com/Cam/gratipay-badge/master/dist/gratipay.png' /></a>
+[![Click here to lend your support to wufuc and make a donation at pledgie.com !](https://pledgie.com/campaigns/34055.png)](https://pledgie.com/campaigns/34055) <a href='https://gratipay.com/wufuc/'><img height=37 alt='Click here to tip wufuc on Gratipay!' src='https://cdn.rawgit.com/zeffy/gratipay-badge/master/dist/gratipay.svg' /></a>
 
 Desabilita a mensagem “Seu PC utiliza um processador que não é suportado por esta versão do Windows e você não receberá atualizações” do Windows Update, e permite que você continue instalando atualizações nos sistemas Windows 7 and 8.1 com os novos processadores Intel Kaby Lake, AMD Ryzen, ou outros processadores.
 
