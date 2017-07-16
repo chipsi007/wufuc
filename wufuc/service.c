@@ -5,6 +5,9 @@
 #include "shellapihelper.h"
 #include "service.h"
 
+static CHAR wuauservdllA[MAX_PATH];
+static WCHAR wuauservdllW[MAX_PATH];
+
 BOOL get_svcdllA(LPCSTR lpServiceName, LPSTR lpServiceDll, DWORD dwSize) {
     CHAR lpSubKey[257];
     sprintf_s(lpSubKey, _countof(lpSubKey), "SYSTEM\\CurrentControlSet\\services\\%s\\Parameters", lpServiceName);
@@ -25,6 +28,20 @@ BOOL get_svcdllW(LPCWSTR lpServiceName, LPWSTR lpServiceDll, DWORD dwSize) {
     }
     dwprintf(L"Service \"%s\" DLL path: %s", lpServiceName, lpServiceDll);
     return TRUE;
+}
+
+LPSTR get_wuauservdllA(void) {
+    if (wuauservdllA[0] == '\0') {
+        get_svcdllA("wuauserv", wuauservdllA, _countof(wuauservdllA));
+    }
+    return wuauservdllA;
+}
+
+LPWSTR get_wuauservdllW(void) {
+    if (wuauservdllW[0] == L'\0') {
+        get_svcdllW(L"wuauserv", wuauservdllW, _countof(wuauservdllW));
+    }
+    return wuauservdllW;
 }
 
 BOOL get_svcpid(SC_HANDLE hSCManager, LPCTSTR lpServiceName, DWORD *lpdwProcessId) {

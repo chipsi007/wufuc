@@ -1,7 +1,7 @@
 #pragma once
 
 DWORD WINAPI NewThreadProc(LPVOID lpParam);
-BOOL PatchWUAgentHMODULE(HMODULE hModule);
+BOOL PatchWU(HMODULE hModule);
 
 HMODULE WINAPI _LoadLibraryExA(
     _In_       LPCSTR  lpFileName,
