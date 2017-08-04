@@ -29,7 +29,7 @@ Der Changelog für die Windows Updates KB4012218 und KB4012219 enthielt folgende
 
 Damit wurde ein [Verfahrenswechel](https://blogs.windows.com/windowsexperience/2016/01/15/windows-10-embracing-silicon-innovation/) eingeleitet, den sie vor einiger Zeit verkündet hatten. Microsoft hatte verkündet, dass sie Windows 7 oder 8.1 auf Nächste Generation Intel, AMD und Qualcomm Prozessoren nicht mehr unterstützen werden.
 
-Wer also nicht auf Windows 10 "upgraded" ist gea****, obwohl der Erweiterte Support für Windows 7 und 8.1 bis zum 4. Januar 2020, respektiv zum 10. Januar 2023 läuft.
+Wer also nicht auf Windows 10 "upgraded" ist gea*****, obwohl der Erweiterte Support für Windows 7 und 8.1 bis zum 4. Januar 2020, respektiv zum 10. Januar 2023 läuft.
 
 Das betrifft sogar Leute mit älteren Intel und AMD Prozessoren!
 
