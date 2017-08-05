@@ -18,5 +18,5 @@
 
 ## Richtlinie zur Schließung der Fehlermeldungen
 
-- Fehlermeldungen die diese Informationen nicht haben (falls zutreffend) werden sofort geschlossen und der Ersteller wir auf diese Richtlinie verwiesen.
+- Fehlermeldungen die diese Informationen nicht haben (falls zutreffend) werden sofort geschlossen und der Ersteller wird auf diese Richtlinie verweisen.
 - Fehlermeldungen nach einer Woche ohne Reaktion vom Ersteller werden nach meinem Ermessen geschlossen.
