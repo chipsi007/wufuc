@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="14.1.1" version="14.1.1" Modules="enterprise" RootPath="." Language="en" Id="{6DF9A5D1-044E-44C4-9CC3-E4E93457870A}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="14.1.1" version="14.2" Modules="enterprise" RootPath="." Language="en" Id="{6DF9A5D1-044E-44C4-9CC3-E4E93457870A}">
   <COMPONENT cid="caphyon.advinst.msicomp.ProjectOptionsComponent">
     <ROW Name="HiddenItems" Value="AppXProductDetailsComponent;AppXDependenciesComponent;AppXAppDetailsComponent;AppXVisualAssetsComponent;AppXCapabilitiesComponent;AppXAppDeclarationsComponent;AppXUriRulesComponent;SccmComponent;ActSyncAppComponent"/>
   </COMPONENT>
@@ -17,10 +17,10 @@
     <ROW Property="ARPURLINFOABOUT" Value="https://github.com/zeffy/wufuc"/>
     <ROW Property="ARPURLUPDATEINFO" Value="https://github.com/zeffy/wufuc/releases"/>
     <ROW Property="Manufacturer" Value="zeffy"/>
-    <ROW Property="ProductCode" Value="1028:{2F696F74-0FD5-49E1-BEEC-A4256F6D7404} 1030:{3FBD2666-E954-4454-A990-1CC5C25CFFF1} 1031:{FF3A4C63-3A23-4359-B610-AC0812354D10} 1033:{AF23CE93-4FB0-4A8A-A8D6-7A97151BCC14} 1035:{F30F6F66-23A0-44C3-B7B0-78DB57D5A145} 1036:{1E1ACBB4-A907-41FF-9B27-372858AC4D67} 1038:{9F8DD843-9947-4D65-BC4D-7395EF5C21AF} 1040:{48F029CE-132A-45AD-909B-2C86F65025F3} 1041:{14A85935-DA96-487B-9342-93D4A7439D82} 1042:{5605ABFB-127F-466B-902C-31808B2D68BA} 1043:{28BBE85D-1EBA-49BE-9EFA-C4F68572620D} 1045:{B0F63DCC-ACCC-4C45-B666-9322A68A2426} 1046:{68AD7740-E0F0-42B7-91D8-7C572CE32A68} 1049:{BEFE9FBB-D099-40C0-A990-3BA2E749A4AD} 1060:{405A42D2-178A-420F-8E06-A0A17EF926BE} 2052:{A381193A-4291-4D29-9FE2-6364D999B8AE} 3082:{8F760ACC-7186-4A5E-BE22-1AE1801ACBFD} " Type="16"/>
+    <ROW Property="ProductCode" Value="1028:{375EEFF0-5E5A-442E-9F6E-BEEBE3E8ECF9} 1030:{E230204D-CE8F-41E1-A4DB-C4207D93F885} 1031:{FCA8704C-D5A0-4D3D-8397-025D19DDAEBD} 1033:{689BF70E-4EB8-4214-8DD9-FADD6C8C985A} 1035:{E61C5090-D156-4AEB-8A5A-D64C4E0CCDF2} 1036:{E81BF4E2-06A5-4E0F-9CFC-B5FD9801D26D} 1038:{E64712EE-46A4-4288-A691-6FF577879C6A} 1040:{0A7AD69F-0738-472F-B123-4A85D96A645B} 1041:{4A754EE6-CEDC-4EB3-BB51-059852714F83} 1042:{AE3758C2-C229-44E3-BDB9-0EDAF467BCFA} 1043:{4D7C4256-58FA-431C-9915-7C8044D95F66} 1045:{41D27F42-A6E8-4A57-8467-CE6F61535741} 1046:{B4A1DEB5-BC54-44F3-9108-2C7EF60DB651} 1049:{F976B57F-4FAC-4BF1-A09B-CA4590FC65D0} 1060:{4E27F130-256F-41B0-9FE5-8DEF1A553773} 2052:{010DEDF4-F79D-45F6-B747-D1473531B13A} 3082:{EF04B4CE-48FD-4409-A855-437835A2E31F} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="wufuc"/>
-    <ROW Property="ProductVersion" Value="0.7.1.81" Type="32" TargetFile="wufuc.dll"/>
+    <ROW Property="ProductVersion" Value="0.7.2.0" Type="32" TargetFile="wufuc.dll"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="SysnativeFolder" Value=" "/>
     <ROW Property="UpgradeCode" Value="{4C52972C-251E-4D1B-AD09-EAA765719DCC}"/>
@@ -287,8 +287,8 @@
     <ROW Condition="( Version9X OR VersionNT64 OR ( VersionNT AND ((VersionNT &lt;&gt; 501) OR (ServicePackLevel &lt;&gt; 3)) AND ((VersionNT &lt;&gt; 502) OR (ServicePackLevel &lt;&gt; 2)) AND ((VersionNT &lt;&gt; 600) OR (MsiNTProductType &lt;&gt; 1)) AND ((VersionNT &lt;&gt; 600) OR (MsiNTProductType = 1)) AND (VersionNT &lt;&gt; 602) AND (VersionNT &lt;&gt; 1000) ) )" Description="[ProductName] cannot be installed on the following Windows versions: [WindowsTypeNTDisplay]." DescriptionLocId="AI.LaunchCondition.NoSpecificNT" IsPredefined="true" Builds="MsiBuild"/>
     <ROW Condition="(VersionNT &lt;&gt; 400)" Description="[ProductName] cannot be installed on [WindowsTypeNT40Display]." DescriptionLocId="AI.LaunchCondition.NoNT40" IsPredefined="true" Builds="DefaultBuild;MsiBuild"/>
     <ROW Condition="(VersionNT &lt;&gt; 500)" Description="[ProductName] cannot be installed on [WindowsTypeNT50Display]." DescriptionLocId="AI.LaunchCondition.NoNT50" IsPredefined="true" Builds="DefaultBuild;MsiBuild"/>
-    <ROW Condition="(VersionNT = 601 AND RESULT_WUAUENG.DLL_WIN7) OR (VersionNT = 603 AND RESULT_WUAUENG.DLL_WIN81)" Description="File [System32Folder]wuaueng.dll is under the minimum supported version." Builds="MsiBuild"/>
-    <ROW Condition="(VersionNT64 = 601 AND RESULT_WUAUENG.DLL_WIN7) OR (VersionNT64 = 603 AND RESULT_WUAUENG.DLL_WIN81)" Description="File [System32Folder]wuaueng.dll is under the minimum supported version." Builds="DefaultBuild"/>
+    <ROW Condition="(VersionNT = 601 AND RESULT_WUAUENG.DLL_WIN7) OR (VersionNT = 603 AND RESULT_WUAUENG.DLL_WIN81)" Description="File wuaueng.dll is below the minimum supported version.&#13;&#10;&#13;&#10;You must first run Windows Update until the &quot;Unsupported Hardware&quot; window pops up, then try again." Builds="MsiBuild"/>
+    <ROW Condition="(VersionNT64 = 601 AND RESULT_WUAUENG.DLL_WIN7) OR (VersionNT64 = 603 AND RESULT_WUAUENG.DLL_WIN81)" Description="File wuaueng.dll is below the minimum supported version.&#13;&#10;&#13;&#10;You must first run Windows Update until the &quot;Unsupported Hardware&quot; window pops up, then try again." Builds="DefaultBuild"/>
     <ROW Condition="(VersionNT64 OR ((VersionNT &lt;&gt; 501) OR (ServicePackLevel = 3))) AND ((VersionNT &lt;&gt; 502) OR (ServicePackLevel = 2))" Description="[ProductName] cannot be installed on [WindowsTypeNT5XDisplay]." DescriptionLocId="AI.LaunchCondition.NoNT5X" IsPredefined="true" Builds="DefaultBuild;MsiBuild"/>
     <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsType9XDisplay]." DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="DefaultBuild;MsiBuild"/>
   </COMPONENT>
