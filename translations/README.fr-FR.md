@@ -1,6 +1,6 @@
 # wufuc [![](https://ci.appveyor.com/api/projects/status/0s2unkpokttyslf0?svg=true)](https://ci.appveyor.com/project/zeffy/wufuc)
 
-[English](README.md) | [русский](README.ru-RU.md) | **Français** | [Deutsch](README.de-DE.md) | [Magyar](README.hu-HU.md) | [Portuguese (Brazil)](README.pt-BR.md)
+[English](../README.md) | [русский](README.ru-RU.md) | **Français** | [Deutsch](README.de-DE.md) | [Magyar](README.hu-HU.md) | [Portuguese (Brazil)](README.pt-BR.md)
 
 [![Cliquez ici pour témoigner votre support à wufuc et faire une donation sur pledgie.com !](https://pledgie.com/campaigns/34055.png)](https://pledgie.com/campaigns/34055) <a href='https://gratipay.com/wufuc/'><img height=37 alt='Cliquez pour laisser un pourboire à wufuc sur Gratipay!' src='https://cdn.rawgit.com/zeffy/gratipay-badge/master/dist/gratipay.svg' /></a>
 
