@@ -70,12 +70,31 @@ HMODULE WINAPI LoadLibraryExA_hook(
     _Reserved_ HANDLE  hFile,
     _In_       DWORD   dwFlags
 ) {
-    HMODULE result = LoadLibraryExA(lpFileName, hFile, dwFlags);
-    if (result) {
-        trace(L"Loaded library: %S", lpFileName);
-        if (!_stricmp(lpFileName, get_wuauservdllA()) && PatchWUA(result))
-            trace(L"Successfully patched WUA module!");
+    CHAR buffer[MAX_PATH];
+    strcpy_s(buffer, _countof(buffer), lpFileName);
+
+    BOOL isWUA = !_stricmp(buffer, get_wuauservdllA());
+    if (isWUA) {
+        CHAR drive[_MAX_DRIVE], dir[_MAX_DIR], fname[_MAX_FNAME], ext[_MAX_EXT];
+        _splitpath_s(buffer, drive, _countof(drive), dir, _countof(dir), fname, _countof(fname), ext, _countof(ext));
+
+        if (!_stricmp(fname, "wuaueng2")) {
+            CHAR newpath[MAX_PATH];
+            _makepath_s(newpath, _countof(buffer), drive, dir, "wuaueng", ext);
+
+            if (GetFileAttributesA(newpath) != INVALID_FILE_ATTRIBUTES) {
+                strcpy_s(buffer, _countof(buffer), newpath);
+                trace(L"UpdatePack7R2 compatibility fix: redirecting %S -> %S", lpFileName, buffer);
+            }
+        }
     }
+
+    HMODULE result = fpLoadLibraryExA(buffer, hFile, dwFlags);
+    trace(L"Loaded library: %S", buffer);
+
+    if (isWUA)
+        PatchWUA(result);
+
     return result;
 }
 
@@ -84,12 +103,31 @@ HMODULE WINAPI LoadLibraryExW_hook(
     _Reserved_ HANDLE  hFile,
     _In_       DWORD   dwFlags
 ) {
-    HMODULE result = LoadLibraryExW(lpFileName, hFile, dwFlags);
-    if (result) {
-        trace(L"Loaded library: %s", lpFileName);
-        if (!_wcsicmp(lpFileName, get_wuauservdllW()) && PatchWUA(result))
-            trace(L"Successfully patched WUA module!");
+    WCHAR buffer[MAX_PATH];
+    wcscpy_s(buffer, _countof(buffer), lpFileName);
+
+    BOOL isWUA = !_wcsicmp(buffer, get_wuauservdllW());
+    if (isWUA) {
+        WCHAR drive[_MAX_DRIVE], dir[_MAX_DIR], fname[_MAX_FNAME], ext[_MAX_EXT];
+        _wsplitpath_s(buffer, drive, _countof(drive), dir, _countof(dir), fname, _countof(fname), ext, _countof(ext));
+
+        if (!_wcsicmp(fname, L"wuaueng2")) {
+            WCHAR newpath[MAX_PATH];
+            _wmakepath_s(newpath, _countof(buffer), drive, dir, L"wuaueng", ext);
+
+            if (GetFileAttributesW(newpath) != INVALID_FILE_ATTRIBUTES) {
+                wcscpy_s(buffer, _countof(buffer), newpath);
+                trace(L"UpdatePack7R2 compatibility fix: redirecting %s -> %s", lpFileName, buffer);
+            }
+        }
     }
+
+    HMODULE result = fpLoadLibraryExW(buffer, hFile, dwFlags);
+    trace(L"Loaded library: %s", buffer);
+
+    if (isWUA)
+        PatchWUA(result);
+
     return result;
 };
 
@@ -141,5 +179,8 @@ BOOL PatchWUA(HMODULE hModule) {
         trace(L"Patched boolean value #2: %p = %08x", lpbIsCPUSupportedResult, *lpbIsCPUSupportedResult);
         result = TRUE;
     }
+    if (result)
+        trace(L"Successfully patched WUA module!");
+
     return result;
 }
