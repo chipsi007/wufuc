@@ -4,7 +4,7 @@
 /* Ported to C from x64dbg's patternfind.cpp:
  *   https://github.com/x64dbg/x64dbg/blob/development/src/dbg/patternfind.cpp
  * x64dbg license (GPL-3.0):
- *   https://github.com/x64dbg/x64dbg/blob/development/LICENSE> 
+ *   https://github.com/x64dbg/x64dbg/blob/development/LICENSE
  */
 
 int hexchtoint(CHAR c) {
