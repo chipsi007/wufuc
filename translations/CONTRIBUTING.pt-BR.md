@@ -1,6 +1,6 @@
 # Contributing guidelines
 
-[English](CONTRIBUTING.md) | [русский](CONTRIBUTING.ru-RU.md) | [Français](CONTRIBUTING.fr-FR.md) | [Deutsch](CONTRIBUTING.de-DE.md) | [Magyar](CONTRIBUTING.de-HU.md) | **Portuguese (Brazil)**
+[English](../CONTRIBUTING.md) | [русский](CONTRIBUTING.ru-RU.md) | [Français](CONTRIBUTING.fr-FR.md) | [Deutsch](CONTRIBUTING.de-DE.md) | [Magyar](CONTRIBUTING.hu-HU.md) | **Portuguese (Brazil)**
 
 ## Reportando problemas [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
 

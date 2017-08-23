@@ -1,6 +1,6 @@
 # wufuc [![](https://ci.appveyor.com/api/projects/status/0s2unkpokttyslf0?svg=true)](https://ci.appveyor.com/project/zeffy/wufuc)
 
-**English** | [русский](README.ru-RU.md) | [Français](README.fr-FR.md) | [Deutsch](README.de-DE.md) | [Magyar](README.hu-HU.md) | [Portuguese (Brazil)](README.pt-BR.md)
+**English** | [русский](translations/README.ru-RU.md) | [Français](translations/README.fr-FR.md) | [Deutsch](translations/README.de-DE.md) | [Magyar](translations/README.hu-HU.md) | [Portuguese (Brazil)](translations/README.pt-BR.md)
 
 [![Click here to lend your support to wufuc and make a donation at pledgie.com !](https://pledgie.com/campaigns/34055.png)](https://pledgie.com/campaigns/34055) <a href='https://gratipay.com/wufuc/'><img height=37 alt='Click here to tip wufuc on Gratipay!' src='https://cdn.rawgit.com/zeffy/gratipay-badge/master/dist/gratipay.svg' /></a>
 

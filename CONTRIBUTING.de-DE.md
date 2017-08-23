@@ -1,6 +1,6 @@
-﻿# Richtlinien für die Fehlermeldung
+# Richtlinien für die Fehlermeldung
 
-[English](CONTRIBUTING.md) | [русский](CONTRIBUTING.ru-RU.md) | [Français](CONTRIBUTING.fr-FR.md) | **Deutsch**  | [Magyar](CONTRIBUTING.hu-HU.md) | [Portuguese (Brazil)](CONTRIBUTING.pt-BR.md)
+[English](../CONTRIBUTING.md) | [русский](CONTRIBUTING.ru-RU.md) | [Français](CONTRIBUTING.fr-FR.md) | **Deutsch**  | [Magyar](CONTRIBUTING.hu-HU.md) | [Portuguese (Brazil)](CONTRIBUTING.pt-BR.md)
 
 ## Fehler melden [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
 

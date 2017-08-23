@@ -124,6 +124,9 @@ if errorlevel 1 (
     echo.
     echo ERROR - Detected that wuaueng.dll is below the minimum supported version.
     echo.
+    echo You must first run Windows Update until the "Unsupported Hardware" window
+    echo pops up, then try again.
+    echo.
     goto :die
 )
 echo Detected supported Windows Update agent version: %Version%

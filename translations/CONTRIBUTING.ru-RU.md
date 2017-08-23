@@ -1,6 +1,6 @@
 # Инструкция для тех, кто желает помочь, внести вклад
 
-[English](CONTRIBUTING.md) | **русский** | [Français](CONTRIBUTING.fr-FR.md) | [Deutsch](CONTRIBUTING.de-DE.md) | [Magyar](CONTRIBUTING.de-HU.md) | [Portuguese (Brazil)](CONTRIBUTING.pt-BR.md)
+[English](../CONTRIBUTING.md) | **русский** | [Français](CONTRIBUTING.fr-FR.md) | [Deutsch](CONTRIBUTING.de-DE.md) | [Magyar](CONTRIBUTING.hu-HU.md) | [Portuguese (Brazil)](CONTRIBUTING.pt-BR.md)
 
 ## Сообщайте об ошибках [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
 
