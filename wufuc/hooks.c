@@ -129,7 +129,7 @@ HMODULE WINAPI LoadLibraryExW_hook(
         PatchWUA(result);
 
     return result;
-};
+}
 
 BOOL PatchWUA(HMODULE hModule) {
     LPSTR pattern;
