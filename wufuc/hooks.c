@@ -169,13 +169,19 @@ BOOL PatchWUA(HMODULE hModule) {
     lpbIsCPUSupportedResult = (LPBOOL)(*(uintptr_t *)(ptr + offset01));
 #endif
 
+    DWORD flNewProtect = PAGE_READWRITE;
+    DWORD flOldProtect;
     if (*lpbFirstRun) {
+        VirtualProtect(lpbFirstRun, sizeof(BOOL), flNewProtect, &flOldProtect);
         *lpbFirstRun = FALSE;
+        VirtualProtect(lpbFirstRun, sizeof(BOOL), flOldProtect, &flNewProtect);
         trace(L"Patched boolean value #1: %p = %08x", lpbFirstRun, *lpbFirstRun);
         result = TRUE;
     }
     if (!*lpbIsCPUSupportedResult) {
+        VirtualProtect(lpbIsCPUSupportedResult, sizeof(BOOL), flNewProtect, &flOldProtect);
         *lpbIsCPUSupportedResult = TRUE;
+        VirtualProtect(lpbIsCPUSupportedResult, sizeof(BOOL), flOldProtect, &flNewProtect);
         trace(L"Patched boolean value #2: %p = %08x", lpbIsCPUSupportedResult, *lpbIsCPUSupportedResult);
         result = TRUE;
     }
