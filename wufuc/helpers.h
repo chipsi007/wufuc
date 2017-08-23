@@ -15,5 +15,6 @@ VOID suspend_other_threads(DWORD dwProcessId, DWORD dwThreadId, HANDLE *lphThrea
 VOID resume_and_close_threads(LPHANDLE lphThreads, SIZE_T dwSize);
 
 void get_cpuid_brand(char *brand);
+
 #define STRINGIZE_(x) #x
 #define STRINGIZE(x) STRINGIZE_(x)
