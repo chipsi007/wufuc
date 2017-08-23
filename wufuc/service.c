@@ -33,14 +33,14 @@ BOOL get_svcdllW(LPCWSTR lpServiceName, LPWSTR lpServiceDll, DWORD dwSize) {
 }
 
 LPSTR get_wuauservdllA(void) {
-    if (!wuauservdllA[0])
+    if (!*wuauservdllA)
         get_svcdllA("wuauserv", wuauservdllA, _countof(wuauservdllA));
     
     return wuauservdllA;
 }
 
 LPWSTR get_wuauservdllW(void) {
-    if (!wuauservdllW[0])
+    if (!*wuauservdllW)
         get_svcdllW(L"wuauserv", wuauservdllW, _countof(wuauservdllW));
     
     return wuauservdllW;
