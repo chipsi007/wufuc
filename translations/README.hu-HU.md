@@ -1,4 +1,4 @@
-﻿# wufuc [![](https://ci.appveyor.com/api/projects/status/0s2unkpokttyslf0?svg=true)](https://ci.appveyor.com/project/zeffy/wufuc)
+# wufuc [![](https://ci.appveyor.com/api/projects/status/0s2unkpokttyslf0?svg=true)](https://ci.appveyor.com/project/zeffy/wufuc)
 
 [English](../README.md) | [русский](README.ru-RU.md) | [Français](README.fr-FR.md) | [Deutsch](README.de-DE.md) | **Magyar** | [Portuguese (Brazil)](README.pt-BR.md)
 
@@ -6,9 +6,9 @@
 
 Kikapcsolja az "Windows Update Unsupported Hardware/Nem támogatott hardver" jelentését, és lehetővé teszi a frissítések telepítését Intel Kaby Lake, AMD Ryzen, vagy más nem támogatott processzoros Windows 7 és 8.1 rendszereken.
 
-## Letöltések [![](https://img.shields.io/github/downloads/zeffy/wufuc/total.svg)](../../releases)
+## Letöltések [![](https://img.shields.io/github/downloads/zeffy/wufuc/total.svg)](../../../releases)
 
-### A legfrissebb stabil verziót [itt](../../releases/latest) találod!
+### A legfrissebb stabil verziót [itt](../../../releases/latest) találod!
 
 Ha bátornak érzed magad, itt próbálhatod ki a legfrissebb build-eket [here](https://ci.appveyor.com/project/zeffy/wufuc). **Saját felelősségre!**
 
@@ -33,7 +33,7 @@ A szerző véleményéről evvel kapcsolatban legjobban az angol verzióból inf
 
 ## Rossz Microsoft!
 
-Ha érdekelnek a részletek, [itt](../../tree/old-kb4012218-19) olvashatsz tovább.
+Ha érdekelnek a részletek, [itt](../../../tree/old-kb4012218-19) olvashatsz tovább.
 
 ## Hogy működik?
 

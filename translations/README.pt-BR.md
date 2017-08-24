@@ -6,9 +6,9 @@
 
 Desabilita a mensagem “Seu PC utiliza um processador que não é suportado por esta versão do Windows e você não receberá atualizações” do Windows Update, e permite que você continue instalando atualizações nos sistemas Windows 7 and 8.1 com os novos processadores Intel Kaby Lake, AMD Ryzen, ou outros processadores.
 
-## Downloads [![](https://img.shields.io/github/downloads/zeffy/wufuc/total.svg)](../../releases)
+## Downloads [![](https://img.shields.io/github/downloads/zeffy/wufuc/total.svg)](../../../releases)
 
-### Você pode baixar a última versão estável [aqui](../../releases/latest)!
+### Você pode baixar a última versão estável [aqui](../../../releases/latest)!
 
 Se você é corajoso, você pode testar a último versão instável  [aqui](https://ci.appveyor.com/project/zeffy/wufuc). **Utilize-o por risco próprio**
 
@@ -31,11 +31,11 @@ Essas atualizações marcaram a implementação da [policy change](https://blogs
 
 Esse anúncio foi basicamente um foda-se para aqueles que decidiram não fazer upgrade para a grande "merda" conhecida por windows 10, especialmente considerando que o período de suporte para o Windows 7 e 8.1 só irá terminar em 4 de Janeiro de 2020 e 10 de Janeiro de 2023, respectivamente.
 
-Essa atualização afetou até as pessoas que possuem processadores antigos da Intel e AMD! Alguns usuários já me relataram que tiveram o mesmo problema [Intel Atom Z530](../../issues/7), [Intel Core i5-M 560](../../issues/23), [Intel Core i5-4300M](../../issues/24), [Intel Atom D525](../../issues/34), [Intel Pentium B940](../../issues/63), [AMD FX-8350](../../issues/32), and [AMD Turion 64 Mobile Technology ML-34](../../issues/80) sendo todos bloqueados no Windows Update.
+Essa atualização afetou até as pessoas que possuem processadores antigos da Intel e AMD! Alguns usuários já me relataram que tiveram o mesmo problema [Intel Atom Z530](../../../issues/7), [Intel Core i5-M 560](../../../issues/23), [Intel Core i5-4300M](../../../issues/24), [Intel Atom D525](../../../issues/34), [Intel Pentium B940](../../../issues/63), [AMD FX-8350](../../../issues/32), and [AMD Turion 64 Mobile Technology ML-34](../../../issues/80) sendo todos bloqueados no Windows Update.
 
 ## Microsoft sacana!
 
-Se você estiver interessado, você pode ler você pode ler as minhas primeiras anotações de como descrobri o CPU check [aqui](../../tree/old-kb4012218-19).
+Se você estiver interessado, você pode ler você pode ler as minhas primeiras anotações de como descrobri o CPU check [aqui](../../../tree/old-kb4012218-19).
 
 ## Como funciona
 

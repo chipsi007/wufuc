@@ -6,7 +6,7 @@
 
 #### Antes de criar um tópico de dúvidas, por favor verifique se:
 
-- você está utilizando a última versão [latest stable version](../../releases/latest)?
+- você está utilizando a última versão [latest stable version](../../../releases/latest)?
 - você já tentou reiniciar o seu PC?
 
 #### Depois de confirmar os dois passos acima, por favor crie um tópico de dúvidas incluindo as seguintes informações:

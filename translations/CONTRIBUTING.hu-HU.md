@@ -6,7 +6,7 @@
 
 #### Mielőtt jeleznél egy hibát, kérem ellenőrizd hogy:
 
-- A  [legújabb stabil verzió](../../releases/latest)t használod?
+- A  [legújabb stabil verzió](../../../releases/latest)t használod?
 - Megpróbáltad újraindítani a számítógépet?
 
 #### Miután ezeket ellenőrizted, hozz létre egy hibajelentést ezekkel az információkkal:

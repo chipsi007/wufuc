@@ -6,7 +6,7 @@
 
 #### Bevor du eine Fehlermeldung meldest, bitte beachte die folgenden Punkte:
 
-- Benutzt du gerade die [neuste stabile Version](../../releases/latest)?
+- Benutzt du gerade die [neuste stabile Version](../../../releases/latest)?
 - Hast du versucht den Rechner neu zu starten?
 
 #### Nachdem du alles überprüft hast, erstelle ein Fehlerbericht mit folgenden Informationen:

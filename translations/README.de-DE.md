@@ -35,7 +35,7 @@ Das betrifft sogar Leute mit älteren Intel und AMD Prozessoren!
 
 ## Böses Microsoft!
 
-Wenn du interessiert bist, kannst du meinen Artikel lesen wie ich den CPU Check herausgefunden habe -> [hier klicken](../../tree/old-kb4012218-19).
+Wenn du interessiert bist, kannst du meinen Artikel lesen wie ich den CPU Check herausgefunden habe -> [hier klicken](../../../tree/old-kb4012218-19).
 
 ## Wie funktioniert es?
 
