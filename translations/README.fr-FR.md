@@ -1,4 +1,4 @@
-# wufuc [![](https://ci.appveyor.com/api/projects/status/0s2unkpokttyslf0?svg=true)](https://ci.appveyor.com/project/zeffy/wufuc)
+﻿# wufuc [![](https://ci.appveyor.com/api/projects/status/0s2unkpokttyslf0?svg=true)](https://ci.appveyor.com/project/zeffy/wufuc)
 
 [English](../README.md) | [русский](README.ru-RU.md) | **Français** | [Deutsch](README.de-DE.md) | [Magyar](README.hu-HU.md) | [Portuguese (Brazil)](README.pt-BR.md)
 
@@ -6,9 +6,9 @@
 
 Ce projet désactive le message de popup "Unsupported Hardware" pendant les mises à jour Windows, et permet de continuer à installer des updates sur les systèmes Windows 7 et 8.1, équipés de processeurs Intel Kaby Lake, AMD Ryzen, ou tout autre processor non supporté.
 
-## Téléchargements [![](https://img.shields.io/github/downloads/zeffy/wufuc/total.svg)](../../releases)
+## Téléchargements [![](https://img.shields.io/github/downloads/zeffy/wufuc/total.svg)](../../../releases)
 
-### Vous pouvez obtenir la dernière version stable [ici](../../releases/latest) !
+### Vous pouvez obtenir la dernière version stable [ici](../../../releases/latest) !
 
 Si vous vous sentez courageux, vous pouvez essayer le dernier build instable [ici](https://ci.appveyor.com/project/zeffy/wufuc). **À utiliser à vos propres risques !**
 
