@@ -6,9 +6,9 @@
 
 Das Tool schaltet die "Unsupported Hardware" Nachricht in Windows Update ab und erlaubt dir auf Windows 7 und 8.1 Systemen mit Intel Kaby Lake, AMD Ryzen oder anderen nicht unterstützten Prozessoren weiterhin Updates zu installieren.
 
-## Downloads [![](https://img.shields.io/github/downloads/zeffy/wufuc/total.svg)](../../releases)
+## Downloads [![](https://img.shields.io/github/downloads/zeffy/wufuc/total.svg)](../../../releases)
 
-### Die neuste stabile Version kannst du [hier](../../releases/latest) herunterladen!
+### Die neuste stabile Version kannst du [hier](../../../releases/latest) herunterladen!
 
 Wenn du dich traust, kannst du von [hier](https://ci.appveyor.com/project/zeffy/wufuc) die letzten instabilen Builds herunterladen. **Auf eigene Verantwortung!**
 
