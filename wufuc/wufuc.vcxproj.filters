@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="hooks.c" />
+    <ClCompile Include="dllmain.c" />
+    <ClCompile Include="iathook.c" />
+    <ClCompile Include="logging.c" />
+    <ClCompile Include="patternfind.c" />
+    <ClCompile Include="rundll32.c" />
+    <ClCompile Include="service.c" />
+    <ClCompile Include="helpers.c" />
+    <ClCompile Include="callbacks.c" />
+    <ClCompile Include="patchwua.c" />
+    <ClCompile Include="ntdllhelper.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="hooks.h" />
+    <ClInclude Include="iathook.h" />
+    <ClInclude Include="logging.h" />
+    <ClInclude Include="patternfind.h" />
+    <ClInclude Include="service.h" />
+    <ClInclude Include="shellapihelper.h" />
+    <ClInclude Include="helpers.h" />
+    <ClInclude Include="callbacks.h" />
+    <ClInclude Include="patchwua.h" />
+    <ClInclude Include="ntdllhelper.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="wufuc.rc" />
+  </ItemGroup>
+</Project>

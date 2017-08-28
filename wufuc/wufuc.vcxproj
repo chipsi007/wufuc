@@ -107,7 +107,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -120,7 +119,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -140,7 +138,6 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -165,7 +162,6 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -175,22 +171,25 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="callbacks.c" />
     <ClCompile Include="hooks.c" />
     <ClCompile Include="dllmain.c" />
     <ClCompile Include="iathook.c" />
     <ClCompile Include="logging.c" />
+    <ClCompile Include="ntdllhelper.c" />
+    <ClCompile Include="patchwua.c" />
     <ClCompile Include="patternfind.c" />
     <ClCompile Include="rundll32.c" />
     <ClCompile Include="service.c" />
     <ClCompile Include="helpers.c" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="exports.def" />
-  </ItemGroup>
-  <ItemGroup>
+    <ClInclude Include="callbacks.h" />
     <ClInclude Include="hooks.h" />
     <ClInclude Include="iathook.h" />
     <ClInclude Include="logging.h" />
+    <ClInclude Include="ntdllhelper.h" />
+    <ClInclude Include="patchwua.h" />
     <ClInclude Include="patternfind.h" />
     <ClInclude Include="service.h" />
     <ClInclude Include="shellapihelper.h" />

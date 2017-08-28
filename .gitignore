@@ -254,3 +254,6 @@ paket-files/
 # Advanced Installer
 **/*-cache/
 **/*-SetupFiles/
+
+# Other
+setup-batch/*.dll

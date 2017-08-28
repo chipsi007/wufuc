@@ -1,5 +1,8 @@
+#ifndef IATHOOK_H
+#define IATHOOK_H
 #pragma once
 
-VOID iat_hook(HMODULE hModule, LPCSTR lpFuncName, LPVOID *lpOldAddress, LPVOID lpNewAddress);
+#include <Windows.h>
 
-static LPVOID *iat_find(HMODULE hModule, LPCSTR lpFunctionName);
+void iat_hook(HMODULE hModule, LPCSTR lpFuncName, LPVOID *lpOldAddress, LPVOID lpNewAddress);
+#endif

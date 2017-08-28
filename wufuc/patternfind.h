@@ -1,16 +1,16 @@
+#ifndef PATTERNFIND_H
+#define PATTERNFIND_H
 #pragma once
+
+#include <Windows.h>
 
 typedef struct _PATTERNBYTE {
     struct _PATTERNNIBBLE {
-        BYTE data;
+        unsigned char data;
         BOOL wildcard;
     } nibble[2];
 } PATTERNBYTE, *PPATTERNBYTE, *LPPATTERNBYTE;
 
-int hexchtoint(CHAR ch);
-SIZE_T formathexpattern(LPCSTR patterntext, LPSTR formattext, SIZE_T formattextsize);
-BOOL patterntransform(LPCSTR patterntext, LPPATTERNBYTE pattern, SIZE_T *patternsize);
-LPBYTE patternfind(LPBYTE data, SIZE_T datasize, SIZE_T startindex, LPCSTR pattern);
-VOID patternwritebyte(LPBYTE byte, LPPATTERNBYTE pbyte);
-BOOL patternwrite(LPBYTE data, SIZE_T datasize, LPCSTR pattern);
-LPBYTE patternsnr(LPBYTE data, SIZE_T datasize, SIZE_T startindex, LPCSTR searchpattern, LPCSTR replacepattern);
+unsigned char *patternfind(unsigned char *data, size_t datasize, size_t startindex, const char *pattern);
+unsigned char *patternsnr(unsigned char *data, size_t datasize, size_t startindex, const char *searchpattern, const char *replacepattern);
+#endif

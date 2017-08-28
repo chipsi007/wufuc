@@ -1,87 +1,84 @@
-#include <Windows.h>
-#include <TlHelp32.h>
-#include <tchar.h>
-#include <VersionHelpers.h>
-
+#include "service.h"
 #include "helpers.h"
 #include "logging.h"
-#include "service.h"
 
+#include <Windows.h>
+#include <tchar.h>
+#include <TlHelp32.h>
+#include <VersionHelpers.h>
+
+__declspec(dllexport)
 void CALLBACK Rundll32Entry(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow) {
     HANDLE hEvent = OpenEvent(SYNCHRONIZE, FALSE, _T("Global\\wufuc_UnloadEvent"));
-    if (hEvent) {
+    if ( hEvent ) {
         CloseHandle(hEvent);
         return;
     }
 
-    LPWSTR osname;
-    if (IsWindows7()) {
-        if (IsWindowsServer())
-            osname = L"Windows Server 2008 R2";
+    wchar_t *osname;
+    if ( IsWindows7() ) {
+        if ( IsWindowsServer() )
+            osname = _T("Windows Server 2008 R2");
         else
-            osname = L"Windows 7";
-    } else if (IsWindows8Point1()) {
-        if (IsWindowsServer())
-            osname = L"Windows Server 2012 R2";
+            osname = _T("Windows 7");
+    } else if ( IsWindows8Point1() ) {
+        if ( IsWindowsServer() )
+            osname = _T("Windows Server 2012 R2");
         else
-            osname = L"Windows 8.1";
+            osname = _T("Windows 8.1");
     }
-    trace(L"Operating System: %s %d-bit", osname, sizeof(uintptr_t) * 8);
+    trace(_T("Operating System: %s %d-bit"), osname, sizeof(uintptr_t) * 8);
 
     char brand[0x31];
     get_cpuid_brand(brand);
-    SIZE_T i = 0;
-    while (i < _countof(brand) && isspace(*(brand + i)))
+    size_t i = 0;
+    while ( i < _countof(brand) && isspace(brand[i]) )
         i++;
 
-    trace(L"Processor: %S", brand + i);
+    trace(_T("Processor: %hs"), brand + i);
 
     SC_HANDLE hSCManager = OpenSCManager(NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_CONNECT);
-    if (!hSCManager)
+    if ( !hSCManager )
         return;
 
     TCHAR lpGroupName[256];
     DWORD dwProcessId;
-    BOOL result = get_svcpid(hSCManager, _T("wuauserv"), &dwProcessId);
-    if (!result && get_svcgname(hSCManager, _T("wuauserv"), lpGroupName, _countof(lpGroupName)))
-        result = get_svcgpid(hSCManager, lpGroupName, &dwProcessId);
+    BOOL result = GetServiceProcessId(hSCManager, _T("wuauserv"), &dwProcessId);
+    if ( !result && GetServiceGroupName(hSCManager, _T("wuauserv"), lpGroupName, _countof(lpGroupName)) )
+        result = GetServiceGroupProcessId(hSCManager, lpGroupName, &dwProcessId);
 
     CloseServiceHandle(hSCManager);
-    if (!result)
+    if ( !result )
         return;
 
     HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwProcessId);
-    if (!hProcess)
+    if ( !hProcess )
         return;
 
     TCHAR lpLibFileName[MAX_PATH];
     GetModuleFileName(HINST_THISCOMPONENT, lpLibFileName, _countof(lpLibFileName));
-    SIZE_T size = (_tcslen(lpLibFileName) + 1) * sizeof(TCHAR);
-
+    SIZE_T size = (SIZE_T)((_tcslen(lpLibFileName) + 1) * sizeof(TCHAR));
     LPVOID lpBaseAddress = VirtualAllocEx(hProcess, NULL, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-    if (lpBaseAddress && WriteProcessMemory(hProcess, lpBaseAddress, lpLibFileName, size, NULL)) {
+
+    if ( lpBaseAddress && WriteProcessMemory(hProcess, lpBaseAddress, lpLibFileName, size, NULL) ) {
         HANDLE hThread = CreateRemoteThread(
-            hProcess,
-            NULL,
-            0,
-            (LPTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandle(_T("kernel32.dll")),
-            STRINGIZE(LoadLibrary)),
-            lpBaseAddress,
-            0,
-            NULL
+            hProcess, NULL, 0,
+            (LPTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandle(_T("kernel32.dll")), STRINGIZE(LoadLibrary)),
+            lpBaseAddress, 0, NULL
         );
         WaitForSingleObject(hThread, INFINITE);
-        trace(L"Injected into process: %d", dwProcessId);
+        trace(_T("Injected into process: %d"), dwProcessId);
         CloseHandle(hThread);
     }
     VirtualFreeEx(hProcess, lpBaseAddress, 0, MEM_RELEASE);
     CloseHandle(hProcess);
 }
 
+__declspec(dllexport)
 void CALLBACK Rundll32Unload(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow) {
     HANDLE hEvent = OpenEvent(EVENT_MODIFY_STATE, FALSE, _T("Global\\wufuc_UnloadEvent"));
-    if (hEvent) {
-        trace(L"Setting unload event...");
+    if ( hEvent ) {
+        trace(_T("Setting unload event..."));
         SetEvent(hEvent);
         CloseHandle(hEvent);
     }

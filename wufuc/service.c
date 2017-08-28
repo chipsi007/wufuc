@@ -1,98 +1,120 @@
-#include <windows.h>
+#include "service.h"
+
 #include <stdio.h>
+
+#include <Windows.h>
 #include <tchar.h>
 
 #include "helpers.h"
 #include "shellapihelper.h"
 #include "logging.h"
-#include "service.h"
 
-static CHAR wuauservdllA[MAX_PATH];
-static WCHAR wuauservdllW[MAX_PATH];
-
-BOOL get_svcdllA(LPCSTR lpServiceName, LPSTR lpServiceDll, DWORD dwSize) {
-    CHAR lpSubKey[257];
-    sprintf_s(lpSubKey, _countof(lpSubKey), "SYSTEM\\CurrentControlSet\\services\\%s\\Parameters", lpServiceName);
-    DWORD cb = dwSize;
-    if (RegGetValueA(HKEY_LOCAL_MACHINE, lpSubKey, "ServiceDll", RRF_RT_REG_SZ, NULL, lpServiceDll, &cb))
-        return FALSE;
-    
-    trace(L"Service \"%S\" DLL path: %S", lpServiceName, lpServiceDll);
-    return TRUE;
-}
-
-BOOL get_svcdllW(LPCWSTR lpServiceName, LPWSTR lpServiceDll, DWORD dwSize) {
-    WCHAR lpSubKey[257];
-    swprintf_s(lpSubKey, _countof(lpSubKey), L"SYSTEM\\CurrentControlSet\\services\\%s\\Parameters", lpServiceName);
-    DWORD cb = dwSize;
-    if (RegGetValueW(HKEY_LOCAL_MACHINE, lpSubKey, L"ServiceDll", RRF_RT_REG_SZ, NULL, lpServiceDll, &cb))
-        return FALSE;
-
-    trace(L"Service \"%s\" DLL path: %s", lpServiceName, lpServiceDll);
-    return TRUE;
-}
-
-LPSTR get_wuauservdllA(void) {
-    if (!*wuauservdllA)
-        get_svcdllA("wuauserv", wuauservdllA, _countof(wuauservdllA));
-    
-    return wuauservdllA;
-}
-
-LPWSTR get_wuauservdllW(void) {
-    if (!*wuauservdllW)
-        get_svcdllW(L"wuauserv", wuauservdllW, _countof(wuauservdllW));
-    
-    return wuauservdllW;
-}
-
-BOOL get_svcpid(SC_HANDLE hSCManager, LPCTSTR lpServiceName, DWORD *lpdwProcessId) {
-    SC_HANDLE hService = OpenService(hSCManager, lpServiceName, SERVICE_QUERY_STATUS);
-    if (!hService)
-        return FALSE;
-
-    SERVICE_STATUS_PROCESS lpBuffer;
-    DWORD cbBytesNeeded;
+static BOOL OpenServiceParametersKey(LPCWSTR lpSubKey, PHKEY phkResult) {
     BOOL result = FALSE;
-    if (QueryServiceStatusEx(hService, SC_STATUS_PROCESS_INFO, (LPBYTE)&lpBuffer, sizeof(lpBuffer), &cbBytesNeeded)
-        && lpBuffer.dwProcessId) {
+    HKEY hKey, hSubKey;
+    if ( !RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\services", 0, KEY_READ, &hKey)
+        && !RegOpenKeyExW(hKey, lpSubKey, 0, KEY_READ, &hSubKey)
+        && !RegOpenKeyExW(hSubKey, L"Parameters", 0, KEY_READ, phkResult) ) {
 
-        *lpdwProcessId = lpBuffer.dwProcessId;
-#ifdef _UNICODE
-        trace(L"Service \"%s\" process ID: %d", lpServiceName, *lpdwProcessId);
-#else
-        trace(L"Service \"%S\" process ID: %d", lpServiceName, *lpdwProcessId);
-#endif
+        result = TRUE;
+    }
+    if ( hKey )
+        RegCloseKey(hKey);
+
+    if ( hSubKey )
+        RegCloseKey(hSubKey);
+    return result;
+}
+
+BOOL FindServiceDllW(LPCWSTR lpServiceName, LPWSTR lpServiceDll, DWORD dwSize) {
+    BOOL result = FALSE;
+    HKEY hKey;
+    if ( OpenServiceParametersKey(lpServiceName, &hKey) ) {
+        DWORD cb = dwSize;
+        if ( !RegGetValueW(hKey, NULL, L"ServiceDll", RRF_RT_REG_SZ, NULL, lpServiceDll, &cb) ) {
+            trace(_T("Service \"%s\" DLL path: %ls"), lpServiceName, lpServiceDll);
+            result = TRUE;
+        }
+        RegCloseKey(hKey);
+    }
+    return result;
+}
+
+LPWSTR GetWindowsUpdateServiceDllW(void) {
+    static WCHAR path[MAX_PATH];
+
+    if ( !path[0] ) {
+        if ( !FindServiceDllW(L"wuauserv", path, _countof(path)) )
+            path[0] = L'\0';
+    }
+
+    return path;
+}
+
+BOOL ApplyUpdatePack7R2ShimIfNeeded(const wchar_t *path, size_t pathsize, wchar_t *newpath, size_t newpathsize) {
+    wchar_t drive[_MAX_DRIVE], dir[_MAX_DIR], fname[_MAX_FNAME], ext[_MAX_EXT];
+    _wsplitpath_s(path, drive, _countof(drive), dir, _countof(dir), fname, _countof(fname), ext, _countof(ext));
+    if ( !_wcsicmp(fname, L"wuaueng2") ) {
+        _wmakepath_s(newpath, newpathsize, drive, dir, L"wuaueng", ext);
+        return GetFileAttributesW(newpath) != INVALID_FILE_ATTRIBUTES;
+    }
+    return FALSE;
+}
+
+BOOL GetServiceProcessId(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPDWORD lpdwProcessId) {
+    BOOL result = FALSE;
+    BOOL selfclose = !hSCManager;
+    if ( selfclose && !(hSCManager = OpenSCManager(NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_CONNECT)) )
+        return result;
+
+    SC_HANDLE hService = OpenService(hSCManager, lpServiceName, SERVICE_QUERY_STATUS);
+
+    if ( selfclose )
+        CloseServiceHandle(hSCManager);
+
+    if ( !hService )
+        return result;
+
+    SERVICE_STATUS_PROCESS buffer;
+    DWORD cb;
+    if ( QueryServiceStatusEx(hService, SC_STATUS_PROCESS_INFO, (LPBYTE)&buffer, sizeof(buffer), &cb)
+        && buffer.dwProcessId ) {
+
+        *lpdwProcessId = buffer.dwProcessId;
+        trace(_T("Service \"%s\" process ID: %d"), lpServiceName, *lpdwProcessId);
         result = TRUE;
     }
     CloseServiceHandle(hService);
     return result;
 }
 
-BOOL get_svcgname(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPTSTR lpGroupName, SIZE_T dwSize) {
+BOOL GetServiceGroupName(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPTSTR lpGroupName, SIZE_T dwSize) {
+    BOOL result = FALSE;
+    BOOL selfclose = !hSCManager;
+    if ( selfclose && !(hSCManager = OpenSCManager(NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_CONNECT)) )
+        return result;
+
     TCHAR lpBinaryPathName[0x8000];
-    if (!get_svcpath(hSCManager, lpServiceName, lpBinaryPathName, _countof(lpBinaryPathName)))
-        return FALSE;
-    
+    if ( !GetServiceCommandLine(hSCManager, lpServiceName, lpBinaryPathName, _countof(lpBinaryPathName)) )
+        return result;
+
+    if ( selfclose )
+        CloseServiceHandle(hSCManager);
+
     int numArgs;
     LPWSTR *argv = CommandLineToArgv(lpBinaryPathName, &numArgs);
-    if (numArgs < 3)
-        return FALSE;
+    if ( numArgs < 3 )
+        return result;
 
     TCHAR fname[_MAX_FNAME];
     _tsplitpath_s(argv[0], NULL, 0, NULL, 0, fname, _countof(fname), NULL, 0);
 
-    BOOL result = FALSE;
-    if (!_tcsicmp(fname, _T("svchost"))) {
+    if ( !_tcsicmp(fname, _T("svchost")) ) {
         LPWSTR *p = argv;
-        for (int i = 1; i < numArgs; i++) {
-            if (!_tcsicmp(*(p++), _T("-k")) && !_tcscpy_s(lpGroupName, dwSize, *p)) {
+        for ( int i = 1; i < numArgs; i++ ) {
+            if ( !_tcsicmp(*(p++), _T("-k")) && !_tcscpy_s(lpGroupName, dwSize, *p) ) {
                 result = TRUE;
-#ifdef _UNICODE
-                trace(L"Service \"%s\" group name: %s", lpServiceName, lpGroupName);
-#else
-                trace(L"Service \"%S\" group name: %S", lpServiceName, lpGroupName);
-#endif
+                trace(_T("Service \"%s\" group name: %s"), lpServiceName, lpGroupName);
                 break;
             }
         }
@@ -100,16 +122,22 @@ BOOL get_svcgname(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPTSTR lpGroupNam
     return result;
 }
 
-BOOL get_svcpath(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPTSTR lpBinaryPathName, SIZE_T dwSize) {
-    HANDLE hService = OpenService(hSCManager, lpServiceName, SERVICE_QUERY_CONFIG);
-    if (!hService)
-        return FALSE;
-    
-    DWORD cbBytesNeeded;
+BOOL GetServiceCommandLine(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPTSTR lpBinaryPathName, SIZE_T dwSize) {
     BOOL result = FALSE;
-    if (!QueryServiceConfig(hService, NULL, 0, &cbBytesNeeded) && GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+    if ( !hSCManager && !(hSCManager = OpenSCManager(NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_CONNECT)) )
+        return result;
+
+    HANDLE hService = OpenService(hSCManager, lpServiceName, SERVICE_QUERY_CONFIG);
+    if ( !hService )
+        return result;
+
+    DWORD cbBytesNeeded;
+    if ( !QueryServiceConfig(hService, NULL, 0, &cbBytesNeeded)
+        && GetLastError() == ERROR_INSUFFICIENT_BUFFER ) {
+
         LPQUERY_SERVICE_CONFIG sc = malloc(cbBytesNeeded);
-        if (QueryServiceConfig(hService, sc, cbBytesNeeded, &cbBytesNeeded) && !_tcscpy_s(lpBinaryPathName, dwSize, sc->lpBinaryPathName))
+        if ( QueryServiceConfig(hService, sc, cbBytesNeeded, &cbBytesNeeded)
+            && !_tcscpy_s(lpBinaryPathName, dwSize, sc->lpBinaryPathName) )
             result = TRUE;
         free(sc);
     }
@@ -117,29 +145,32 @@ BOOL get_svcpath(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPTSTR lpBinaryPat
     return result;
 }
 
-BOOL get_svcgpid(SC_HANDLE hSCManager, LPTSTR lpServiceGroupName, DWORD *lpdwProcessId) {
+BOOL GetServiceGroupProcessId(SC_HANDLE hSCManager, LPTSTR lpServiceGroupName, LPDWORD lpdwProcessId) {
+    BOOL result = FALSE;
+    BOOL selfclose = !hSCManager;
+    if ( selfclose && !(hSCManager = OpenSCManager(NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_CONNECT)) )
+        return result;
+
     DWORD uBytes = 1 << 20;
     LPBYTE pvData = malloc(uBytes);
     RegGetValue(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Svchost"),
         lpServiceGroupName, RRF_RT_REG_MULTI_SZ, NULL, pvData, &uBytes);
 
-    BOOL result = FALSE;
-    for (LPTSTR p = (LPTSTR)pvData; *p; p += _tcslen(p) + 1) {
+    for ( LPTSTR p = (LPTSTR)pvData; *p; p += _tcslen(p) + 1 ) {
         DWORD dwProcessId;
         TCHAR group[256];
-        if (get_svcpid(hSCManager, p, &dwProcessId)
-            && (get_svcgname(hSCManager, p, group, _countof(group)) && !_tcsicmp(group, lpServiceGroupName))) {
+        if ( GetServiceProcessId(hSCManager, p, &dwProcessId)
+            && (GetServiceGroupName(hSCManager, p, group, _countof(group))
+            && !_tcsicmp(group, lpServiceGroupName)) ) {
 
             *lpdwProcessId = dwProcessId;
             result = TRUE;
-#ifdef _UNICODE
-            trace(L"Service group \"%s\" process ID: %d", lpServiceGroupName, *lpdwProcessId);
-#else
-            trace(L"Service group \"%S\" process ID: %d", lpServiceGroupName, *lpdwProcessId);
-#endif
+            trace(_T("Service group \"%s\" process ID: %d"), lpServiceGroupName, *lpdwProcessId);
             break;
         }
     }
     free(pvData);
+    if ( selfclose )
+        CloseServiceHandle(hSCManager);
     return result;
 }

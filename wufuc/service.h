@@ -1,18 +1,14 @@
+#ifndef SERVICE_H
+#define SERVICE_H
 #pragma once
 
-BOOL get_svcdllA(LPCSTR lpServiceName, LPSTR lpServiceDll, DWORD dwSize);
-BOOL get_svcdllW(LPCWSTR lpServiceName, LPWSTR lpServiceDll, DWORD dwSize);
-BOOL get_svcpid(SC_HANDLE hSCManager, LPCTSTR lpServiceName, DWORD *lpdwProcessId);
-BOOL get_svcgname(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPTSTR lpGroupName, SIZE_T dwSize);
-BOOL get_svcpath(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPTSTR lpBinaryPathName, SIZE_T dwSize);
-BOOL get_svcgpid(SC_HANDLE hSCManager, LPTSTR lpServiceGroupName, DWORD *lpdwProcessId);
-LPSTR get_wuauservdllA(void);
-LPWSTR get_wuauservdllW(void);
+#include <Windows.h>
 
-#ifdef UNICODE
-#define get_svcdll get_svcdllW
-#define get_wuauservdll get_wuauservdllW
-#else
-#define get_svcdll get_svcdllA
-#define get_wuauservdll get_wuauservdllA
+BOOL FindServiceDllW(LPCWSTR lpServiceName, LPWSTR lpServiceDll, DWORD nCount);
+LPWSTR GetWindowsUpdateServiceDllW(void);
+BOOL ApplyUpdatePack7R2ShimIfNeeded(const wchar_t *path, size_t pathsize, wchar_t *newpath, size_t newpathsize);
+BOOL GetServiceProcessId(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPDWORD lpdwProcessId);
+BOOL GetServiceGroupName(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPTSTR lpGroupName, SIZE_T dwSize);
+BOOL GetServiceCommandLine(SC_HANDLE hSCManager, LPCTSTR lpServiceName, LPTSTR lpBinaryPathName, SIZE_T dwSize);
+BOOL GetServiceGroupProcessId(SC_HANDLE hSCManager, LPTSTR lpServiceGroupName, LPDWORD lpdwProcessId);
 #endif

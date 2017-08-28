@@ -1,8 +1,8 @@
 version: 0.7.2.{build}
 skip_commits:
   files:
-    - README.md
-    - CONTRIBUTING.md
+    - **/*.md
+    - **/*.aip
 image: Visual Studio 2017
 configuration: Release
 platform:
