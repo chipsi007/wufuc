@@ -7,7 +7,6 @@
 #include <TlHelp32.h>
 #include <VersionHelpers.h>
 
-__declspec(dllexport)
 void CALLBACK Rundll32Entry(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow) {
     HANDLE hEvent = OpenEvent(SYNCHRONIZE, FALSE, _T("Global\\wufuc_UnloadEvent"));
     if ( hEvent ) {
@@ -74,7 +73,6 @@ void CALLBACK Rundll32Entry(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int n
     CloseHandle(hProcess);
 }
 
-__declspec(dllexport)
 void CALLBACK Rundll32Unload(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow) {
     HANDLE hEvent = OpenEvent(EVENT_MODIFY_STATE, FALSE, _T("Global\\wufuc_UnloadEvent"));
     if ( hEvent ) {

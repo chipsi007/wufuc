@@ -1,0 +1,3 @@
+EXPORTS
+    Rundll32Entry
+    Rundll32Unload

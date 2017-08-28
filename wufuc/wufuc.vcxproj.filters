@@ -28,4 +28,7 @@
   <ItemGroup>
     <ResourceCompile Include="wufuc.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="wufuc.def" />
+  </ItemGroup>
 </Project>

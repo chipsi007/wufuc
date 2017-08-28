@@ -1,5 +1,6 @@
 #include "patchwua.h"
 
+#include "helpers.h"
 #include "patternfind.h"
 #include "logging.h"
 
