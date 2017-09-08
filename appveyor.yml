@@ -1,23 +1,19 @@
-version: 0.7.2.{build}
+version: 0.8.0.{build}
 skip_commits:
   files:
     - '**/*.md'
     - '**/*.aip'
 image: Visual Studio 2017
+environment:
+  BUILD_VERSION: '%APPVEYOR_BUILD_VERSION%-%APPVEYOR_REPO_COMMIT:~0,8%'
+  BUILD_VERSION_COMMA_SEP: '%APPVEYOR_BUILD_VERSION:.=,%'
+  BUILD_ZIPFILE: '%APPVEYOR_BUILD_FOLDER%\%APPVEYOR_PROJECT_NAME%_v%BUILD_VERSION%_%PLATFORM%.zip'
 configuration: Release
 platform:
   - x86
   - x64
 build:
   verbosity: minimal
-before_build:
-- cmd: >-
-    set "BUILD_VERSION=%APPVEYOR_BUILD_VERSION%-%APPVEYOR_REPO_COMMIT:~0,8%"
-
-    set "BUILD_VERSION_COMMA_SEP=%APPVEYOR_BUILD_VERSION:.=,%"
-
-    set "BUILD_ZIPFILE=%APPVEYOR_BUILD_FOLDER%\%APPVEYOR_PROJECT_NAME%_v%BUILD_VERSION%_%PLATFORM%.zip"
-
 after_build:
 - cmd: >-
     copy /Y "wufuc\bin\%CONFIGURATION%\%PLATFORM%\wufuc*.dll" "setup-batch\"
@@ -33,6 +29,5 @@ after_build:
     7z a "%BUILD_ZIPFILE%" "..\setup-batch"
     
     7z rn "%BUILD_ZIPFILE%" "setup-batch" "%APPVEYOR_PROJECT_NAME%"
-
 artifacts:
   - path: '*.zip'
