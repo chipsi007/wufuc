@@ -44,9 +44,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="wufuc.def" />
-    <ClInclude Include="wufuc.rch">
+    <None Include="wufuc.rch">
       <FileType>Document</FileType>
-    </ClInclude>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="wufuc.rc">
