@@ -1,11 +1,8 @@
-#ifndef CALLBACKS_H
-#define CALLBACKS_H
+#ifndef CALLBACKS_H_INCLUDED
+#define CALLBACKS_H_INCLUDED
 #pragma once
-
-#include "ntdllhelper.h"
 
 #include <Windows.h>
 
-DWORD WINAPI ThreadProcCallback(LPVOID lpParam);
-VOID CALLBACK LdrDllNotificationCallback(ULONG NotificationReason, PCLDR_DLL_NOTIFICATION_DATA NotificationData, PVOID Context);
+DWORD WINAPI ThreadProcCallback(LPVOID *lpParam);
 #endif

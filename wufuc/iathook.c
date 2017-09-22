@@ -1,6 +1,6 @@
 #include "iathook.h"
 
-#include "logging.h"
+#include "tracing.h"
 
 #include <Windows.h>
 #include <tchar.h>
@@ -32,10 +32,11 @@ void iat_hook(HMODULE hModule, LPCSTR lpFuncName, LPVOID *lpOldAddress, LPVOID l
     trace(_T("Modified IAT: hModule=%p, Name=%hs, OldAddress=%p, NewAddress=%p"), hModule, lpFuncName, *lpAddress, lpNewAddress);
 
     DWORD flOldProtect;
-    DWORD flNewProtect = PAGE_READWRITE;
-    VirtualProtect(lpAddress, sizeof(LPVOID), flNewProtect, &flOldProtect);
-    if ( lpOldAddress )
-        *lpOldAddress = *lpAddress;
-    *lpAddress = lpNewAddress;
-    VirtualProtect(lpAddress, sizeof(LPVOID), flOldProtect, &flNewProtect);
+    if ( VirtualProtect(lpAddress, sizeof(LPVOID), PAGE_READWRITE, &flOldProtect) ) {
+        if ( lpOldAddress )
+            *lpOldAddress = *lpAddress;
+        *lpAddress = lpNewAddress;
+        if ( !VirtualProtect(lpAddress, sizeof(LPVOID), flOldProtect, &flOldProtect) )
+            trace(_T("Failed to restore memory region permissions at %p (error code=%08x)"), lpAddress, GetLastError());
+    } else trace(_T("Failed to change memory region permissions at %p (error code=%08x)"), lpAddress, GetLastError());
 }

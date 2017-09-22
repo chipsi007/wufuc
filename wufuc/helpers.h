@@ -1,5 +1,5 @@
-#ifndef HELPERS_H
-#define HELPERS_H
+#ifndef HELPERS_H_INCLUDED
+#define HELPERS_H_INCLUDED
 #pragma once
 
 #include <Windows.h>
@@ -11,11 +11,10 @@ BOOL IsWindows8Point1(void);
 BOOL IsOperatingSystemSupported(void);
 BOOL IsWow64(void);
 
-void suspend_other_threads(LPHANDLE lphThreads, size_t *lpcb);
-void resume_and_close_threads(LPHANDLE lphThreads, size_t cb);
+size_t suspend_other_threads(LPHANDLE lphThreads, size_t nMaxCount);
+void resume_and_close_threads(LPHANDLE lphThreads, size_t nCount);
 
-void get_cpuid_brand(char *brand);
-
-#define STRINGIZE_(x) #x
-#define STRINGIZE(x) STRINGIZE_(x)
+char *get_cpuid_brand(char *brand, size_t nMaxCount);
+wchar_t *find_fname(wchar_t *pPath);
+int compare_versions(WORD ma1, WORD mi1, WORD b1, WORD r1, WORD ma2, WORD mi2, WORD b2, WORD r2);
 #endif

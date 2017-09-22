@@ -2,8 +2,9 @@
 
 #include <Windows.h>
 
-/* Ported to C from x64dbg's patternfind.cpp:
+/* Ported to Win32 C from x64dbg's patternfind.cpp:
  *   https://github.com/x64dbg/x64dbg/blob/development/src/dbg/patternfind.cpp
+ *
  * x64dbg license (GPL-3.0):
  *   https://github.com/x64dbg/x64dbg/blob/development/LICENSE
  */
@@ -34,7 +35,7 @@ static size_t formathexpattern(const char *patterntext, char *formattext, size_t
     return result;
 }
 
-static BOOL patterntransform(const char *patterntext, LPPATTERNBYTE pattern, size_t *patternsize) {
+static BOOL patterntransform(const char *patterntext, PPATTERNBYTE pattern, size_t *patternsize) {
     size_t cb = formathexpattern(patterntext, NULL, 0);
     if ( !cb || cb > *patternsize )
         return FALSE;
@@ -60,7 +61,7 @@ static BOOL patterntransform(const char *patterntext, LPPATTERNBYTE pattern, siz
     return TRUE;
 }
 
-static void patternwritebyte(unsigned char *byte, LPPATTERNBYTE pbyte) {
+static void patternwritebyte(unsigned char *byte, PPATTERNBYTE pbyte) {
     unsigned char n1 = (*byte >> 4) & 0xf;
     unsigned char n2 = *byte & 0xf;
     if ( !pbyte->nibble[0].wildcard )
@@ -77,12 +78,10 @@ static BOOL patternwrite(unsigned char *data, size_t datasize, const char *patte
         writepatternsize = datasize;
 
     BOOL result = FALSE;
-    LPPATTERNBYTE writepattern = calloc(writepatternsize, sizeof(PATTERNBYTE));
+    PPATTERNBYTE writepattern = calloc(writepatternsize, sizeof(PATTERNBYTE));
     if ( patterntransform(pattern, writepattern, &writepatternsize) ) {
-        DWORD flNewProtect = PAGE_READWRITE;
         DWORD flOldProtect;
-
-        if ( result = VirtualProtect(data, writepatternsize, flNewProtect, &flOldProtect) ) {
+        if ( result = VirtualProtect(data, writepatternsize, PAGE_READWRITE, &flOldProtect) ) {
             for ( size_t i = 0; i < writepatternsize; i++ ) {
                 BYTE n1 = (data[i] >> 4) & 0xf;
                 BYTE n2 = data[i] & 0xf;
@@ -92,7 +91,7 @@ static BOOL patternwrite(unsigned char *data, size_t datasize, const char *patte
                 if ( !writepattern[i].nibble[1].wildcard )
                     n2 = writepattern[i].nibble[1].data;
                 data[i] = ((n1 << 4) & 0xf0) | (n2 & 0xf);
-                result = VirtualProtect(data, writepatternsize, flOldProtect, &flNewProtect);
+                result = VirtualProtect(data, writepatternsize, flOldProtect, &flOldProtect);
             }
         }
     }
@@ -103,7 +102,7 @@ static BOOL patternwrite(unsigned char *data, size_t datasize, const char *patte
 unsigned char *patternfind(unsigned char *data, size_t datasize, size_t startindex, const char *pattern) {
     unsigned char *result = NULL;
     size_t searchpatternsize = strlen(pattern);
-    LPPATTERNBYTE searchpattern = calloc(searchpatternsize, sizeof(PATTERNBYTE));
+    PPATTERNBYTE searchpattern = calloc(searchpatternsize, sizeof(PATTERNBYTE));
 
     if ( patterntransform(pattern, searchpattern, &searchpatternsize) ) {
         for ( size_t i = startindex, j = 0; i < datasize; i++ ) { //search for the pattern

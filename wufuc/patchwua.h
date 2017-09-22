@@ -1,5 +1,5 @@
-#ifndef PATCHWUA_H
-#define PATCHWUA_H
+#ifndef PATCHWUA_H_INCLUDED
+#define PATCHWUA_H_INCLUDED
 #pragma once
 
 #include <Windows.h>

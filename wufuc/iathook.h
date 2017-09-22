@@ -1,5 +1,5 @@
-#ifndef IATHOOK_H
-#define IATHOOK_H
+#ifndef IATHOOK_H_INCLUDED
+#define IATHOOK_H_INCLUDED
 #pragma once
 
 #include <Windows.h>

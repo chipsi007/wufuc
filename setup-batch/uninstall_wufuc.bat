@@ -40,23 +40,28 @@ if /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 goto :die
 
 :is_x86
-set "WINDOWS_ARCHITECTURE=x86"
 set "wufuc_dll=%~dp0wufuc32.dll"
 goto :get_ver
 
 :is_x64
-set "WINDOWS_ARCHITECTURE=x64"
 set "wufuc_dll=%~dp0wufuc64.dll"
 
 :get_ver
 for /f "tokens=*" %%i in ('wmic /output:stdout datafile where "name='%wufuc_dll:\=\\%'" get Version /value ^| find "="') do set "%%i"
 title wufuc uninstaller - v%Version%
 
+:loop
+if [%1]==[] goto :confirmation
+if /I "%1"=="/UNATTENDED" goto :uninstall
+shift
+goto :loop
+
 :confirmation
 set /p CONTINUE=Enter 'Y' if you want to uninstall wufuc: 
 if /I not "%CONTINUE%"=="Y" goto :cancel
 echo.
 
+:uninstall
 set "wufuc_task=wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307}"
 rundll32 "%wufuc_dll%",Rundll32Unload
 net start Schedule

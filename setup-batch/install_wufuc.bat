@@ -75,7 +75,7 @@ title wufuc installer - v%Version%
 set "wufuc_xml=%~dp0wufuc.xml"
 
 if exist "%wufuc_xml%" (
-    goto :check_ver
+    goto :check_winver
 )
 echo ERROR - Could not find %wufuc_xml%!
 echo.
@@ -85,18 +85,14 @@ echo Please extract all the files from wufuc_v%Version%.zip to a permanent
 echo location like C:\Program Files\wufuc and try again.
 goto :die
 
-:check_ver
+:check_winver
 ver | findstr " 6\.1\." >nul && (
-    set "WINDOWS_VER=6.1"
-    set "WUAUENG_DLL_MIN_VER=7.6.7601.23714"
     echo Detected supported operating system: Windows 7 %WINDOWS_ARCHITECTURE%
-    goto :check_wuaueng_ver
+    goto :check_unattended
 )
 ver | findstr " 6\.3\." >nul && (
-    set "WINDOWS_VER=8.1"
-    set "WUAUENG_DLL_MIN_VER=7.9.9600.18621"
     echo Detected supported operating system: Windows 8.1 %WINDOWS_ARCHITECTURE%
-    goto :check_wuaueng_ver
+    goto :check_unattended
 )
 
 :unsupported_os
@@ -117,19 +113,11 @@ echo and that this warning is a mistake, you may continue with the patching proc
 echo at your own peril.
 goto :confirmation
 
-:check_wuaueng_ver
-call :get_filever "%systemroot%\System32\wuaueng.dll"
-call :compareversion "%WUAUENG_DLL_MIN_VER%" "%Version%"
-if errorlevel 1 (
-    echo.
-    echo ERROR - Detected that wuaueng.dll is below the minimum supported version.
-    echo.
-    echo You must first run Windows Update until the "Unsupported Hardware" window
-    echo pops up, then try again.
-    echo.
-    goto :die
-)
-echo Detected supported Windows Update agent version: %Version%
+:check_unattended
+if [%1]==[] goto :confirmation
+if /I "%1"=="/UNATTENDED" goto :uninstall
+shift
+goto :check_unattended
 
 :confirmation
 echo.
@@ -178,44 +166,5 @@ exit
 :get_filever  file
 set "file=%~1"
 for /f "tokens=*" %%i in ('wmic /output:stdout datafile where "name='%file:\=\\%'" get Version /value ^| find "="') do set "%%i"
-exit /b
 
-:compareversion  version1  version2
-:: https://stackoverflow.com/a/15809139
-:: Compares two version numbers and returns the result in the ERRORLEVEL
-::
-:: Returns 1 if version1 > version2
-::         0 if version1 = version2
-::        -1 if version1 < version2
-::
-:: The nodes must be delimited by . or , or -
-::
-:: Nodes are normally strictly numeric, without a 0 prefix. A letter suffix
-:: is treated as a separate node
-setlocal enableDelayedExpansion
-set "v1=%~1"
-set "v2=%~2"
-call :divideLetters v1
-call :divideLetters v2
-:loop
-call :parseNode "%v1%" n1 v1
-call :parseNode "%v2%" n2 v2
-if %n1% gtr %n2% exit /b 1
-if %n1% lss %n2% exit /b -1
-if not defined v1 (
-    if not defined v2 ( exit /b 0 )
-)
-if not defined v1 ( exit /b -1 )
-if not defined v2 ( exit /b 1 )
-goto :loop
-
-:parseNode  version  nodeVar  remainderVar
-for /f "tokens=1* delims=.,-" %%A in ("%~1") do (
-  set "%~2=%%A"
-  set "%~3=%%B"
-)
-exit /b
-
-:divideLetters  versionVar
-for %%C in (a b c d e f g h i j k l m n o p q r s t u v w x y z) do set "%~1=!%~1:%%C=.%%C!"
 exit /b
