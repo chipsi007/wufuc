@@ -15,16 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ntdllhelper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="patchwua.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="patternfind.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="service.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="callbacks.h">
@@ -36,30 +30,21 @@
     <ClInclude Include="hooks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="iathook.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="tracing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="wufuc.rch">
-      <Filter>Resource Files</Filter>
+    <ClInclude Include="appverifier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rtl_malloc.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ntdllhelper.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="patchwua.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="patternfind.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="rundll32.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="service.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="callbacks.c">
@@ -74,17 +59,15 @@
     <ClCompile Include="hooks.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="iathook.c">
+    <ClCompile Include="tracing.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tracing.c">
+    <ClCompile Include="rtl_malloc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="wufuc.def">
-      <Filter>Source Files</Filter>
-    </None>
+    <None Include="wufuc.rch" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="wufuc.rc">

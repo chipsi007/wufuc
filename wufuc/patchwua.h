@@ -1,8 +1,7 @@
-#ifndef PATCHWUA_H_INCLUDED
-#define PATCHWUA_H_INCLUDED
 #pragma once
 
-#include <Windows.h>
+#include <stdbool.h>
 
-BOOL PatchWUA(void *lpBaseOfDll, size_t SizeOfImage);
-#endif
+#include <phnt_windows.h>
+
+bool patch_wua(void *lpBaseOfDll, size_t SizeOfImage);

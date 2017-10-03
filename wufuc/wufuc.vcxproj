@@ -19,42 +19,32 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="appverifier.h" />
     <ClInclude Include="callbacks.h" />
     <ClInclude Include="helpers.h" />
     <ClInclude Include="hooks.h" />
-    <ClInclude Include="iathook.h" />
+    <ClInclude Include="rtl_malloc.h" />
     <ClInclude Include="tracing.h" />
-    <ClInclude Include="ntdllhelper.h" />
     <ClInclude Include="patchwua.h" />
     <ClInclude Include="patternfind.h" />
-    <ClInclude Include="service.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="callbacks.c" />
     <ClCompile Include="dllmain.c" />
     <ClCompile Include="helpers.c" />
     <ClCompile Include="hooks.c" />
-    <ClCompile Include="iathook.c" />
+    <ClCompile Include="rtl_malloc.c" />
     <ClCompile Include="tracing.c" />
-    <ClCompile Include="ntdllhelper.c" />
     <ClCompile Include="patchwua.c" />
     <ClCompile Include="patternfind.c" />
-    <ClCompile Include="rundll32.c" />
-    <ClCompile Include="service.c" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="wufuc.def" />
     <None Include="wufuc.rch">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="wufuc.rc">
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">X64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">X64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ResourceCompile>
+    <ResourceCompile Include="wufuc.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -114,6 +104,7 @@
     <IntDir>$(ProjectDir)$(BaseIntermediateOutputPath)$(Configuration)\$(PlatformShortName)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
     <GenerateManifest>false</GenerateManifest>
+    <IncludePath>$(SolutionDir)phnt\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -121,6 +112,7 @@
     <IntDir>$(ProjectDir)$(BaseIntermediateOutputPath)$(Configuration)\$(PlatformShortName)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
     <GenerateManifest>false</GenerateManifest>
+    <IncludePath>$(SolutionDir)phnt\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -128,6 +120,7 @@
     <IntDir>$(ProjectDir)$(BaseIntermediateOutputPath)$(Configuration)\$(PlatformShortName)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
     <GenerateManifest>false</GenerateManifest>
+    <IncludePath>$(SolutionDir)phnt\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -135,34 +128,53 @@
     <IntDir>$(ProjectDir)$(BaseIntermediateOutputPath)$(Configuration)\$(PlatformShortName)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
     <GenerateManifest>false</GenerateManifest>
+    <IncludePath>$(SolutionDir)phnt\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;WUFUC_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;WUFUC_EXPORTS;_NO_CRT_STDIO_INLINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CompileAs>CompileAsC</CompileAs>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>wufuc.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
+      <EntryPointSymbol>DllMain</EntryPointSymbol>
+      <AdditionalDependencies>ntdll.lib;ntdllp.lib;version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
     </Link>
+    <PreBuildEvent />
+    <ResourceCompile>
+      <PreprocessorDefinitions>X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;WUFUC_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;WUFUC_EXPORTS;_NO_CRT_STDIO_INLINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CompileAs>CompileAsC</CompileAs>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>wufuc.def</ModuleDefinitionFile>
+      <AdditionalDependencies>ntdll.lib;ntdllp.lib;version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
+      <EntryPointSymbol>DllMain</EntryPointSymbol>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
     </Link>
+    <PreBuildEvent />
+    <ResourceCompile>
+      <PreprocessorDefinitions>X64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -170,10 +182,10 @@
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;WUFUC_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;WUFUC_EXPORTS;_NO_CRT_STDIO_INLINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CompileAs>CompileAsC</CompileAs>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <ResourceCompile Condition="'$(APPVEYOR)'=='True'">
       <PreprocessorDefinitions>BUILD_COMMIT_VERSION=$(BUILD_COMMIT_VERSION);BUILD_VERSION_COMMA=$(BUILD_VERSION_COMMA);$(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -183,13 +195,22 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>wufuc.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
+      <EntryPointSymbol>DllMain</EntryPointSymbol>
+      <AdditionalDependencies>ntdll.lib;ntdllp.lib;version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
     </Link>
     <PostBuildEvent>
       <Command>
       </Command>
     </PostBuildEvent>
+    <PreBuildEvent />
+    <ResourceCompile>
+      <PreprocessorDefinitions>X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -197,10 +218,10 @@
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;WUFUC_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;WUFUC_EXPORTS;_NO_CRT_STDIO_INLINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CompileAs>CompileAsC</CompileAs>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <ResourceCompile Condition="'$(APPVEYOR)'=='True'">
       <PreprocessorDefinitions>BUILD_COMMIT_VERSION=$(BUILD_COMMIT_VERSION);BUILD_VERSION_COMMA=$(BUILD_VERSION_COMMA);$(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -210,13 +231,22 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>version.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>wufuc.def</ModuleDefinitionFile>
+      <AdditionalDependencies>ntdll.lib;ntdllp.lib;version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
+      <EntryPointSymbol>DllMain</EntryPointSymbol>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
     </Link>
     <PostBuildEvent>
       <Command>
       </Command>
     </PostBuildEvent>
+    <PreBuildEvent />
+    <ResourceCompile>
+      <PreprocessorDefinitions>X64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

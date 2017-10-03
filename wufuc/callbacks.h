@@ -1,8 +1,6 @@
-#ifndef CALLBACKS_H_INCLUDED
-#define CALLBACKS_H_INCLUDED
 #pragma once
 
-#include <Windows.h>
+#include <phnt_windows.h>
 
-DWORD WINAPI ThreadProcCallback(LPVOID *lpParam);
-#endif
+VOID NTAPI VerifierDllLoadCallback(PWSTR DllName, PVOID DllBase, SIZE_T DllSize, PVOID Reserved);
+VOID NTAPI VerifierDllUnloadCallback(PWSTR DllName, PVOID DllBase, SIZE_T DllSize, PVOID Reserved);

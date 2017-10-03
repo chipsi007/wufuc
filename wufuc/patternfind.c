@@ -1,133 +1,179 @@
 #include "patternfind.h"
 
-#include <Windows.h>
+#include "rtl_malloc.h"
 
-/* Ported to Win32 C from x64dbg's patternfind.cpp:
- *   https://github.com/x64dbg/x64dbg/blob/development/src/dbg/patternfind.cpp
- *
- * x64dbg license (GPL-3.0):
- *   https://github.com/x64dbg/x64dbg/blob/development/LICENSE
- */
+#include <stddef.h>
+#include <stdbool.h>
+#include <string.h>
 
-static int hexchtoint(char c) {
-    int result = -1;
-    if ( c >= '0' && c <= '9' )
-        result = c - '0';
-    else if ( c >= 'A' && c <= 'F' )
-        result = c - 'A' + 10;
-    else if ( c >= 'a' && c <= 'f' )
-        result = c - 'a' + 10;
-
-    return result;
+static inline bool isHex(char ch)
+{
+        return (ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'F') || (ch >= 'a' && ch <= 'f');
 }
 
-static size_t formathexpattern(const char *patterntext, char *formattext, size_t formattextsize) {
-    size_t len = strlen(patterntext);
-    size_t result = 0;
-    for ( size_t i = 0; i < len && (!formattext || result < formattextsize); i++ ) {
-        if ( patterntext[i] == '?' || hexchtoint(patterntext[i]) != -1 ) {
-            if ( formattext )
-                formattext[result] = patterntext[i];
-
-            result++;
-        }
-    }
-    return result;
+static inline int hexchtoint(char ch)
+{
+        if ( ch >= '0' && ch <= '9' )
+                return ch - '0';
+        else if ( ch >= 'A' && ch <= 'F' )
+                return ch - 'A' + 10;
+        else if ( ch >= 'a' && ch <= 'f' )
+                return ch - 'a' + 10;
+        return -1;
 }
 
-static BOOL patterntransform(const char *patterntext, PPATTERNBYTE pattern, size_t *patternsize) {
-    size_t cb = formathexpattern(patterntext, NULL, 0);
-    if ( !cb || cb > *patternsize )
-        return FALSE;
+static inline size_t formathexpattern(const char *patterntext, char *formattext, size_t formattextsize)
+{
+        size_t len = strlen(patterntext);
+        size_t result = 0;
+        for ( size_t i = 0; i < len; i++ ) {
+                if ( patterntext[i] == '?' || hexchtoint(patterntext[i]) != -1 ) {
+                        if ( formattext && result + 1 < formattextsize )
+                                formattext[result] = patterntext[i];
 
-    char *formattext = calloc(cb, sizeof(char));
-    cb = formathexpattern(patterntext, formattext, cb);
-
-    if ( cb % 2 )
-        formattext[cb++] = '?';
-
-    formattext[cb] = '\0';
-
-    for ( size_t i = 0, j = 0, k = 0; i < cb; i++, j ^= 1, k = (i - j) >> 1 ) {
-        if ( formattext[i] == '?' )
-            pattern[k].nibble[j].wildcard = TRUE;
-        else {
-            pattern[k].nibble[j].wildcard = FALSE;
-            pattern[k].nibble[j].data = hexchtoint(formattext[i]) & 0xf;
-        }
-    }
-    free(formattext);
-    *patternsize = cb >> 1;
-    return TRUE;
-}
-
-static void patternwritebyte(unsigned char *byte, PPATTERNBYTE pbyte) {
-    unsigned char n1 = (*byte >> 4) & 0xf;
-    unsigned char n2 = *byte & 0xf;
-    if ( !pbyte->nibble[0].wildcard )
-        n1 = pbyte->nibble[0].data;
-
-    if ( !pbyte->nibble[1].wildcard )
-        n2 = pbyte->nibble[1].data;
-    *byte = ((n1 << 4) & 0xf0) | (n2 & 0xf);
-}
-
-static BOOL patternwrite(unsigned char *data, size_t datasize, const char *pattern) {
-    size_t writepatternsize = strlen(pattern);
-    if ( writepatternsize > datasize )
-        writepatternsize = datasize;
-
-    BOOL result = FALSE;
-    PPATTERNBYTE writepattern = calloc(writepatternsize, sizeof(PATTERNBYTE));
-    if ( patterntransform(pattern, writepattern, &writepatternsize) ) {
-        DWORD flOldProtect;
-        if ( result = VirtualProtect(data, writepatternsize, PAGE_READWRITE, &flOldProtect) ) {
-            for ( size_t i = 0; i < writepatternsize; i++ ) {
-                BYTE n1 = (data[i] >> 4) & 0xf;
-                BYTE n2 = data[i] & 0xf;
-                if ( !writepattern[i].nibble[0].wildcard )
-                    n1 = writepattern[i].nibble[0].data;
-
-                if ( !writepattern[i].nibble[1].wildcard )
-                    n2 = writepattern[i].nibble[1].data;
-                data[i] = ((n1 << 4) & 0xf0) | (n2 & 0xf);
-                result = VirtualProtect(data, writepatternsize, flOldProtect, &flOldProtect);
-            }
-        }
-    }
-    free(writepattern);
-    return result;
-}
-
-unsigned char *patternfind(unsigned char *data, size_t datasize, size_t startindex, const char *pattern) {
-    unsigned char *result = NULL;
-    size_t searchpatternsize = strlen(pattern);
-    PPATTERNBYTE searchpattern = calloc(searchpatternsize, sizeof(PATTERNBYTE));
-
-    if ( patterntransform(pattern, searchpattern, &searchpatternsize) ) {
-        for ( size_t i = startindex, j = 0; i < datasize; i++ ) { //search for the pattern
-            if ( (searchpattern[j].nibble[0].wildcard || searchpattern[j].nibble[0].data == ((data[i] >> 4) & 0xf))
-                && (searchpattern[j].nibble[1].wildcard || searchpattern[j].nibble[1].data == (data[i] & 0xf)) ) { //check if our pattern matches the current byte
-
-                if ( ++j == searchpatternsize ) { //everything matched
-                    result = data + (i - searchpatternsize + 1);
-                    break;
+                        result++;
                 }
-            } else if ( j > 0 ) { //fix by Computer_Angel
-                i -= j;
-                j = 0; //reset current pattern position
-            }
         }
-    }
-    free(searchpattern);
-    return result;
+        if ( result % 2 ) { //not a multiple of 2
+                if ( formattext && result + 1 < formattextsize )
+                        formattext[result] = '?';
+
+                result++;
+        }
+        if ( formattext ) {
+                if ( result <= formattextsize )
+                        formattext[result] = '\0';
+                else
+                        formattext[0] = '\0';
+        }
+        return result;
 }
 
-unsigned char *patternsnr(unsigned char *data, size_t datasize, size_t startindex, const char *searchpattern, const char *replacepattern) {
-    unsigned char *result = patternfind(data, datasize, startindex, searchpattern);
-    if ( !result )
-        return result;
+bool patterntransform(const char *patterntext, PatternByte *pattern, size_t patternsize)
+{
+        memset(pattern, 0, patternsize * sizeof(PatternByte));
+        size_t len = formathexpattern(patterntext, NULL, 0);
 
-    patternwrite(result, datasize, replacepattern);
-    return result;
+        if ( !len || len / 2 > patternsize )
+                return false;
+
+        size_t size = len + 1;
+        char *formattext = rtl_malloc(size);
+        formathexpattern(patterntext, formattext, size);
+        PatternByte newByte;
+
+        for ( int i = 0, j = 0, k = 0; i < len && k <= patternsize; i++ ) {
+                if ( formattext[i] == '?' ) { //wildcard
+                        newByte.nibble[j].wildcard = true; //match anything
+                } else { //hex
+                        newByte.nibble[j].wildcard = false;
+                        newByte.nibble[j].data = hexchtoint(formattext[i]) & 0xF;
+                }
+
+                j++;
+                if ( j == 2 ) { //two nibbles = one byte
+                        j = 0;
+                        pattern[k++] = newByte;
+                }
+        }
+        return true;
+}
+
+static inline bool patternmatchbyte(unsigned char byte, const PatternByte pbyte)
+{
+        int matched = 0;
+
+        unsigned char n1 = (byte >> 4) & 0xF;
+        if ( pbyte.nibble[0].wildcard )
+                matched++;
+        else if ( pbyte.nibble[0].data == n1 )
+                matched++;
+
+        unsigned char n2 = byte & 0xF;
+        if ( pbyte.nibble[1].wildcard )
+                matched++;
+        else if ( pbyte.nibble[1].data == n2 )
+                matched++;
+
+        return (matched == 2);
+}
+
+unsigned char *patternfind(unsigned char *data, size_t datasize, const char *pattern)
+{
+        size_t searchpatternsize = formathexpattern(pattern, NULL, 0) / 2;
+        PatternByte *searchpattern = rtl_calloc(searchpatternsize, sizeof(PatternByte));
+
+        unsigned char *result = NULL;
+        if ( patterntransform(pattern, searchpattern, searchpatternsize) )
+                result = patternfind3(data, datasize, searchpattern, searchpatternsize);
+        
+        rtl_free(searchpattern);
+        return result;
+}
+
+unsigned char *patternfind2(unsigned char *data, size_t datasize, unsigned char *pattern, size_t patternsize)
+{
+        if ( patternsize > datasize )
+                patternsize = datasize;
+        for ( size_t i = 0, pos = 0; i < datasize; i++ ) {
+                if ( data[i] == pattern[pos] ) {
+                        pos++;
+                        if ( pos == patternsize )
+                                return &data[i - patternsize + 1];
+                } else if ( pos > 0 ) {
+                        i -= pos;
+                        pos = 0; //reset current pattern position
+                }
+        }
+        return NULL;
+}
+
+static inline void patternwritebyte(unsigned char *byte, const PatternByte pbyte)
+{
+        unsigned char n1 = (*byte >> 4) & 0xF;
+        unsigned char n2 = *byte & 0xF;
+        if ( !pbyte.nibble[0].wildcard )
+                n1 = pbyte.nibble[0].data;
+        if ( !pbyte.nibble[1].wildcard )
+                n2 = pbyte.nibble[1].data;
+        *byte = ((n1 << 4) & 0xF0) | (n2 & 0xF);
+}
+
+void patternwrite(unsigned char *data, size_t datasize, const char *pattern)
+{
+        size_t writepatternsize = formathexpattern(pattern, NULL, 0) / 2;
+        PatternByte *writepattern = rtl_calloc(writepatternsize, sizeof(PatternByte));
+
+        if ( patterntransform(pattern, writepattern, writepatternsize) ) {
+                if ( writepatternsize > datasize )
+                        writepatternsize = datasize;
+                for ( size_t i = 0; i < writepatternsize; i++ )
+                        patternwritebyte(&data[i], writepattern[i]);
+        }
+
+        rtl_free(writepattern);
+}
+
+bool patternsnr(unsigned char *data, size_t datasize, const char *searchpattern, const char *replacepattern)
+{
+        unsigned char *found = patternfind(data, datasize, searchpattern);
+        if ( !found )
+                return false;
+        patternwrite(found, datasize - (found - data), replacepattern);
+        return true;
+}
+
+unsigned char *patternfind3(unsigned char *data, size_t datasize, const PatternByte *pattern, size_t searchpatternsize)
+{
+        for ( size_t i = 0, pos = 0; i < datasize; i++ ) { //search for the pattern
+                if ( patternmatchbyte(data[i], pattern[pos]) ) { //check if our pattern matches the current byte
+                        pos++;
+                        if ( pos == searchpatternsize ) //everything matched
+                                return &data[i - searchpatternsize + 1];
+                } else if ( pos > 0 ) { //fix by Computer_Angel
+                        i -= pos;
+                        pos = 0; //reset current pattern position
+                }
+        }
+        return NULL;
 }

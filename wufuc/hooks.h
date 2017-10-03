@@ -1,23 +1,15 @@
-#ifndef HOOKS_H_INCLUDED
-#define HOOKS_H_INCLUDED
 #pragma once
 
-#define WIN32_NO_STATUS
-#include <Windows.h>
-#undef WIN32_NO_STATUS
+#include <phnt_windows.h>
 
-typedef struct tagLANGANDCODEPAGE {
-    WORD wLanguage;
-    WORD wCodePage;
+typedef struct tagLANGANDCODEPAGE
+{
+        WORD wLanguage;
+        WORD wCodePage;
 } LANGANDCODEPAGE, *PLANGANDCODEPAGE;
 
-typedef LRESULT(WINAPI *REGQUERYVALUEEXW)(HKEY, LPCWSTR, LPDWORD, LPDWORD, LPBYTE, LPDWORD);
-typedef HMODULE(WINAPI *LOADLIBRARYEXW)(LPCWSTR, HANDLE, DWORD);
+typedef LSTATUS(WINAPI *LPFN_REGQUERYVALUEEXW)(HKEY, LPCWSTR, LPDWORD, LPDWORD, LPBYTE, LPDWORD);
+typedef HMODULE(WINAPI *LPFN_LOADLIBRARYEXW)(LPCWSTR, HANDLE, DWORD);
 
-extern REGQUERYVALUEEXW pfnRegQueryValueExW;
-extern LOADLIBRARYEXW pfnLoadLibraryExW;
-
-LRESULT WINAPI RegQueryValueExW_hook(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData);
-HMODULE WINAPI LoadLibraryExW_hook(LPCWSTR lpFileName, HANDLE hFile, DWORD dwFlags);
-
-#endif
+LSTATUS WINAPI RegQueryValueExW_Hook(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData);
+HMODULE WINAPI LoadLibraryExW_Hook(LPCWSTR lpFileName, HANDLE hFile, DWORD dwFlags);

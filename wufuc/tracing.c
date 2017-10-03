@@ -1,72 +1,63 @@
 #include "tracing.h"
 
+#include "helpers.h"
+#include "rtl_malloc.h"
+
+#include <stdlib.h>
 #include <stdio.h>
-#include <time.h>
+#include <stdint.h>
 
-#include <Windows.h>
-#include <tchar.h>
+#include <phnt_windows.h>
+#include <phnt.h>
 
-static FILE *m_pStream;
-static HANDLE m_hMutex;
-static BOOL m_bDeinitializing;
-
-BOOL InitTracing(void) {
-    if ( m_bDeinitializing )
-        return FALSE;
-
-    if ( !m_hMutex )
-        m_hMutex = CreateMutex(NULL, FALSE, _T("Global\\wufuc_TracingMutex"));
-
-    if ( m_hMutex && !m_pStream ) {
-        TCHAR path[MAX_PATH];
-        GetModuleFileName(HINST_THISCOMPONENT, path, _countof(path));
-
-        TCHAR drive[_MAX_DRIVE], dir[_MAX_DIR], fname[_MAX_FNAME];
-        _tsplitpath_s(path, drive, _countof(drive), dir, _countof(dir), fname, _countof(fname), NULL, 0);
-        _tmakepath_s(path, _countof(path), drive, dir, fname, _T(".log"));
-
-        m_pStream = _tfsopen(path, _T("at"), _SH_DENYNO);
-    }
-    return m_pStream && m_hMutex;
-}
-
-DWORD WaitForTracingMutex(void) {
-    return WaitForSingleObject(m_hMutex, INFINITE);
-}
-
-BOOL ReleaseTracingMutex(void) {
-    return ReleaseMutex(m_hMutex);
-}
-
-void trace_(LPCTSTR format, ...) {
-    if ( InitTracing() ) {
-        TCHAR datebuf[9], timebuf[9];
-        _tstrdate_s(datebuf, _countof(datebuf));
-        _tstrtime_s(timebuf, _countof(timebuf));
-        if ( !WaitForTracingMutex() ) {
-            _ftprintf_s(m_pStream, _T("%s %s [PID: %d TID: %d] "), datebuf, timebuf, GetCurrentProcessId(), GetCurrentThreadId());
-
-            va_list argptr;
-            va_start(argptr, format);
-            _vftprintf_s(m_pStream, format, argptr);
-            va_end(argptr);
-            fflush(m_pStream);
+void trace_sysinfo(void)
+{
+        RTL_OSVERSIONINFOW osvi = { 0 };
+        osvi.dwOSVersionInfoSize = sizeof(RTL_OSVERSIONINFOW);
+        NTSTATUS status = RtlGetVersion(&osvi);
+        if ( NT_SUCCESS(status) ) {
+                trace(L"Windows version: %d.%d.%d (%Iu-bit)",
+                        osvi.dwMajorVersion,
+                        osvi.dwMinorVersion,
+                        osvi.dwBuildNumber,
+                        sizeof(uintptr_t) * 8);
+        } else trace(L"Failed to get Windows version (status=%08X)", status);
+        
+        int CPUInfo[4];
+        __cpuidex(CPUInfo, 0x80000000, 0);
+        if ( CPUInfo[0] < 0x80000004 ) {
+                trace(L"This processor does not support the brand identification feature.");
+                return;
         }
-        ReleaseTracingMutex();
-    }
+        char brand[0x31];
+        uint32_t *u32ptr = (uint32_t *)&brand;
+        for ( int func = 0x80000002; func <= 0x80000004; func++ ) {
+                __cpuidex(CPUInfo, func, 0);
+                for ( int i = 0; i < 4; i++ )
+                        *(u32ptr++) = CPUInfo[i];
+        }
+        size_t c = 0;
+        do {
+                if ( !isspace(brand[c]) )
+                        break;
+                c++;
+        } while ( c < _countof(brand) );
+        trace(L"Processor: %hs", &brand[c]);
 }
 
-BOOL DeinitTracing(void) {
-    m_bDeinitializing = TRUE;
-
-    BOOL result = TRUE;
-    if ( m_hMutex ) {
-        result = CloseHandle(m_hMutex);
-        m_hMutex = NULL;
-    }
-    if ( m_pStream ) {
-        result = result && !fclose(m_pStream);
-        m_pStream = NULL;
-    }
-    return result;
+void trace_(const wchar_t *const format, ...)
+{
+        static int shown_sysinfo = 0;
+        if ( !shown_sysinfo ) {
+                shown_sysinfo = 1;
+                trace_sysinfo();
+        }
+        va_list argptr;
+        va_start(argptr, format);
+        int count = _vscwprintf(format, argptr) + 1;
+        wchar_t *buffer = rtl_calloc(count, sizeof(wchar_t));
+        vswprintf_s(buffer, count, format, argptr);
+        va_end(argptr);
+        OutputDebugStringW(buffer);
+        rtl_free(buffer);
 }

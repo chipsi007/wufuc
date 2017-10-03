@@ -257,3 +257,4 @@ paket-files/
 
 # Other
 setup-batch/*.dll
+/setup-ai/wufuc.back.aip
