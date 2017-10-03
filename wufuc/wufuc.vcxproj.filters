@@ -67,11 +67,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="wufuc.rch" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="wufuc.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="wufuc.rch">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
