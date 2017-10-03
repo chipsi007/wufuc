@@ -8,7 +8,7 @@ Disables the "Unsupported Hardware" message in Windows Update, and allows you to
 
 - [**Click here for the latest stable version**](../../releases/latest)
 
-- [Unstable builds](https://ci.appveyor.com/project/zeffy/wufuc) (Use these at your own risk!)
+- [~~Unstable builds~~](https://ci.appveyor.com/project/zeffy/wufuc) **Broken until AppVeyor adds WDK support for Visual Studio 2017 ([appveyor/ci#1554](https://github.com/appveyor/ci/issues/1554))**
 
 ## Preface
 
