@@ -15,10 +15,10 @@ RTL_VERIFIER_THUNK_DESCRIPTOR g_vfK32ThunkDescriptors[] = {
 RTL_VERIFIER_DLL_DESCRIPTOR g_vfDllDescriptors[] = {
         { L"kernel32.dll", 0, NULL, g_vfK32ThunkDescriptors },
         { 0 } };
-RTL_VERIFIER_DLL_DESCRIPTOR g_vfNullDllDescriptor[] = { { 0 } };
+RTL_VERIFIER_DLL_DESCRIPTOR g_vfNullDllDescriptor = { 0 };
 RTL_VERIFIER_PROVIDER_DESCRIPTOR g_vfProviderDescriptor = {
         sizeof(RTL_VERIFIER_PROVIDER_DESCRIPTOR),
-        g_vfNullDllDescriptor,
+        &g_vfNullDllDescriptor,
         //(RTL_VERIFIER_DLL_LOAD_CALLBACK)&VerifierDllLoadCallback,
         //(RTL_VERIFIER_DLL_UNLOAD_CALLBACK)&VerifierDllUnloadCallback
 };
@@ -47,7 +47,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                                 &QueryTable,
                                 NULL,
                                 NULL);
-
+                        
                         // TODO: check status and maybe fix implementation? idk...
                         if ( !RtlCompareUnicodeString(&NtCurrentPeb()->ProcessParameters->CommandLine, &ImagePath, TRUE) )
                                 g_vfProviderDescriptor.ProviderDlls = g_vfDllDescriptors;
