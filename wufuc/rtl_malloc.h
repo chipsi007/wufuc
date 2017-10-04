@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stddef.h>
+
 void *rtl_malloc(size_t size);
 
 void rtl_free(void *memblock);

@@ -1,6 +1,6 @@
 # wufuc [![](https://ci.appveyor.com/api/projects/status/0s2unkpokttyslf0?svg=true)](https://ci.appveyor.com/project/zeffy/wufuc) [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
 
-**English** | [русский](translations/README.ru-RU.md) | [Français](translations/README.fr-FR.md) | [Deutsch](translations/README.de-DE.md) | [Magyar](translations/README.hu-HU.md) | [Portuguese (Brazil)](translations/README.pt-BR.md)
+**English** | [русский](../../wiki/README-(русский)) | [Français](../../wiki/README-(Français)) | [Deutsch](../../wiki/CONTRIBUTING-(Deutsch)) | [Magyar](../../wiki/README-(Magyar)) | [Portuguese (Brazil)](../../wiki/README-(Português-Brasileiro))
 
 Disables the "Unsupported Hardware" message in Windows Update, and allows you to continue installing updates on Windows 7 and 8.1 systems with Intel Kaby Lake, AMD Ryzen, or other unsupported processors.
 

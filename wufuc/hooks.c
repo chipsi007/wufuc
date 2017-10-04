@@ -126,7 +126,7 @@ HMODULE WINAPI LoadLibraryExW_Hook(LPCWSTR lpFileName, HANDLE hFile, DWORD dwFla
                                                 trace(L"%ls version: %d.%d.%d.%d", fname, wMajor, wMinor, wBuild, wRevision);
                                                 MODULEINFO modinfo;
                                                 if ( GetModuleInformation(GetCurrentProcess(), result, &modinfo, sizeof(MODULEINFO)) ) {
-                                                        if ( !patch_wua(modinfo.lpBaseOfDll, modinfo.SizeOfImage) )
+                                                        if ( !patch_wua(modinfo.lpBaseOfDll, modinfo.SizeOfImage, fname) )
                                                                 trace(L"Failed to patch %ls!", fname);
                                                 } else trace(L"Failed to get module information for %ls (%p) (couldn't patch)", fname, result);
                                         } else trace(L"Unsupported version of %ls: %d.%d.%d.%d (patching skipped)", fname, wMajor, wMinor, wBuild, wRevision);

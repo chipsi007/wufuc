@@ -35,23 +35,22 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 if ( verify_winver(6, 1, 0, 0, 0, VER_EQUAL, VER_EQUAL, 0, 0, 0)
                         || verify_winver(6, 3, 0, 0, 0, VER_EQUAL, VER_EQUAL, 0, 0, 0) ) {
 
-                        RTL_QUERY_REGISTRY_TABLE QueryTable[1];
+                        RTL_QUERY_REGISTRY_TABLE QueryTable;
                         RtlSecureZeroMemory(&QueryTable, sizeof(QueryTable));
-                        QueryTable[0].Name = L"ImagePath";
-                        QueryTable[0].Flags = RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_REQUIRED;
+                        QueryTable.Name = L"ImagePath";
+                        QueryTable.Flags = RTL_QUERY_REGISTRY_DIRECT;
                         UNICODE_STRING ImagePath;
                         RtlInitUnicodeString(&ImagePath, NULL);
-                        QueryTable[0].EntryContext = &ImagePath;
+                        QueryTable.EntryContext = &ImagePath;
                         NTSTATUS Status = RtlQueryRegistryValues(RTL_REGISTRY_SERVICES,
                                 L"wuauserv",
-                                QueryTable,
+                                &QueryTable,
                                 NULL,
                                 NULL);
 
                         // TODO: check status and maybe fix implementation? idk...
-                        if ( !RtlCompareUnicodeString(&NtCurrentPeb()->ProcessParameters->CommandLine, &ImagePath, TRUE) ) {
+                        if ( !RtlCompareUnicodeString(&NtCurrentPeb()->ProcessParameters->CommandLine, &ImagePath, TRUE) )
                                 g_vfProviderDescriptor.ProviderDlls = g_vfDllDescriptors;
-                        }
                 }
                 *(PRTL_VERIFIER_PROVIDER_DESCRIPTOR *)lpReserved = &g_vfProviderDescriptor;
                 break;
