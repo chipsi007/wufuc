@@ -39,7 +39,7 @@ If you are interested, you can read my original write up on discovering the CPU 
 
 - Enables Windows Update on PCs with unsupported processors.
 - Written in C, the best programming language. :sunglasses:
-- Comepletely free software (as in freedom) ([GPL v3.0](LICENSE))
+- Completely free (as in freedom) software.
 - Does not modify any system files.
 - Byte pattern-based patching, which means it will usually keep working even after new updates come out.
 - Absolutely zero dependencies.
