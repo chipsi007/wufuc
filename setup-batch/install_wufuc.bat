@@ -43,18 +43,19 @@ goto :unsupported_os
 
 :is_x86
 set "WINDOWS_ARCHITECTURE=x86"
-set "wufuc_dll=%~dp0wufuc32.dll"
+set "wufuc_dll=wufuc32.dll"
 goto :dll_exists
 
 :is_x64
 set "WINDOWS_ARCHITECTURE=x64"
-set "wufuc_dll=%~dp0wufuc64.dll"
+set "wufuc_dll=wufuc64.dll"
 
 :dll_exists
-if exist "%wufuc_dll%" (
+set "wufuc_dll_fullpath=%~dp0%wufuc_dll%"
+if exist "%wufuc_dll_fullpath%" (
     goto :get_ver
 )
-echo ERROR - Could not find %wufuc_dll%!
+echo ERROR - Could not find %wufuc_dll_fullpath%!
 echo.
 echo This most likely means you tried to clone the repository.
 echo Please download wufuc from here:  https://github.com/zeffy/wufuc/releases
@@ -69,21 +70,8 @@ echo in which case, you will need to make an exception and restore it.
 goto :die
 
 :get_ver
-call :get_filever "%wufuc_dll%"
+call :get_filever "%wufuc_dll_fullpath%"
 title wufuc installer - v%Version%
-
-set "wufuc_xml=%~dp0wufuc.xml"
-
-if exist "%wufuc_xml%" (
-    goto :check_winver
-)
-echo ERROR - Could not find %wufuc_xml%!
-echo.
-echo This most likely means you didn't extract all the files from the archive.
-echo.
-echo Please extract all the files from wufuc_v%Version%.zip to a permanent
-echo location like C:\Program Files\wufuc and try again.
-goto :die
 
 :check_winver
 ver | findstr " 6\.1\." >nul && (
@@ -129,27 +117,23 @@ echo Please be absolutely sure you really need wufuc before proceeding.
 echo.
 set /p CONTINUE=Enter 'Y' if you want to install wufuc: 
 if /I not "%CONTINUE%"=="Y" goto :cancel
-echo.
 
 :install
 sfc /SCANFILE="%systemroot%\System32\wuaueng.dll"
-net start Schedule
-set "wufuc_task=wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307}"
-schtasks /Create /XML "%wufuc_xml%" /TN "%wufuc_task%" /F
-schtasks /Change /TN "%wufuc_task%" /TR "'%systemroot%\System32\rundll32.exe' """%wufuc_dll%""",Rundll32Entry"
-schtasks /Change /TN "%wufuc_task%" /ENABLE
-rundll32 "%wufuc_dll%",Rundll32Unload
-net stop wuauserv
-schtasks /Run /TN "%wufuc_task%"
 
-timeout /nobreak /t 3 >nul
-net start wuauserv
+set "regkey=HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\svchost2.exe"
+copy /Y "%wufuc_dll_fullpath%" "%systemroot%\System32\"
+reg add "%regkey%" /v GlobalFlag /t REG_DWORD /d 0x00000100 /f
+reg add "%regkey%" /v VerifierDlls /t REG_SZ /d "%wufuc_dll%" /f
 
 echo.
-echo Installed and started wufuc, you can now continue installing updates! :^)
+echo wufuc has been successfully installed!
 echo.
-echo To uninstall, run uninstall_wufuc.bat as administrator.
-goto :die
+echo You must restart your computer to activate wufuc.
+echo.
+set /p RESTART_NOW=Enter 'Y' if you would like to restart now: 
+if /I not "%RESTART_NOW%"=="Y" goto :die
+shutdown /r /t 5
 
 :die
 echo.
@@ -166,5 +150,4 @@ exit
 :get_filever  file
 set "file=%~1"
 for /f "tokens=*" %%i in ('wmic /output:stdout datafile where "name='%file:\=\\%'" get Version /value ^| find "="') do set "%%i"
-
 exit /b
