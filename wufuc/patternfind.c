@@ -98,21 +98,6 @@ static inline bool patternmatchbyte(unsigned char byte, const PatternByte pbyte)
         return (matched == 2);
 }
 
-unsigned char *patternfind3(unsigned char *data, size_t datasize, const PatternByte *pattern, size_t searchpatternsize)
-{
-        for ( size_t i = 0, pos = 0; i < datasize; i++ ) { //search for the pattern
-                if ( patternmatchbyte(data[i], pattern[pos]) ) { //check if our pattern matches the current byte
-                        pos++;
-                        if ( pos == searchpatternsize ) //everything matched
-                                return &data[i - searchpatternsize + 1];
-                } else if ( pos > 0 ) { //fix by Computer_Angel
-                        i -= pos;
-                        pos = 0; //reset current pattern position
-                }
-        }
-        return NULL;
-}
-
 unsigned char *patternfind(unsigned char *data, size_t datasize, const char *pattern)
 {
         size_t searchpatternsize = formathexpattern(pattern, NULL, 0) / 2;
@@ -176,4 +161,19 @@ bool patternsnr(unsigned char *data, size_t datasize, const char *searchpattern,
                 return false;
         patternwrite(found, datasize - (found - data), replacepattern);
         return true;
+}
+
+unsigned char *patternfind3(unsigned char *data, size_t datasize, const PatternByte *pattern, size_t searchpatternsize)
+{
+        for ( size_t i = 0, pos = 0; i < datasize; i++ ) { //search for the pattern
+                if ( patternmatchbyte(data[i], pattern[pos]) ) { //check if our pattern matches the current byte
+                        pos++;
+                        if ( pos == searchpatternsize ) //everything matched
+                                return &data[i - searchpatternsize + 1];
+                } else if ( pos > 0 ) { //fix by Computer_Angel
+                        i -= pos;
+                        pos = 0; //reset current pattern position
+                }
+        }
+        return NULL;
 }

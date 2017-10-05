@@ -22,4 +22,3 @@ BOOL file_exists(const wchar_t *path);
 int compare_versions(
         WORD wMajorA, WORD wMinorA, WORD wBuildA, WORD wRevisionA,
         WORD wMajorB, WORD wMinorB, WORD wBuildB, WORD wRevisionB);
-

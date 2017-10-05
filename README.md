@@ -65,6 +65,6 @@ The installer packages are created with Advanced Installer using an [open source
 
 ## Special thanks
 
-- Alex Ionescu ([@ionescu007](https://github.com/ionescu007)) for his [_"Hooking Nirvana"_ presentation at REcon 2015](https://www.youtube.com/watch?v=bqU0y4FzvT0) and its corresponding [repository of example code](https://github.com/ionescu007/HookingNirvana). wufuc v0.8+ could not have been possible without his great work.
+- Alex Ionescu ([@ionescu007](https://github.com/ionescu007)) for his [_"Hooking Nirvana"_ presentation at REcon 2015](https://www.youtube.com/watch?v=bqU0y4FzvT0) and its corresponding [repository of example code](https://github.com/ionescu007/HookingNirvana).
 - Wen Jia Liu ([@wj32](https://github.com/wj32)) for his awesome program [Process Hacker](https://github.com/processhacker2/processhacker) which has been absolutely instrumental in the development of wufuc, and also for his [`phnt`](https://github.com/processhacker2/processhacker/tree/master/phnt) headers.
 - Duncan Ogilvie ([@mrexodia](https://github.com/mrexodia)) for his [`patternfind.cpp`](https://github.com/x64dbg/x64dbg/blob/development/src/dbg/patternfind.cpp) algorithm from [x64dbg](https://github.com/x64dbg/x64dbg).
