@@ -25,7 +25,7 @@ LSTATUS WINAPI RegQueryValueExW_Hook(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpR
                 DWORD cbData = *lpcbData;
                 size_t MaxCount = cbData / sizeof(wchar_t);
 
-                // this way the dll path is garunteed to be null terminated
+                // this way the dll path is guaranteed to be null-terminated
                 result = RegGetValueW(hKey, NULL, lpValueName, RRF_RT_REG_EXPAND_SZ | RRF_NOEXPAND, lpType, lpData, lpcbData);
                 if ( result != ERROR_SUCCESS )
                         goto L_ret;
@@ -39,8 +39,13 @@ LSTATUS WINAPI RegQueryValueExW_Hook(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpR
                 Status = NtQueryKey((HANDLE)hKey, KeyNameInformation, (PVOID)pkni, ResultLength, &ResultLength);
                 if ( Status == STATUS_SUCCESS ) {
                         size_t BufferCount = pkni->NameLength / sizeof(wchar_t);
+
+                        // change key name to lower-case because there is no case-insensitive version of _snwscanf_s
+                        for ( size_t i = 0; i < BufferCount; i++ )
+                                pkni->Name[i] = towlower(pkni->Name[i]);
+
                         int current, pos;
-                        if ( _snwscanf_s(pkni->Name, BufferCount, L"\\REGISTRY\\MACHINE\\SYSTEM\\ControlSet%03d\\services\\wuauserv\\Parameters%n", &current, &pos) == 1
+                        if ( _snwscanf_s(pkni->Name, BufferCount, L"\\registry\\machine\\system\\controlset%03d\\services\\wuauserv\\parameters%n", &current, &pos) == 1
                                 && pos == BufferCount ) {
 
                                 wchar_t drive[_MAX_DRIVE], dir[_MAX_DIR], fname[_MAX_FNAME], ext[_MAX_EXT];
@@ -68,7 +73,7 @@ LSTATUS WINAPI RegQueryValueExW_Hook(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpR
                                         if ( file_exists(lpDst) ) {
                                                 _wmakepath_s((wchar_t *)lpData, MaxCount, drive, dir, L"wuaueng", ext);
                                                 *lpcbData = (DWORD)((wcslen((wchar_t *)lpData) + 1) * sizeof(wchar_t));
-                                                trace(L"Fixed wuauserv ServiceDll path: %ls", lpDst);
+                                                trace(L"Fixed wuauserv %ls path: %ls", lpValueName, lpDst);
                                         }
                                         rtl_free(lpDst);
                                 }
@@ -77,7 +82,7 @@ LSTATUS WINAPI RegQueryValueExW_Hook(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpR
                 rtl_free(pkni);
         } else {
                 // handle normally
-                result = ((LPFN_REGQUERYVALUEEXW)g_vfK32ThunkDescriptors[0].ThunkOldAddress)(hKey, lpValueName, lpReserved, lpType, lpData, lpcbData);
+                result = (*g_plpfnRegQueryValueExW)(hKey, lpValueName, lpReserved, lpType, lpData, lpcbData);
         }
 L_ret:
         return result;
@@ -85,17 +90,19 @@ L_ret:
 
 HMODULE WINAPI LoadLibraryExW_Hook(LPCWSTR lpFileName, HANDLE hFile, DWORD dwFlags)
 {
-        HMODULE result = ((LPFN_LOADLIBRARYEXW)g_vfK32ThunkDescriptors[1].ThunkOldAddress)(lpFileName, hFile, dwFlags);
+        HMODULE result = (*g_plpfnLoadLibraryExW)(lpFileName, hFile, dwFlags);
         if ( !result ) {
                 trace(L"Failed to load library: %ls (error code=%08X)", lpFileName, GetLastError());
                 goto L_ret;
         }
+
         trace(L"Loaded library: %ls", lpFileName);
         DWORD dwLen = GetFileVersionInfoSizeW(lpFileName, NULL);
         if ( !dwLen ) {
                 trace(L"Failed to get file version info size for file %ls (error code=%08X)", lpFileName, GetLastError());
                 goto L_ret;
         }
+
         LPVOID pBlock = rtl_malloc(dwLen);
         if ( GetFileVersionInfoW(lpFileName, 0, dwLen, pBlock) ) {
                 PLANGANDCODEPAGE ptl;

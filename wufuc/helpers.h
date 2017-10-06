@@ -16,9 +16,11 @@ bool verify_winver(
         BYTE ServicePackMajorCondition,
         BYTE ServicePackMinorCondition
 );
+bool verify_win7(void);
+bool verify_win81(void);
 
 wchar_t *find_fname(wchar_t *pPath);
-BOOL file_exists(const wchar_t *path);
+bool file_exists(const wchar_t *path);
 int compare_versions(
         WORD wMajorA, WORD wMinorA, WORD wBuildA, WORD wRevisionA,
         WORD wMajorB, WORD wMinorB, WORD wBuildB, WORD wRevisionB);

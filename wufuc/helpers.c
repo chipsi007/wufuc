@@ -53,6 +53,26 @@ bool verify_winver(
         return RtlVerifyVersionInfo(&osvi, TypeMask, ConditionMask) == STATUS_SUCCESS;
 }
 
+bool verify_win7(void)
+{
+        static bool a, b;
+        if ( !a ) {
+                b = verify_winver(6, 1, 0, 0, 0, VER_EQUAL, VER_EQUAL, 0, 0, 0);
+                a = true;
+        }
+        return b;
+}
+
+bool verify_win81(void)
+{
+        static bool a, b;
+        if ( !a ) {
+                b = verify_winver(6, 3, 0, 0, 0, VER_EQUAL, VER_EQUAL, 0, 0, 0);
+                a = true;
+        }
+        return b;
+}
+
 wchar_t *find_fname(wchar_t *pPath)
 {
         wchar_t *pwc = wcsrchr(pPath, L'\\');
@@ -62,7 +82,7 @@ wchar_t *find_fname(wchar_t *pPath)
         return pPath;
 }
 
-BOOL file_exists(const wchar_t *path)
+bool file_exists(const wchar_t *path)
 {
         return GetFileAttributesW(path) != INVALID_FILE_ATTRIBUTES;
 }

@@ -4,7 +4,6 @@
 #include "patternfind.h"
 #include "tracing.h"
 
-#include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -40,10 +39,12 @@ bool patch_wua(void *lpBaseOfDll, size_t SizeOfImage, wchar_t *fname)
 #ifdef _M_AMD64
         pps = &X64PatchSet;
 #elif defined(_M_IX86)
-        if ( verify_winver(6, 1, 0, 0, 0, VER_EQUAL, VER_EQUAL, 0, 0, 0) )
+        if ( verify_win7() )
                 pps = &Win7X86PatchSet;
-        else if ( verify_winver(6, 3, 0, 0, 0, VER_EQUAL, VER_EQUAL, 0, 0, 0) )
+        else if ( verify_win81() )
                 pps = &Win81X86PatchSet;
+        else 
+                goto L_ret;
 #endif
         unsigned char *ptr = patternfind(lpBaseOfDll, SizeOfImage, pps->Pattern);
         if ( !ptr ) {

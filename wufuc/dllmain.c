@@ -8,20 +8,21 @@
 #include <phnt_windows.h>
 #include <phnt.h>
 
-RTL_VERIFIER_THUNK_DESCRIPTOR g_vfK32ThunkDescriptors[] = {
+RTL_VERIFIER_THUNK_DESCRIPTOR g_vfThunkDescriptors[] = {
         { "RegQueryValueExW", NULL, (PVOID)&RegQueryValueExW_Hook },
         { "LoadLibraryExW", NULL, (PVOID)&LoadLibraryExW_Hook },
         { 0 } };
-RTL_VERIFIER_DLL_DESCRIPTOR g_vfDllDescriptors[] = {
-        { L"kernel32.dll", 0, NULL, g_vfK32ThunkDescriptors },
-        { 0 } };
-RTL_VERIFIER_DLL_DESCRIPTOR g_vfNullDllDescriptor = { 0 };
+
+RTL_VERIFIER_DLL_DESCRIPTOR g_vfDllDescriptors[2];
+
 RTL_VERIFIER_PROVIDER_DESCRIPTOR g_vfProviderDescriptor = {
         sizeof(RTL_VERIFIER_PROVIDER_DESCRIPTOR),
-        &g_vfNullDllDescriptor,
-        //(RTL_VERIFIER_DLL_LOAD_CALLBACK)&VerifierDllLoadCallback,
-        //(RTL_VERIFIER_DLL_UNLOAD_CALLBACK)&VerifierDllUnloadCallback
-};
+        g_vfDllDescriptors/*,
+        (RTL_VERIFIER_DLL_LOAD_CALLBACK)&VerifierDllLoadCallback,
+        (RTL_VERIFIER_DLL_UNLOAD_CALLBACK)&VerifierDllUnloadCallback*/ };
+
+LPFN_REGQUERYVALUEEXW *g_plpfnRegQueryValueExW;
+LPFN_LOADLIBRARYEXW *g_plpfnLoadLibraryExW;
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
@@ -31,27 +32,31 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 break;
         case DLL_PROCESS_DETACH:
                 break;
-        case DLL_PROCESS_VERIFIER:;
-                if ( verify_winver(6, 1, 0, 0, 0, VER_EQUAL, VER_EQUAL, 0, 0, 0)
-                        || verify_winver(6, 3, 0, 0, 0, VER_EQUAL, VER_EQUAL, 0, 0, 0) ) {
+        case DLL_PROCESS_VERIFIER:
+                if ( verify_win7() || verify_win81 ) {
+                        UNICODE_STRING ImagePath;
+                        RtlInitUnicodeString(&ImagePath, NULL);
 
                         RTL_QUERY_REGISTRY_TABLE QueryTable[2];
                         RtlSecureZeroMemory(&QueryTable, sizeof(QueryTable));
                         QueryTable[0].Name = L"ImagePath";
                         QueryTable[0].Flags = RTL_QUERY_REGISTRY_DIRECT;
-                        UNICODE_STRING ImagePath;
-                        RtlInitUnicodeString(&ImagePath, NULL);
                         QueryTable[0].EntryContext = &ImagePath;
 
-                        //TODO: check status and maybe fix implementation? idk...
-                        NTSTATUS Status = RtlQueryRegistryValues(RTL_REGISTRY_SERVICES,
-                                L"wuauserv",
-                                QueryTable,
-                                NULL,
-                                NULL);
-                        
-                        if ( !RtlCompareUnicodeString(&NtCurrentPeb()->ProcessParameters->CommandLine, &ImagePath, TRUE) )
-                                g_vfProviderDescriptor.ProviderDlls = g_vfDllDescriptors;
+                        if ( RtlQueryRegistryValues(RTL_REGISTRY_SERVICES, L"wuauserv", QueryTable, NULL, NULL) == STATUS_SUCCESS
+                                && !RtlCompareUnicodeString(&NtCurrentPeb()->ProcessParameters->CommandLine, &ImagePath, TRUE) ) {
+
+                                if ( verify_win7() )
+                                        g_vfDllDescriptors[0].DllName = L"kernel32.dll";
+                                else if ( verify_win81() )
+                                        g_vfDllDescriptors[0].DllName = L"kernelbase.dll";
+                                
+                                g_vfDllDescriptors[0].DllThunks = g_vfThunkDescriptors;
+
+                                g_plpfnRegQueryValueExW = (LPFN_REGQUERYVALUEEXW *)&g_vfThunkDescriptors[0].ThunkOldAddress;
+                                g_plpfnLoadLibraryExW = (LPFN_LOADLIBRARYEXW *)&g_vfThunkDescriptors[1].ThunkOldAddress;
+                        }
+                        RtlFreeUnicodeString(&ImagePath);
                 }
                 *(PRTL_VERIFIER_PROVIDER_DESCRIPTOR *)lpReserved = &g_vfProviderDescriptor;
                 break;
