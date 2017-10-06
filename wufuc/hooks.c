@@ -127,8 +127,8 @@ HMODULE WINAPI LoadLibraryExW_Hook(LPCWSTR lpFileName, HANDLE hFile, DWORD dwFla
                                         GetModuleFileNameW(result, path, _countof(path));
                                         wchar_t *fname = find_fname(path);
 
-                                        if ( (verify_winver(6, 1, 0, 0, 0, VER_EQUAL, VER_EQUAL, 0, 0, 0) && compare_versions(wMajor, wMinor, wBuild, wRevision, 7, 6, 7601, 23714) != -1)
-                                                || (verify_winver(6, 3, 0, 0, 0, VER_EQUAL, VER_EQUAL, 0, 0, 0) && compare_versions(wMajor, wMinor, wBuild, wRevision, 7, 9, 9600, 18621) != -1) ) {
+                                        if ( (verify_win7() && compare_versions(wMajor, wMinor, wBuild, wRevision, 7, 6, 7601, 23714) != -1)
+                                                || (verify_win81() && compare_versions(wMajor, wMinor, wBuild, wRevision, 7, 9, 9600, 18621) != -1) ) {
 
                                                 trace(L"%ls version: %d.%d.%d.%d", fname, wMajor, wMinor, wBuild, wRevision);
                                                 MODULEINFO modinfo;
