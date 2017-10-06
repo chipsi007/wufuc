@@ -63,8 +63,8 @@ echo.
 
 :uninstall
 set "regkey=HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\svchost.exe"
-del /F "%systemroot%\System32\%wufuc_dll%"
 reg del "%regkey%" /f
+del /F "%systemroot%\System32\%wufuc_dll%"
 
 echo.
 echo Unloaded and uninstalled wufuc. :^(
