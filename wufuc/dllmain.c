@@ -33,7 +33,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         case DLL_PROCESS_DETACH:
                 break;
         case DLL_PROCESS_VERIFIER:
-                if ( verify_win7() || verify_win81 ) {
+                if ( verify_win7() || verify_win81() ) {
                         UNICODE_STRING ImagePath;
                         RtlInitUnicodeString(&ImagePath, NULL);
 
