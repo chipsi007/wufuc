@@ -121,7 +121,7 @@ if /I not "%CONTINUE%"=="Y" goto :cancel
 :install
 sfc /SCANFILE="%systemroot%\System32\wuaueng.dll"
 
-set "regkey=HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\svchost2.exe"
+set "regkey=HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\svchost.exe"
 copy /Y "%wufuc_dll_fullpath%" "%systemroot%\System32\"
 reg add "%regkey%" /v GlobalFlag /t REG_DWORD /d 0x00000100 /f
 reg add "%regkey%" /v VerifierDlls /t REG_SZ /d "%wufuc_dll%" /f
