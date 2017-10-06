@@ -22,63 +22,67 @@ LSTATUS WINAPI RegQueryValueExW_Hook(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpR
         if ( (lpData && lpcbData)
                 && (lpValueName && !_wcsicmp(lpValueName, L"ServiceDll")) ) {
 
+                // store original lpData buffer size
                 DWORD cbData = *lpcbData;
-                size_t MaxCount = cbData / sizeof(wchar_t);
 
                 // this way the dll path is guaranteed to be null-terminated
                 result = RegGetValueW(hKey, NULL, lpValueName, RRF_RT_REG_EXPAND_SZ | RRF_NOEXPAND, lpType, lpData, lpcbData);
-                if ( result != ERROR_SUCCESS )
-                        goto L_ret;
 
+                NTSTATUS Status;
                 ULONG ResultLength;
-                NTSTATUS Status = NtQueryKey((HANDLE)hKey, KeyNameInformation, NULL, 0, &ResultLength);
-                if ( Status != STATUS_BUFFER_OVERFLOW && Status != STATUS_BUFFER_TOO_SMALL )
+                if ( result != ERROR_SUCCESS 
+                        || (Status = NtQueryKey((HANDLE)hKey, KeyNameInformation, NULL, 0, &ResultLength),
+                        Status != STATUS_BUFFER_OVERFLOW && Status != STATUS_BUFFER_TOO_SMALL) )
                         goto L_ret;
 
                 PKEY_NAME_INFORMATION pkni = rtl_malloc(ResultLength);
-                Status = NtQueryKey((HANDLE)hKey, KeyNameInformation, (PVOID)pkni, ResultLength, &ResultLength);
-                if ( Status == STATUS_SUCCESS ) {
-                        size_t BufferCount = pkni->NameLength / sizeof(wchar_t);
 
-                        // change key name to lower-case because there is no case-insensitive version of _snwscanf_s
-                        for ( size_t i = 0; i < BufferCount; i++ )
-                                pkni->Name[i] = towlower(pkni->Name[i]);
+                if ( NtQueryKey((HANDLE)hKey, KeyNameInformation, (PVOID)pkni, ResultLength, &ResultLength) != STATUS_SUCCESS )
+                        goto L_free_pkni;
 
-                        int current, pos;
-                        if ( _snwscanf_s(pkni->Name, BufferCount, L"\\registry\\machine\\system\\controlset%03d\\services\\wuauserv\\parameters%n", &current, &pos) == 1
-                                && pos == BufferCount ) {
+                size_t BufferCount = pkni->NameLength / sizeof(wchar_t);
 
-                                wchar_t drive[_MAX_DRIVE], dir[_MAX_DIR], fname[_MAX_FNAME], ext[_MAX_EXT];
-                                _wsplitpath_s((wchar_t *)lpData, 
-                                        drive, _countof(drive), 
-                                        dir, _countof(dir), 
-                                        fname, _countof(fname), 
-                                        ext, _countof(ext));
+                // change key name to lower-case because there is no case-insensitive version of _snwscanf_s
+                for ( size_t i = 0; i < BufferCount; i++ )
+                        pkni->Name[i] = towlower(pkni->Name[i]);
 
-                                if ( !_wcsicmp(ext, L".dll")
-                                        && (!_wcsicmp(fname, L"wuaueng2") // UpdatePack7R2
-                                        || !_wcsicmp(fname, L"WuaCpuFix64") // WuaCpuFix
-                                        || !_wcsicmp(fname, L"WuaCpuFix")) ) {
+                int current, pos;
+                if ( _snwscanf_s(pkni->Name, BufferCount, 
+                        L"\\registry\\machine\\system\\controlset%03d\\services\\wuauserv\\parameters%n", &current, &pos) == 1 
+                        && pos == BufferCount ) {
 
-                                        wchar_t *tmp = rtl_malloc(cbData);
+                        wchar_t drive[_MAX_DRIVE], dir[_MAX_DIR], fname[_MAX_FNAME], ext[_MAX_EXT];
+                        _wsplitpath_s((wchar_t *)lpData,
+                                drive, _countof(drive),
+                                dir, _countof(dir),
+                                fname, _countof(fname),
+                                ext, _countof(ext));
 
-                                        _wmakepath_s(tmp, MaxCount, drive, dir, L"wuaueng", ext);
-                                        DWORD nSize = ExpandEnvironmentStringsW(tmp, NULL, 0);
+                        if ( !_wcsicmp(ext, L".dll")
+                                && (!_wcsicmp(fname, L"wuaueng2") // UpdatePack7R2
+                                || !_wcsicmp(fname, L"WuaCpuFix64") // WuaCpuFix
+                                || !_wcsicmp(fname, L"WuaCpuFix")) ) {
 
-                                        wchar_t *lpDst = rtl_calloc(nSize, sizeof(wchar_t));
-                                        ExpandEnvironmentStringsW(tmp, lpDst, nSize);
+                                wchar_t *tmp = rtl_malloc(cbData);
 
-                                        rtl_free(tmp);
+                                size_t MaxCount = cbData / sizeof(wchar_t);
+                                _wmakepath_s(tmp, MaxCount, drive, dir, L"wuaueng", ext);
+                                DWORD nSize = ExpandEnvironmentStringsW(tmp, NULL, 0);
 
-                                        if ( file_exists(lpDst) ) {
-                                                _wmakepath_s((wchar_t *)lpData, MaxCount, drive, dir, L"wuaueng", ext);
-                                                *lpcbData = (DWORD)((wcslen((wchar_t *)lpData) + 1) * sizeof(wchar_t));
-                                                trace(L"Fixed wuauserv %ls path: %ls", lpValueName, lpDst);
-                                        }
-                                        rtl_free(lpDst);
+                                wchar_t *lpDst = rtl_calloc(nSize, sizeof(wchar_t));
+                                ExpandEnvironmentStringsW(tmp, lpDst, nSize);
+
+                                rtl_free(tmp);
+
+                                if ( file_exists(lpDst) ) {
+                                        _wmakepath_s((wchar_t *)lpData, MaxCount, drive, dir, L"wuaueng", ext);
+                                        *lpcbData = (DWORD)((wcslen((wchar_t *)lpData) + 1) * sizeof(wchar_t));
+                                        trace(L"Fixed wuauserv %ls path: %ls", lpValueName, lpDst);
                                 }
+                                rtl_free(lpDst);
                         }
                 }
+L_free_pkni:
                 rtl_free(pkni);
         } else {
                 // handle normally
@@ -98,50 +102,54 @@ HMODULE WINAPI LoadLibraryExW_Hook(LPCWSTR lpFileName, HANDLE hFile, DWORD dwFla
 
         trace(L"Loaded library: %ls", lpFileName);
         DWORD dwLen = GetFileVersionInfoSizeW(lpFileName, NULL);
-        if ( !dwLen ) {
-                trace(L"Failed to get file version info size for file %ls (error code=%08X)", lpFileName, GetLastError());
+        if ( !dwLen )
                 goto L_ret;
-        }
-
+        
         LPVOID pBlock = rtl_malloc(dwLen);
-        if ( GetFileVersionInfoW(lpFileName, 0, dwLen, pBlock) ) {
-                PLANGANDCODEPAGE ptl;
-                UINT cb;
-                if ( VerQueryValueW(pBlock, L"\\VarFileInfo\\Translation", (LPVOID *)&ptl, &cb) ) {
-                        wchar_t lpSubBlock[38];
-                        for ( size_t i = 0; i < (cb / sizeof(LANGANDCODEPAGE)); i++ ) {
-                                swprintf_s(lpSubBlock, _countof(lpSubBlock), L"\\StringFileInfo\\%04x%04x\\InternalName", ptl[i].wLanguage, ptl[i].wCodePage);
-                                wchar_t *lpszInternalName;
-                                UINT uLen;
-                                if ( VerQueryValueW(pBlock, lpSubBlock, (LPVOID *)&lpszInternalName, &uLen)
-                                        && !_wcsicmp(lpszInternalName, L"wuaueng.dll") ) {
 
-                                        VS_FIXEDFILEINFO *pffi;
-                                        VerQueryValueW(pBlock, L"\\", (LPVOID *)&pffi, &uLen);
-                                        WORD wMajor = HIWORD(pffi->dwProductVersionMS);
-                                        WORD wMinor = LOWORD(pffi->dwProductVersionMS);
-                                        WORD wBuild = HIWORD(pffi->dwProductVersionLS);
-                                        WORD wRevision = LOWORD(pffi->dwProductVersionLS);
+        PLANGANDCODEPAGE ptl;
+        UINT cb;
+        if ( !GetFileVersionInfoW(lpFileName, 0, dwLen, pBlock)
+                || !VerQueryValueW(pBlock, L"\\VarFileInfo\\Translation", (LPVOID *)&ptl, &cb) )
+                goto L_free_pBlock;
 
-                                        wchar_t path[MAX_PATH];
-                                        GetModuleFileNameW(result, path, _countof(path));
-                                        wchar_t *fname = find_fname(path);
+        wchar_t lpSubBlock[38];
+        for ( size_t i = 0; i < (cb / sizeof(LANGANDCODEPAGE)); i++ ) {
+                swprintf_s(lpSubBlock, _countof(lpSubBlock),
+                        L"\\StringFileInfo\\%04x%04x\\InternalName", 
+                        ptl[i].wLanguage, 
+                        ptl[i].wCodePage);
+                
+                wchar_t *lpszInternalName;
+                UINT uLen;
+                if ( VerQueryValueW(pBlock, lpSubBlock, (LPVOID *)&lpszInternalName, &uLen)
+                        && !_wcsicmp(lpszInternalName, L"wuaueng.dll") ) {
 
-                                        if ( (verify_win7() && compare_versions(wMajor, wMinor, wBuild, wRevision, 7, 6, 7601, 23714) != -1)
-                                                || (verify_win81() && compare_versions(wMajor, wMinor, wBuild, wRevision, 7, 9, 9600, 18621) != -1) ) {
+                        VS_FIXEDFILEINFO *pffi;
+                        VerQueryValueW(pBlock, L"\\", (LPVOID *)&pffi, &uLen);
+                        WORD wMajor = HIWORD(pffi->dwProductVersionMS);
+                        WORD wMinor = LOWORD(pffi->dwProductVersionMS);
+                        WORD wBuild = HIWORD(pffi->dwProductVersionLS);
+                        WORD wRevision = LOWORD(pffi->dwProductVersionLS);
 
-                                                trace(L"%ls version: %d.%d.%d.%d", fname, wMajor, wMinor, wBuild, wRevision);
-                                                MODULEINFO modinfo;
-                                                if ( GetModuleInformation(GetCurrentProcess(), result, &modinfo, sizeof(MODULEINFO)) ) {
-                                                        if ( !patch_wua(modinfo.lpBaseOfDll, modinfo.SizeOfImage, fname) )
-                                                                trace(L"Failed to patch %ls!", fname);
-                                                } else trace(L"Failed to get module information for %ls (%p) (couldn't patch)", fname, result);
-                                        } else trace(L"Unsupported version of %ls: %d.%d.%d.%d (patching skipped)", fname, wMajor, wMinor, wBuild, wRevision);
-                                        break;
-                                }
-                        }
+                        wchar_t path[MAX_PATH];
+                        GetModuleFileNameW(result, path, _countof(path));
+                        wchar_t *fname = find_fname(path);
+
+                        if ( (verify_win7() && compare_versions(wMajor, wMinor, wBuild, wRevision, 7, 6, 7601, 23714) != -1)
+                                || (verify_win81() && compare_versions(wMajor, wMinor, wBuild, wRevision, 7, 9, 9600, 18621) != -1) ) {
+
+                                trace(L"%ls version: %d.%d.%d.%d", fname, wMajor, wMinor, wBuild, wRevision);
+                                MODULEINFO modinfo;
+                                if ( GetModuleInformation(GetCurrentProcess(), result, &modinfo, sizeof(MODULEINFO)) ) {
+                                        if ( !patch_wua(modinfo.lpBaseOfDll, modinfo.SizeOfImage, fname) )
+                                                trace(L"Failed to patch %ls!", fname);
+                                } else trace(L"Failed to get module information for %ls (%p) (couldn't patch)", fname, result);
+                        } else trace(L"Unsupported %ls version: %d.%d.%d.%d (patching skipped)", fname, wMajor, wMinor, wBuild, wRevision);
+                        break;
                 }
         }
+L_free_pBlock:
         rtl_free(pBlock);
 L_ret:
         return result;
