@@ -44,15 +44,6 @@ If you are interested, you can read my original write up on discovering the CPU 
 - Byte pattern-based patching, which means it will usually keep working even after new updates come out.
 - Absolutely zero dependencies.
 
-## How to use unattended feature in the batch setup scripts
-
-`install_wufuc.bat` and `uninstall_wufuc.bat` both support two command line parameters that can used alone or be combined to change the behavior of the scripts:
-
-- `/NORESTART` - Automatically declines rebooting after the setup finishes.
-- `/UNATTENDED` - Skips all prompts for user interaction, and automatically restarts unless `/NORESTART` is also specified.
-
-These must be used from an elevated command line prompt.
-
 ## How it works
 
 Basically, inside a system file called `wuaueng.dll` there are two functions responsible for the CPU check: `IsDeviceServiceable(void)` and `IsCPUSupported(void)`. 
@@ -65,6 +56,15 @@ My patch takes advantage of this behavior by patching a couple of boolean values
     * `LoadLibraryExW` hook will automatically patch `wuaueng.dll` as soon as it is loaded.
     * `RegQueryValueExW` hook is necessary to provide compatibility with attempts by other third-parties at bypassing the CPU check. (see issue [#100](../../issues/100))
 - If wufuc gets loaded by a `svchost.exe` process that isn't related to Windows Update, it goes into a dormant state and no hooks are applied.
+
+## How to use unattended feature in the batch setup scripts
+
+`install_wufuc.bat` and `uninstall_wufuc.bat` both support two command line parameters that can used alone or be combined to change the behavior of the scripts:
+
+- `/NORESTART` - Automatically declines rebooting after the setup finishes.
+- `/UNATTENDED` - Skips all prompts for user interaction, and automatically restarts unless `/NORESTART` is also specified.
+
+These must be used from an elevated command line prompt.
 
 ## What to do if you get stuck on a black screen with just a cursor after the Windows boot animation
 
