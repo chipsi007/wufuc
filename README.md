@@ -44,7 +44,7 @@ If you are interested, you can read my original write up on discovering the CPU 
 - Byte pattern-based patching, which means it will usually keep working even after new updates come out.
 - Absolutely zero dependencies.
 
-## How to use unattended setup feature in the batch script setup
+## How to use unattended feature in the batch script setup
 
 `wufuc_setup.bat` supports three command line parameters, that can be combined to change the behavior of the script:
 
