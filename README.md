@@ -52,7 +52,7 @@ If you are interested, you can read my original write up on discovering the CPU 
 - `/UNATTENDED` - skips all prompts for user interaction. **Beware: this will automatically restart your computer after setup is complete, unless combined with `/NORESTART`.**
 - `/UNINSTALL` - skips the prompt that asks if you want to install or uninstall.
 
-These also change the default behavior of the script by changing these lines near the top of the script:
+You can also change the default behavior of the script by modifying these lines near the beginning of the script:
 
 ```bat
 call :set_uninstall 0
