@@ -50,7 +50,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                                         g_vfDllDescriptors[0].DllName = L"kernel32.dll";
                                 else if ( verify_win81() )
                                         g_vfDllDescriptors[0].DllName = L"kernelbase.dll";
-                                
+
                                 g_vfDllDescriptors[0].DllThunks = g_vfThunkDescriptors;
 
                                 g_plpfnRegQueryValueExW = (LPFN_REGQUERYVALUEEXW *)&g_vfThunkDescriptors[0].ThunkOldAddress;
