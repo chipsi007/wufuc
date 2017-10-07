@@ -56,12 +56,8 @@ set "systemfolder=%systemroot%\System32"
 if /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
         goto :is_x64
 ) else (
-        if /I "%PROCESSOR_ARCHITEW6432%"=="AMD64" (
-                goto :is_wow64
-        )
-        if /I "%PROCESSOR_ARCHITECTURE%"=="x86" (
-                goto :is_x86
-        )
+        if /I "%PROCESSOR_ARCHITEW6432%"=="AMD64" goto :is_wow64
+        if /I "%PROCESSOR_ARCHITECTURE%"=="x86" goto :is_x86
 )
 goto :unsupported
 
@@ -160,24 +156,23 @@ echo You will need to restart your PC to finish uninstalling wufuc.
 goto :confirm_restart
 
 :uninstall
-        sfc /SCANFILE="%systemroot%\System32\wuaueng.dll"
+        :: restore wuaueng.dll if it was modified by 0.1-0.5
+        sfc /SCANFILE="%systemfolder%\wuaueng.dll"
+
+        :: remove traces of wufuc 0.6-0.7
         set "wufuc_task=wufuc.{72EEE38B-9997-42BD-85D3-2DD96DA17307}"
         schtasks /Query /TN "%wufuc_task%" >nul 2>&1 && (
-                schtasks /Delete /TN "%wufuc_task%" /F
-        )
+        schtasks /Delete /TN "%wufuc_task%" /F )
         rundll32 "%wufuc_dll_fullpath%",RUNDLL32_LegacyUnload
-        reg query "%regkey%" >nul 2>&1 || (
-                goto :delete_target
-        )
-        reg delete "%regkey%" /f || (
-                goto :skip_delete
-                )
+
+        :: remove traces of wufuc >=0.8
+        reg query "%regkey%" >nul 2>&1 || goto :delete_target
+        reg delete "%regkey%" /f || goto :skip_delete
 :delete_target
         set "del_ext=.del-%random%"
         if exist "%wufuc_dll_target%" (
                 ren "%wufuc_dll_target%" "%wufuc_dll%%del_ext%" && (
-                        rundll32 "%wufuc_dll_fullpath%",RUNDLL32_DeleteFile "%wufuc_dll_target%%del_ext%"
-                )
+                rundll32 "%wufuc_dll_fullpath%",RUNDLL32_DeleteFile "%wufuc_dll_target%%del_ext%" )
         )
 :skip_delete
         exit /b

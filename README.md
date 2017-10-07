@@ -51,6 +51,8 @@ If you are interested, you can read my original write up on discovering the CPU 
 - `/NORESTART` - Automatically declines rebooting after the setup finishes.
 - `/UNATTENDED` - Skips all prompts for user interaction, and automatically restarts unless `/NORESTART` is also specified.
 
+These must be used from an elevated command line prompt.
+
 ## How it works
 
 Basically, inside a system file called `wuaueng.dll` there are two functions responsible for the CPU check: `IsDeviceServiceable(void)` and `IsCPUSupported(void)`. 
@@ -63,6 +65,23 @@ My patch takes advantage of this behavior by patching a couple of boolean values
     * `LoadLibraryExW` hook will automatically patch `wuaueng.dll` as soon as it is loaded.
     * `RegQueryValueExW` hook is necessary to provide compatibility with attempts by other third-parties at bypassing the CPU check. (see issue [#100](../../issues/100))
 - If wufuc gets loaded by a `svchost.exe` process that isn't related to Windows Update, it goes into a dormant state and no hooks are applied.
+
+## What to do if you get stuck on a black screen with just a cursor after the Windows boot animation
+
+This will happen if wufuc somehow manages to crash the `svchost.exe` process that is responsible for displaying the login screen.
+Normally this should **never ever** happen, because wufuc goes dormant in `svchost.exe` processes that are unrelated to Windows Update.
+I have only encountered this during development with very unstable code, or by causing it intentionally.
+
+However, just in case this does happen to someone, here is how to fix it:
+
+1. [Boot into Safe Mode with Command Prompt](https://support.microsoft.com/en-us/help/17419/windows-7-advanced-startup-options-safe-mode).
+2. In the command prompt type `regedit` and press enter.
+3. Navigate to the key `HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options`
+4. Expand the `Image File Execution Options` tree.
+5. Locate the `svchost.exe` sub key, right-click it and press **Delete**.
+6. Reboot.
+7. You should be able to log in normally again.
+8. **If this happens to you, please report it in the issues tab so I can try to figure out what is causing the crash!**
 
 ## Sponsors
 
