@@ -49,7 +49,7 @@ If you are interested, you can read my original write up on discovering the CPU 
 `wufuc_setup.bat` supports three command line parameters, that can be combined to change the behavior of the script:
 
 - `/NORESTART` - automatically declines rebooting after setup finishes.
-- `/UNATTENDED` - skips all prompts for user interaction. **Beware: this will automatically restart your computer after setup is complete, unless combined with `/NORESTART`.**
+- `/UNATTENDED` - skips all prompts for user interaction. **Beware: this will automatically restart your PC, unless combined with `/NORESTART`.**
 - `/UNINSTALL` - skips the prompt that asks if you want to install or uninstall.
 
 You can also change the default behavior of the script by modifying these lines near the beginning of the script:
