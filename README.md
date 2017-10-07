@@ -8,7 +8,7 @@ Disables the "Unsupported Hardware" message in Windows Update, and allows you to
 
 - [**Click here for the latest stable version**](../../releases/latest)
 
-- [~~Unstable builds~~](https://ci.appveyor.com/project/zeffy/wufuc) **Broken until AppVeyor adds WDK support for Visual Studio 2017 ([appveyor/ci#1554](https://github.com/appveyor/ci/issues/1554))**
+- [~~Unstable builds~~](https://ci.appveyor.com/project/zeffy/wufuc) **Discontinued until AppVeyor adds WDK support for Visual Studio 2017 ([appveyor/ci#1554](https://github.com/appveyor/ci/issues/1554))**
 
 ## Preface
 
@@ -57,9 +57,13 @@ My patch takes advantage of this behavior by patching a couple of boolean values
     * `RegQueryValueExW` hook is necessary to provide compatibility with attempts by other third-parties at bypassing the CPU check. (see issue [#100](../../issues/100))
 - If wufuc gets loaded by a `svchost.exe` process that isn't related to Windows Update, it goes into a dormant state and no hooks are applied.
 
+## How to deploy wufuc using Group Policy
+
+[There is a tutorial on the Advanced Installer website that explains how to do this](http://www.advancedinstaller.com/user-guide/tutorial-gpo.html).
+
 ## How to use unattended feature in the batch setup scripts
 
-`install_wufuc.bat` and `uninstall_wufuc.bat` both support two command line parameters that can used alone or be combined to change the behavior of the scripts:
+`install_wufuc.bat` and `uninstall_wufuc.bat` both support two command line parameters that can be used alone, or combined to change the behavior of the scripts:
 
 - `/NORESTART` - Automatically declines rebooting after the setup finishes.
 - `/UNATTENDED` - Skips all prompts for user interaction, and automatically restarts unless `/NORESTART` is also specified.
@@ -87,7 +91,8 @@ However, just in case this does happen to someone, here is how to fix it:
 
 ### [Advanced Installer](http://www.advancedinstaller.com/)
 
-The installer packages are created with Advanced Installer using an [open source license](http://www.advancedinstaller.com/free-license.html). Advanced Installer's intuitive and friendly user interface allowed me to quickly create a feature complete installer with minimal effort. [Check it out!](http://www.advancedinstaller.com/)
+The installer packages are created with Advanced Installer using an [open source license](http://www.advancedinstaller.com/free-license.html). 
+Advanced Installer's intuitive and friendly user interface allowed me to quickly create a feature complete installer with minimal effort. [Check it out!](http://www.advancedinstaller.com/)
 
 ## Special thanks
 
