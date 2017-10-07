@@ -44,21 +44,12 @@ If you are interested, you can read my original write up on discovering the CPU 
 - Byte pattern-based patching, which means it will usually keep working even after new updates come out.
 - Absolutely zero dependencies.
 
-## How to use unattended feature in the batch script setup
+## How to use unattended feature in the batch setup scripts
 
-`wufuc_setup.bat` supports three command line parameters, that can be combined to change the behavior of the script:
+`install_wufuc.bat` and `uninstall_wufuc.bat` both support two command line parameters that can used alone or be combined to change the behavior of the scripts:
 
-- `/NORESTART` - automatically declines rebooting after setup finishes.
-- `/UNATTENDED` - skips all prompts for user interaction. **Beware: this will automatically restart your PC, unless combined with `/NORESTART`.**
-- `/UNINSTALL` - skips the prompt that asks if you want to install or uninstall.
-
-You can also change the default behavior of the script by modifying these lines near the beginning of the script:
-
-```bat
-call :set_uninstall 0
-call :set_unattended 0
-call :set_norestart 0
-```
+- `/NORESTART` - Automatically declines rebooting after the setup finishes.
+- `/UNATTENDED` - Skips all prompts for user interaction, and automatically restarts unless `/NORESTART` is also specified.
 
 ## How it works
 

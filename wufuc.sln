@@ -10,9 +10,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		appveyor.yml = appveyor.yml
 		CONTRIBUTING.md = CONTRIBUTING.md
+		setup-batch\install_wufuc.bat = setup-batch\install_wufuc.bat
 		LICENSE = LICENSE
 		README.md = README.md
-		setup-batch\setup_wufuc.bat = setup-batch\setup_wufuc.bat
+		setup-batch\uninstall_wufuc.bat = setup-batch\uninstall_wufuc.bat
 	EndProjectSection
 EndProject
 Global
