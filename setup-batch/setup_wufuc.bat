@@ -15,6 +15,10 @@ title wufuc installer
 :: You should have received a copy of the GNU General Public License
 :: along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+call :set_uninstall 0
+call :set_unattended 0
+call :set_norestart 0
+
 echo Copyright ^(C^) 2017 zeffy
 echo This program comes with ABSOLUTELY NO WARRANTY.
 echo This is free software, and you are welcome to redistribute it
@@ -26,9 +30,6 @@ fltmc >nul 2>&1 || (
     echo %~nx0 and select "Run as administrator".
     goto :die
 )
-call :set_uninstall 0
-call :set_unattended 0
-call :set_norestart 0
 
 :loop_args
 if [%1]==[] goto :check_requirements
