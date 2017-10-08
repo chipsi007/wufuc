@@ -21,34 +21,21 @@ echo This is free software, and you are welcome to redistribute it
 echo under certain conditions; see COPYING.txt for details.
 echo.
 
-call :set_uninstall 0
-call :set_unattended 0
-call :set_norestart 0
-
-:loop_args
-if [%1]==[] goto :check_admin
-if /I "%1"=="/UNINSTALL" call :set_uninstall 1
-if /I "%1"=="/UNATTENDED" call :set_unattended 1
-if /I "%1"=="/NORESTART" call :set_norestart 1
-shift /1
-goto :loop_args
-:set_uninstall
-        set "UNINSTALL=%~1"
-        exit /b
-:set_unattended
-        set "UNATTENDED=%~1"
-        exit /b
-:set_norestart
-        set "NORESTART=%~1"
-        exit /b
-        
-:check_admin
 fltmc >nul 2>&1 || (
         echo This batch script requires administrator privileges. Right-click on
         echo the script and select "Run as administrator".
         goto :die
 )
 
+:loop_args
+if [%1]==[] goto :check_requirements
+if /I "%1"=="/UNINSTALL" set "UNINSTALL=1"
+if /I "%1"=="/UNATTENDED" set "UNATTENDED=1"
+if /I "%1"=="/NORESTART" set "NORESTART=1"
+shift /1
+goto :loop_args
+        
+:check_requirements
 echo Checking system requirements...
 
 set "systemfolder=%systemroot%\System32"
@@ -192,7 +179,7 @@ goto :die
 :die
 echo.
 if "%UNATTENDED%"=="1" (
-        timeout /T 5 /NOBREAK
+        timeout /t 5 /nobreak
 ) else (
         echo Press any key to exit...
         pause >nul
