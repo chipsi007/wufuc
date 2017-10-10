@@ -5,18 +5,20 @@
     <ProjectGuid>8f75fc4a-22ff-4cda-8a09-3bc547e7c29b</ProjectGuid>
     <OutputType>msi</OutputType>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>wufuc_setup_ai.aip</StartupFile>
+    <StartupFile>wufuc_setup.aip</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <IsWindowsApplication>True</IsWindowsApplication>
-    <AssemblyName>wufuc_setup_ai</AssemblyName>
-    <Name>wufuc_setup_ai</Name>
-    <RootNamespace>wufuc_setup_ai</RootNamespace>
+    <AssemblyName>wufuc_setup</AssemblyName>
+    <Name>wufuc_setup</Name>
+    <RootNamespace>wufuc_setup</RootNamespace>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'DefaultBuild' " />
+  <PropertyGroup Condition=" '$(Configuration)' == 'x64' " />
+  <PropertyGroup Condition=" '$(Configuration)' == 'x86' " />
+  <PropertyGroup Condition=" '$(Configuration)' == 'All' " />
   <ItemGroup>
-    <Compile Include="wufuc_setup_ai.aip">
+    <Compile Include="wufuc_setup.aip">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

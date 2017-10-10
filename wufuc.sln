@@ -20,11 +20,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{65210B26-9B74-4B7E-B777-7A2EE4162595}"
 	ProjectSection(SolutionItems) = preProject
 		CONTRIBUTING.md = CONTRIBUTING.md
+		DONATIONS.md = DONATIONS.md
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{840C416C-B8F3-42BC-B0DD-F6BB14C9F8CB}") = "wufuc_setup_ai", "wufuc_setup_ai\wufuc_setup_ai.aiproj", "{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}"
+Project("{840C416C-B8F3-42BC-B0DD-F6BB14C9F8CB}") = "wufuc_setup", "wufuc_setup\wufuc_setup.aiproj", "{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,18 +49,18 @@ Global
 		{00F96695-CE41-4C2F-A344-6219DFB4F887}.Release|x64.Build.0 = Release|x64
 		{00F96695-CE41-4C2F-A344-6219DFB4F887}.Release|x86.ActiveCfg = Release|Win32
 		{00F96695-CE41-4C2F-A344-6219DFB4F887}.Release|x86.Build.0 = Release|Win32
-		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.Debug|x64.ActiveCfg = DefaultBuild
-		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.Debug|x64.Build.0 = DefaultBuild
-		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.Debug|x86.ActiveCfg = DefaultBuild
-		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.Debug|x86.Build.0 = DefaultBuild
-		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.DefaultBuild|x64.ActiveCfg = DefaultBuild
-		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.DefaultBuild|x64.Build.0 = DefaultBuild
-		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.DefaultBuild|x86.ActiveCfg = DefaultBuild
-		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.DefaultBuild|x86.Build.0 = DefaultBuild
-		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.Release|x64.ActiveCfg = DefaultBuild
-		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.Release|x64.Build.0 = DefaultBuild
-		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.Release|x86.ActiveCfg = DefaultBuild
-		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.Release|x86.Build.0 = DefaultBuild
+		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.Debug|x64.ActiveCfg = All
+		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.Debug|x64.Build.0 = All
+		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.Debug|x86.ActiveCfg = All
+		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.Debug|x86.Build.0 = All
+		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.DefaultBuild|x64.ActiveCfg = All
+		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.DefaultBuild|x64.Build.0 = All
+		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.DefaultBuild|x86.ActiveCfg = All
+		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.DefaultBuild|x86.Build.0 = All
+		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.Release|x64.ActiveCfg = All
+		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.Release|x64.Build.0 = All
+		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.Release|x86.ActiveCfg = All
+		{8F75FC4A-22FF-4CDA-8A09-3BC547E7C29B}.Release|x86.Build.0 = All
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
