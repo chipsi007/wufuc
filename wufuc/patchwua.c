@@ -58,7 +58,7 @@ bool patch_wua(void *lpBaseOfDll, size_t SizeOfImage, wchar_t *fname)
                 if ( *pba == TRUE ) {
                         if ( VirtualProtect(pba, sizeof(BOOL), PAGE_READWRITE, &flOldProtect) ) {
                                 *pba = FALSE;
-                                trace(L"Patched value a at %ls!%p: %08X", fname, pba, *pba);
+                                trace(L"Patched value #1 at %ls!%p: %08X", fname, pba, *pba);
                                 if ( !VirtualProtect(pba, sizeof(BOOL), flOldProtect, &flOldProtect) )
                                         trace(L"Failed to restore memory region permissions at %ls!%p (error code=%08X)", fname, pba, GetLastError());
                         } else trace(L"Failed to change memory region permissions at %ls!%p (error code=%08X)", fname, pba, GetLastError());
@@ -66,7 +66,7 @@ bool patch_wua(void *lpBaseOfDll, size_t SizeOfImage, wchar_t *fname)
                 if ( *pbb == FALSE ) {
                         if ( VirtualProtect(pbb, sizeof(BOOL), PAGE_READWRITE, &flOldProtect) ) {
                                 *pbb = TRUE;
-                                trace(L"Patched value b at %ls!%p: %08X", fname, pbb, *pbb);
+                                trace(L"Patched value #2 at %ls!%p: %08X", fname, pbb, *pbb);
                                 if ( !VirtualProtect(pbb, sizeof(BOOL), flOldProtect, &flOldProtect) )
                                         trace(L"Failed to restore memory region permissions at %ls!%p: (error code=%08X)", fname, pbb, GetLastError());
                         } else trace(L"Failed to change memory region permissions at %ls!%p (error code=%08X)", fname, pbb, GetLastError());
