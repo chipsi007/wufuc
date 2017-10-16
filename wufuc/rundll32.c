@@ -7,7 +7,7 @@ void CALLBACK RUNDLL32_DeleteFileW(HWND hwnd, HINSTANCE hinst, LPWSTR lpszCmdLin
         wchar_t **argv = CommandLineToArgvW(lpszCmdLine, &argc);
 
         if ( argv ) {
-                if ( !DeleteFileW(argv[0]) 
+                if ( !DeleteFileW(argv[0])
                         && GetLastError() == ERROR_ACCESS_DENIED )
                         MoveFileExW(argv[0], NULL, MOVEFILE_DELAY_UNTIL_REBOOT);
 

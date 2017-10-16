@@ -1,6 +1,6 @@
 # Contributing guidelines
 
-**English** | [русский](../../wiki/CONTRIBUTING-(русский)) | [Français](../../wiki/CONTRIBUTING-(Français)) | [Deutsch](../../wiki/CONTRIBUTING-(Deutsch)) | [Magyar](../../wiki/CONTRIBUTING-(Magyar)) | [Português Brasileiro](../../wiki/CONTRIBUTING-(Português-Brasileiro)) | [Italiano](../../wiki/CONTRIBUTING-(Italiano))
+**English** | [русский](../../wiki/CONTRIBUTING-(русский)) | [Français](../../wiki/CONTRIBUTING-(Français)) | [Deutsch](../../wiki/CONTRIBUTING-(Deutsch)) | [Magyar](../../wiki/CONTRIBUTING-(Magyar)) | [Português Brasileiro](../../wiki/CONTRIBUTING-(Português-Brasileiro)) | [Italiano](../../wiki/CONTRIBUTING-(Italiano)) | [Español](../../wiki/CONTRIBUTING-(Español))
 
 ## Reporting an issue [![](https://isitmaintained.com/badge/resolution/zeffy/wufuc.svg)](https://isitmaintained.com/project/zeffy/wufuc)
 
