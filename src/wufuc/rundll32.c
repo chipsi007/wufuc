@@ -30,7 +30,7 @@ void CALLBACK RUNDLL32_StartW(HWND hwnd,
         size_t count;
         DWORD ret;
         size_t index;
-        size_t crashes;
+        size_t crashes = 0;
 
         if ( !ptrlist_create(&list, 0, MAXIMUM_WAIT_OBJECTS) ) return;
 
