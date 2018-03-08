@@ -1,15 +1,23 @@
 #include "stdafx.h"
-#include "context.h"
 #include "callbacks.h"
+#include "eventhelper.h"
 #include "log.h"
 #include "modulehelper.h"
+#include "mutexhelper.h"
+#include "ptrlist.h"
 #include "registryhelper.h"
 #include "servicehelper.h"
 #include "wufuc.h"
 
-void CALLBACK RUNDLL32_StartW(HWND hwnd, HINSTANCE hinst, LPWSTR lpszCmdLine, int nCmdShow)
+const wchar_t m_szUnloadEventName[] = L"Global\\wufuc_UnloadEvent";
+
+void CALLBACK RUNDLL32_StartW(HWND hwnd,
+        HINSTANCE hinst,
+        LPWSTR lpszCmdLine,
+        int nCmdShow)
 {
-        context ctx;
+        ptrlist_t list;
+        HANDLE hEvent;
         DWORD dwDesiredAccess;
         DWORD dwProcessId;
         bool Unloading = false;
@@ -17,21 +25,29 @@ void CALLBACK RUNDLL32_StartW(HWND hwnd, HINSTANCE hinst, LPWSTR lpszCmdLine, in
         SC_HANDLE hSCM;
         SC_HANDLE hService;
         SERVICE_NOTIFYW NotifyBuffer;
-        DWORD count;
+        void **values;
+        uint32_t *tags;
+        size_t count;
         DWORD ret;
-        HANDLE handle;
-        DWORD tag;
+        size_t index;
+        size_t crashes;
 
-        if ( !ctx_create(&ctx,
-                L"Global\\25020063-b5a7-4227-9fdf-25cb75e8c645", 0,
-                L"Global\\wufuc_UnloadEvent", L"D:(A;;0x001F0003;;;BA)", 0) )
-                return;
+        if ( !ptrlist_create(&list, 0, MAXIMUM_WAIT_OBJECTS) ) return;
+
+        g_hMainMutex = mutex_create_new(true,
+                L"Global\\25020063-b5a7-4227-9fdf-25cb75e8c645");
+        if ( !g_hMainMutex ) goto destroy_list;
+
+        hEvent = event_create_with_string_security_descriptor(
+                true, false, m_szUnloadEventName, L"D:(A;;0x001F0003;;;BA)");
+        if ( !hEvent ) goto release_mutex;
+        if ( !ptrlist_add(&list, hEvent, 0) ) goto set_event;
 
         dwDesiredAccess = SERVICE_QUERY_STATUS | SERVICE_QUERY_CONFIG;
         do {
                 Lagging = false;
                 hSCM = OpenSCManagerW(NULL, NULL, SC_MANAGER_ENUMERATE_SERVICE);
-                if ( !hSCM ) goto delete_ctx;
+                if ( !hSCM ) goto set_event;
 
                 hService = OpenServiceW(hSCM, L"wuauserv", dwDesiredAccess);
                 if ( !hService ) goto close_scm;
@@ -41,41 +57,59 @@ void CALLBACK RUNDLL32_StartW(HWND hwnd, HINSTANCE hinst, LPWSTR lpszCmdLine, in
 
                         dwProcessId = svc_heuristic_process_id(hSCM, hService);
                         if ( dwProcessId )
-                                wufuc_inject(dwProcessId, (LPTHREAD_START_ROUTINE)cb_start, &ctx);
+                                wufuc_inject(dwProcessId, (LPTHREAD_START_ROUTINE)cb_start, &list);
                 }
                 ZeroMemory(&NotifyBuffer, sizeof NotifyBuffer);
                 NotifyBuffer.dwVersion = SERVICE_NOTIFY_STATUS_CHANGE;
                 NotifyBuffer.pfnNotifyCallback = (PFN_SC_NOTIFY_CALLBACK)cb_service_notify;
-                NotifyBuffer.pContext = (PVOID)&ctx;
+                NotifyBuffer.pContext = (PVOID)&list;
                 while ( !Unloading && !Lagging ) {
                         switch ( NotifyServiceStatusChangeW(hService,
                                 SERVICE_NOTIFY_START_PENDING | SERVICE_NOTIFY_RUNNING,
                                 &NotifyBuffer) ) {
                         case ERROR_SUCCESS:
-                                count = ctx_wait_any(&ctx, true, &ret, &handle, &tag);
-                                if ( count == -1 ) {
-                                        // Wait function failed while making static copy of handles/tags, wtf!
+                                if ( !ptrlist_copy(&list, &values, &tags, &count) ) {
                                         Unloading = true;
                                         break;
-                                } else if ( ret == WAIT_OBJECT_0 + 1 ) {
-                                        trace(L"Unload event was signaled!");
-                                        Unloading = true;
-                                        break;
-                                } else if ( (ret >= ERROR_ABANDONED_WAIT_0 || ret < WAIT_ABANDONED_0 + count) ) {
-                                        g_ServiceHostCrashCount++;
-                                        trace(L"A process that wufuc injected into has crashed %Iu times!!! PID=%lu",
-                                                g_ServiceHostCrashCount, tag);
+                                }
+                                ret = WaitForMultipleObjectsEx((DWORD)count,
+                                        values, FALSE, INFINITE, TRUE);
 
-                                        ReleaseMutex(handle); // release the abandoned mutex
-                                        ctx_close_and_remove_handle(&ctx, handle);
-                                        if ( g_ServiceHostCrashCount >= WUFUC_CRASH_THRESHOLD ) {
+                                if ( ret >= WAIT_OBJECT_0 && ret < WAIT_OBJECT_0 + count ) {
+                                        // object signaled
+                                        index = ret - WAIT_OBJECT_0;
+
+                                        if ( index == 0 ) { // Unload event
+                                                Unloading = true;
+                                                break;
+                                        } else { // crash mutex was closed but the process didn't crash
+                                                ptrlist_remove(&list, values[index]);
+                                                ReleaseMutex(values[index]);
+                                                CloseHandle(values[index]);
+                                        }
+                                } else if ( ret >= WAIT_ABANDONED_0 && ret < WAIT_ABANDONED_0 + count ) {
+                                        // object abandoned
+                                        // crash mutex was abandoned, process has most likely crashed.
+                                        index = ret - WAIT_ABANDONED_0;
+
+                                        ptrlist_remove(&list, values[index]);
+                                        ReleaseMutex(values[index]);
+                                        CloseHandle(values[index]);
+
+                                        crashes++;
+                                        trace(L"A process that wufuc injected into has crashed %Iu time%ls!!! (PID=%lu)",
+                                                crashes, crashes != 1 ? L"s" : L"", tags[index]);
+
+                                        if ( crashes >= SVCHOST_CRASH_THRESHOLD ) {
                                                 trace(L"Crash threshold has been reached, disabling wufuc until next reboot!");
                                                 Unloading = true;
                                         }
                                 } else if ( ret == WAIT_FAILED ) {
-                                        trace(L"Wait failed! GLE=%lu", GetLastError());
+                                        trace(L"WTF - Unexpected result from wait function!!!");
                                         Unloading = true;
                                 }
+                                free(values);
+                                free(tags);
                                 break;
                         case ERROR_SERVICE_NOTIFY_CLIENT_LAGGING:
                                 trace(L"Client lagging!");
@@ -90,15 +124,25 @@ void CALLBACK RUNDLL32_StartW(HWND hwnd, HINSTANCE hinst, LPWSTR lpszCmdLine, in
 close_scm:
                 CloseServiceHandle(hSCM);
         } while ( Lagging );
-delete_ctx:
-        ctx_delete(&ctx);
+set_event:
+        // signal event in case it is open in any other processes
+        SetEvent(hEvent);
+release_mutex:
+        ReleaseMutex(g_hMainMutex);
+destroy_list:
+        ptrlist_for_each_stdcall(&list, CloseHandle);
+        ptrlist_destroy(&list);
 }
 
-void CALLBACK RUNDLL32_UnloadW(HWND hwnd, HINSTANCE hinst, LPWSTR lpszCmdLine, int nCmdShow)
+void CALLBACK RUNDLL32_UnloadW(
+        HWND hwnd,
+        HINSTANCE hinst,
+        LPWSTR lpszCmdLine,
+        int nCmdShow)
 {
         HANDLE hEvent;
 
-        hEvent = OpenEventW(EVENT_MODIFY_STATE, FALSE, L"Global\\wufuc_UnloadEvent");
+        hEvent = OpenEventW(EVENT_MODIFY_STATE, FALSE, m_szUnloadEventName);
         if ( hEvent ) {
                 SetEvent(hEvent);
                 CloseHandle(hEvent);

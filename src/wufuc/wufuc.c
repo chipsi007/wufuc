@@ -1,38 +1,97 @@
 #include "stdafx.h"
-#include "context.h"
+#include "ptrlist.h"
 #include "wufuc.h"
 #include "hooks.h"
 #include "log.h"
 #include "modulehelper.h"
+#include "mutexhelper.h"
 #include "patternfind.h"
 #include "versionhelper.h"
 
 #include <minhook.h>
 
-size_t g_ServiceHostCrashCount;
+HANDLE g_hMainMutex;
 
-bool wufuc_inject(DWORD dwProcessId,
-        LPTHREAD_START_ROUTINE pfnStart,
-        context *pContext)
+bool close_remote_handle(HANDLE hProcess, HANDLE hObject)
 {
         bool result = false;
-        HANDLE hProcess;
-        HANDLE hMutex;
-        context ctx;
+        DWORD ExitCode;
+        HANDLE hThread;
 
-        if ( !ctx_add_new_mutex_fmt(pContext,
-                false,
-                dwProcessId,
-                &hMutex,
-                L"Global\\%08x-7132-44a8-be15-56698979d2f3", dwProcessId) )
-                return false;
+        hThread = CreateRemoteThread(hProcess,
+                NULL,
+                0,
+                (LPTHREAD_START_ROUTINE)CloseHandle,
+                (LPVOID)hObject,
+                0,
+                NULL);
+        if ( hThread ) {
+                if ( WaitForSingleObject(hThread, INFINITE) == WAIT_OBJECT_0
+                        && GetExitCodeThread(hThread, &ExitCode) ) {
+
+                        result = !!ExitCode;
+                }
+                CloseHandle(hThread);
+        }
+        return result;
+}
+
+bool wufuc_inject(DWORD dwProcessId,
+        LPTHREAD_START_ROUTINE pStartAddress,
+        ptrlist_t *list)
+{
+        bool result = false;
+        HANDLE hCrashMutex;
+        HANDLE hProcess;
+        HANDLE h;
+        HANDLE hProceedEvent;
+        HANDLE p[4];
+
+        hCrashMutex = mutex_create_new_fmt(false, L"Global\\wufuc_CrashMutex*%08x", dwProcessId);
+        if ( !hCrashMutex ) return result;
+        if ( !ptrlist_add(list, hCrashMutex, dwProcessId) )
+                goto close_mutex;
+
+        hProceedEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
+        if ( !hProceedEvent ) goto close_mutex;
 
         hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwProcessId);
-        if ( !hProcess ) return false;
+        if ( !hProcess ) goto close_pevent;
 
-        result = ctx_duplicate_context(pContext, hProcess, &ctx, hMutex, DUPLICATE_SAME_ACCESS, dwProcessId)
-                && mod_inject_and_begin_thread(hProcess, PIMAGEBASE, pfnStart, &ctx, sizeof ctx);
+        h = GetCurrentProcess();
+        if ( !DuplicateHandle(h, g_hMainMutex, hProcess, &p[0], SYNCHRONIZE, FALSE, 0) )
+                goto close_process;
+        if ( !DuplicateHandle(h, ptrlist_at(list, 0, NULL), hProcess, &p[1], SYNCHRONIZE, FALSE, 0) )
+                goto close_p0;
+        if ( !DuplicateHandle(h, hCrashMutex, hProcess, &p[2], 0, FALSE, DUPLICATE_SAME_ACCESS) )
+                goto close_p1;
+        if ( !DuplicateHandle(h, hProceedEvent, hProcess, &p[3], EVENT_MODIFY_STATE, FALSE, 0) )
+                goto close_p2;
+
+        result = mod_inject_and_begin_thread(hProcess, PIMAGEBASE, pStartAddress, p, sizeof p);
+
+        if ( result ) {
+                // wait for injected thread to signal that it has taken
+                // ownership of hCrashMutex before proceeding.
+                result = WaitForSingleObject(hProceedEvent, 5000) != WAIT_TIMEOUT;
+        } else {
+                close_remote_handle(hProcess, p[3]);
+close_p2:
+                close_remote_handle(hProcess, p[2]);
+close_p1:
+                close_remote_handle(hProcess, p[1]);
+close_p0:
+                close_remote_handle(hProcess, p[0]);
+        }
+close_process:
         CloseHandle(hProcess);
+close_pevent:
+        CloseHandle(hProceedEvent);
+        if ( !result ) {
+close_mutex:
+                ptrlist_remove(list, hCrashMutex);
+                CloseHandle(hCrashMutex);
+        }
         return result;
 }
 
@@ -50,6 +109,7 @@ bool wufuc_hook(HMODULE hModule)
         VS_FIXEDFILEINFO *pffi;
         MODULEINFO modinfo;
         size_t offset;
+        LPVOID pTarget;
 
         if ( !ver_verify_windows_7_sp1() && !ver_verify_windows_8_1() )
                 return false;
@@ -85,11 +145,11 @@ bool wufuc_hook(HMODULE hModule)
                         trace(L"Failed to allocate version information from hmodule.");
                         break;
                 }
-                trace(L"Windows Update Agent version: %hu.%hu.%hu.%hu"),
+                trace(L"Windows Update Agent version: %hu.%hu.%hu.%hu",
                         HIWORD(pffi->dwProductVersionMS),
                         LOWORD(pffi->dwProductVersionMS),
                         HIWORD(pffi->dwProductVersionLS),
-                        LOWORD(pffi->dwProductVersionLS);
+                        LOWORD(pffi->dwProductVersionLS));
 
                 // assure wuaueng.dll is at least the minimum supported version
                 tmp = ((ver_verify_windows_7_sp1() && ver_compare_product_version(pffi, 7, 6, 7601, 23714) != -1)
@@ -113,10 +173,9 @@ bool wufuc_hook(HMODULE hModule)
 #endif
                 );
                 if ( offset != -1 ) {
-                        result = MH_CreateHook(
-                                RtlOffsetToPointer(modinfo.lpBaseOfDll, offset),
-                                IsDeviceServiceable_hook,
-                                NULL) == MH_OK;
+                        pTarget = (LPVOID)RtlOffsetToPointer(modinfo.lpBaseOfDll, offset);
+                        MH_CreateHook(pTarget, IsDeviceServiceable_hook, NULL);
+                        result = (MH_EnableHook(pTarget) == MH_OK);
                 } else {
                         trace(L"Could not locate pattern offset!");
                 }

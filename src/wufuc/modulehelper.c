@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "modulehelper.h"
+#include "log.h"
 
 HMODULE mod_get_from_th32_snapshot(HANDLE hSnapshot, const wchar_t *pLibFileName)
 {
@@ -61,7 +62,7 @@ bool mod_inject_and_begin_thread(
 virt_free:
         if ( !result && pBaseAddress )
                 VirtualFreeEx(hProcess, pBaseAddress, 0, MEM_RELEASE);
-resume_process: 
+resume_process:
         NtResumeProcess(hProcess);
         return result;
 }
@@ -148,9 +149,9 @@ bool mod_inject(
                 result = GetExitCodeThread(hThread, (LPDWORD)phRemoteModule) != FALSE;
         }
         CloseHandle(hThread);
-virt_free:  
+virt_free:
         VirtualFreeEx(hProcess, pBaseAddress, 0, MEM_RELEASE);
-resume_process: 
+resume_process:
         NtResumeProcess(hProcess);
         return result;
 }

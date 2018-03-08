@@ -20,7 +20,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="callbacks.h" />
-    <ClInclude Include="context.h" />
+    <ClInclude Include="eventhelper.h" />
+    <ClInclude Include="mutexhelper.h" />
+    <ClInclude Include="ptrlist.h" />
     <ClInclude Include="log.h" />
     <ClInclude Include="modulehelper.h" />
     <ClInclude Include="registryhelper.h" />
@@ -34,11 +36,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="callbacks.c" />
-    <ClCompile Include="context.c" />
     <ClCompile Include="dllmain.c" />
+    <ClCompile Include="eventhelper.c" />
+    <ClCompile Include="ptrlist.c" />
     <ClCompile Include="modulehelper.c" />
     <ClCompile Include="registryhelper.c" />
     <ClCompile Include="servicehelper.c" />
+    <ClCompile Include="mutexhelper.c" />
     <ClCompile Include="versionhelper.c" />
     <ClCompile Include="hooks.c" />
     <ClCompile Include="log.c" />

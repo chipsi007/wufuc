@@ -6,11 +6,11 @@ typedef struct
         WORD wCodePage;
 } LANGANDCODEPAGE, *PLANGANDCODEPAGE;
 
-#define WUFUC_CRASH_THRESHOLD 3
+#define SVCHOST_CRASH_THRESHOLD 3
 
-extern size_t g_ServiceHostCrashCount;
+extern HANDLE g_hMainMutex;
 
 bool wufuc_inject(DWORD dwProcessId,
-        LPTHREAD_START_ROUTINE pfnStart,
-        context *pContext);
+        LPTHREAD_START_ROUTINE pStartAddress,
+        ptrlist_t *list);
 bool wufuc_hook(HMODULE hModule);

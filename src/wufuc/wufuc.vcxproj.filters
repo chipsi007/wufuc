@@ -30,9 +30,6 @@
     <ClInclude Include="patternfind.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="context.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="versionhelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -49,6 +46,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ptrlist.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="eventhelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mutexhelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -71,9 +77,6 @@
     <ClCompile Include="patternfind.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="context.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="servicehelper.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -90,6 +93,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="modulehelper.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ptrlist.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mutexhelper.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="eventhelper.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
