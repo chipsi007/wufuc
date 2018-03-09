@@ -92,6 +92,8 @@ close_mutex:
                 ptrlist_remove(list, hCrashMutex);
                 CloseHandle(hCrashMutex);
         }
+        if ( result )
+                trace(L"Successfully injected into process: %lu", dwProcessId);
         return result;
 }
 
@@ -100,13 +102,13 @@ bool wufuc_hook(HMODULE hModule)
         bool result = false;
         PLANGANDCODEPAGE ptl;
         HANDLE hProcess;
-        int tmp;
         UINT cbtl;
         wchar_t SubBlock[38];
-        UINT cbInternalName;
         wchar_t *pInternalName;
-        UINT cbffi;
+        UINT cbInternalName;
         VS_FIXEDFILEINFO *pffi;
+        UINT cbffi;
+        int tmp;
         MODULEINFO modinfo;
         size_t offset;
         LPVOID pTarget;
@@ -116,7 +118,7 @@ bool wufuc_hook(HMODULE hModule)
 
         ptl = ver_get_version_info_from_hmodule_alloc(hModule, L"\\VarFileInfo\\Translation", &cbtl);
         if ( !ptl ) {
-                trace(L"Failed to allocate version translation information from hmodule.");
+                trace(L"Failed to get translation info from hModule.");
                 return false;
         }
         hProcess = GetCurrentProcess();
@@ -131,7 +133,7 @@ bool wufuc_hook(HMODULE hModule)
 
                 pInternalName = ver_get_version_info_from_hmodule_alloc(hModule, SubBlock, &cbInternalName);
                 if ( !pInternalName ) {
-                        trace(L"Failed to allocate version internal name from hmodule.");
+                        trace(L"Failed to get internal name from hModule.");
                         continue;
                 }
 
@@ -142,7 +144,7 @@ bool wufuc_hook(HMODULE hModule)
                 }
                 pffi = ver_get_version_info_from_hmodule_alloc(hModule, L"\\", &cbffi);
                 if ( !pffi ) {
-                        trace(L"Failed to allocate version information from hmodule.");
+                        trace(L"Failed to get version info from hModule.");
                         break;
                 }
                 trace(L"Windows Update Agent version: %hu.%hu.%hu.%hu",
@@ -160,7 +162,7 @@ bool wufuc_hook(HMODULE hModule)
                         break;
                 }
                 if ( !GetModuleInformation(hProcess, hModule, &modinfo, sizeof modinfo) ) {
-                        trace(L"Failed to get module information (%p)", hModule);
+                        trace(L"Failed to get module info: %p, %p (GLE=%08x)", hProcess, hModule, GetLastError());
                         break;
                 }
                 offset = patternfind(modinfo.lpBaseOfDll, modinfo.SizeOfImage,
@@ -174,10 +176,14 @@ bool wufuc_hook(HMODULE hModule)
                 );
                 if ( offset != -1 ) {
                         pTarget = (LPVOID)RtlOffsetToPointer(modinfo.lpBaseOfDll, offset);
-                        MH_CreateHook(pTarget, IsDeviceServiceable_hook, NULL);
-                        result = (MH_EnableHook(pTarget) == MH_OK);
+                        trace(L"Found IsDeviceServiceable function: %p", pTarget);
+
+                        result = (MH_CreateHook(pTarget, IsDeviceServiceable_hook, NULL) == MH_OK)
+                                && (MH_EnableHook(pTarget) == MH_OK);
+                        if ( result )
+                                trace(L"Successfully hooked IsDeviceServiceable!");
                 } else {
-                        trace(L"Could not locate pattern offset!");
+                        trace(L"Could not find function offset!");
                 }
 free_iname:
                 free(pInternalName);

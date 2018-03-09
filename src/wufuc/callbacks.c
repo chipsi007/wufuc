@@ -12,7 +12,6 @@
 
 VOID CALLBACK cb_service_notify(PSERVICE_NOTIFYW pNotifyBuffer)
 {
-        trace(L"enter");
         switch ( pNotifyBuffer->dwNotificationStatus ) {
         case ERROR_SUCCESS:
                 if ( pNotifyBuffer->ServiceStatus.dwProcessId )
@@ -22,7 +21,7 @@ VOID CALLBACK cb_service_notify(PSERVICE_NOTIFYW pNotifyBuffer)
                                 (ptrlist_t *)pNotifyBuffer->pContext);
                 break;
         case ERROR_SERVICE_MARKED_FOR_DELETE:
-                SetEvent(ptrlist_at((ptrlist_t *)pNotifyBuffer->pContext, 1, NULL));
+                SetEvent(ptrlist_at((ptrlist_t *)pNotifyBuffer->pContext, 0, NULL));
                 break;
         }
         if ( pNotifyBuffer->pszServiceNames )
@@ -39,6 +38,7 @@ DWORD WINAPI cb_start(HANDLE *pParam)
         DWORD dwProcessId;
         LPQUERY_SERVICE_CONFIGW pServiceConfig;
         DWORD dwServiceType;
+        int tmp;
         LPVOID pTarget = NULL;
         wchar_t *str;
         HMODULE hModule;
@@ -72,11 +72,12 @@ DWORD WINAPI cb_start(HANDLE *pParam)
         dwProcessId = svc_heuristic_process_id(hSCM, hService);
         pServiceConfig = svc_query_config_alloc(hSCM, hService, NULL);
         dwServiceType = pServiceConfig->dwServiceType;
+        tmp = _wcsicmp(pServiceConfig->lpBinaryPathName, GetCommandLineW());
         free(pServiceConfig);
         CloseServiceHandle(hService);
         CloseServiceHandle(hSCM);
 
-        if ( dwProcessId != GetCurrentProcessId() ) {
+        if ( !tmp || dwProcessId != GetCurrentProcessId() ) {
                 trace(L"Injected into wrong process!");
                 goto release;
         }
@@ -86,12 +87,12 @@ DWORD WINAPI cb_start(HANDLE *pParam)
                 // RegQueryValueExW hook to fix incompatibility with
                 // UpdatePack7R2 and other patches that modify the
                 // Windows Update ServiceDll path in the registry.
-                trace(L"MH_CreateHookApi RegQueryValueExW=%hs", MH_StatusToString(MH_CreateHookApiEx(L"kernel32.dll",
+                MH_CreateHookApiEx(L"kernel32.dll",
                         "RegQueryValueExW",
                         RegQueryValueExW_hook,
                         &(PVOID)g_pfnRegQueryValueExW,
-                        &pTarget)));
-                trace(L"MH_EnableHook RegQueryValueExW=%hs", MH_StatusToString(MH_EnableHook(pTarget)));
+                        &pTarget);
+                MH_EnableHook(pTarget);
         }
 
         // query the ServiceDll path after applying our compat hook so that it
@@ -102,17 +103,17 @@ DWORD WINAPI cb_start(HANDLE *pParam)
         if ( !str ) {
 abort_hook:
                 if ( pTarget )
-                        trace(L"MH_RemoveHook RegQueryValueExW=%hs", MH_StatusToString(MH_RemoveHook(pTarget)));
+                        MH_RemoveHook(pTarget);
                 goto release;
         }
         g_pszWUServiceDll = env_expand_strings_alloc(str, NULL);
         free(str);
         if ( !g_pszWUServiceDll ) goto abort_hook;
 
-        trace(L"MH_CreateHookApi LoadLibraryExW=%hs", MH_StatusToString(MH_CreateHookApi(L"kernel32.dll",
+       MH_CreateHookApi(L"kernel32.dll",
                 "LoadLibraryExW",
                 LoadLibraryExW_hook,
-                &(PVOID)g_pfnLoadLibraryExW)));
+                &(PVOID)g_pfnLoadLibraryExW);
 
         if ( GetModuleHandleExW(0, g_pszWUServiceDll, &hModule)
                 || GetModuleHandleExW(0, PathFindFileNameW(g_pszWUServiceDll), &hModule) ) {
@@ -122,14 +123,14 @@ abort_hook:
                 FreeLibrary(hModule);
 
         }
-        trace(L"MH_EnableHook=%hs", MH_StatusToString(MH_EnableHook(MH_ALL_HOOKS)));
+        MH_EnableHook(MH_ALL_HOOKS);
 
         // wait for unload event or the main mutex to be released or abandoned,
         // for example if the user killed rundll32.exe with task manager.
         WaitForMultipleObjects(_countof(handles), handles, FALSE, INFINITE);
         trace(L"Unload condition has been met.");
 
-        trace(L"MH_DisableHook(MH_ALL_HOOKS) LoadLibraryExW=%hs", MH_StatusToString(MH_DisableHook(MH_ALL_HOOKS)));
+        MH_DisableHook(MH_ALL_HOOKS);
         free(g_pszWUServiceDll);
 release:
         ReleaseMutex(hCrashMutex);

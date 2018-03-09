@@ -19,29 +19,30 @@ void CALLBACK RUNDLL32_StartW(HWND hwnd,
         ptrlist_t list;
         HANDLE hEvent;
         DWORD dwDesiredAccess;
-        DWORD dwProcessId;
-        bool Unloading = false;
         bool Lagging;
         SC_HANDLE hSCM;
         SC_HANDLE hService;
+        DWORD dwProcessId;
         SERVICE_NOTIFYW NotifyBuffer;
+        bool Unloading = false;
+        DWORD e;
         void **values;
         uint32_t *tags;
         size_t count;
-        DWORD e;
         DWORD r;
         size_t index;
         size_t crashes = 0;
-
-        if ( !ptrlist_create(&list, 0, MAXIMUM_WAIT_OBJECTS) ) return;
+        bool Suspending = false;
 
         g_hMainMutex = mutex_create_new(true,
                 L"Global\\25020063-b5a7-4227-9fdf-25cb75e8c645");
-        if ( !g_hMainMutex ) goto destroy_list;
+        if ( !g_hMainMutex ) return;
+
+        if ( !ptrlist_create(&list, 0, MAXIMUM_WAIT_OBJECTS) ) goto release_mutex;
 
         hEvent = event_create_with_string_security_descriptor(
                 true, false, m_szUnloadEventName, L"D:(A;;0x001F0003;;;BA)");
-        if ( !hEvent ) goto release_mutex;
+        if ( !hEvent ) goto destroy_list;
         if ( !ptrlist_add(&list, hEvent, 0) ) goto set_event;
 
         dwDesiredAccess = SERVICE_QUERY_STATUS | SERVICE_QUERY_CONFIG;
@@ -100,15 +101,16 @@ void CALLBACK RUNDLL32_StartW(HWND hwnd,
                                                 CloseHandle(values[index]);
 
                                                 crashes++;
-                                                trace(L"A process that wufuc injected into has crashed %Iu time%ls!!! (PID=%lu)",
+                                                trace(L"A process wufuc injected into has crashed %Iu time%ls! (PID=%lu)",
                                                         crashes, crashes != 1 ? L"s" : L"", tags[index]);
 
                                                 if ( crashes >= SVCHOST_CRASH_THRESHOLD ) {
                                                         trace(L"Crash threshold has been reached, disabling wufuc until next reboot!");
                                                         Unloading = true;
+                                                        Suspending = true;
                                                 }
                                         } else if ( r == WAIT_FAILED ) {
-                                                trace(L"WTF - Unexpected result from wait function!!!");
+                                                trace(L"Wait function failed!");
                                                 Unloading = true;
                                         }
                                         free(values);
@@ -132,11 +134,15 @@ close_scm:
 set_event:
         // signal event in case it is open in any other processes
         SetEvent(hEvent);
-release_mutex:
-        ReleaseMutex(g_hMainMutex);
 destroy_list:
         ptrlist_for_each_stdcall(&list, CloseHandle);
         ptrlist_destroy(&list);
+
+        if ( Suspending )
+                NtSuspendProcess(GetCurrentProcess());
+release_mutex:
+        ReleaseMutex(g_hMainMutex);
+        CloseHandle(g_hMainMutex);
 }
 
 void CALLBACK RUNDLL32_UnloadW(
