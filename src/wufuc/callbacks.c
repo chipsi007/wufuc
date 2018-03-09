@@ -77,7 +77,7 @@ DWORD WINAPI cb_start(HANDLE *pParam)
         CloseServiceHandle(hService);
         CloseServiceHandle(hSCM);
 
-        if ( !tmp || dwProcessId != GetCurrentProcessId() ) {
+        if ( tmp || dwProcessId != GetCurrentProcessId() ) {
                 trace(L"Injected into wrong process!");
                 goto release;
         }
