@@ -60,6 +60,7 @@ DWORD WINAPI cb_start(HANDLE *pParam)
                 goto close_handles;
         }
         SetEvent(hProceedEvent);
+        CloseHandle(hProceedEvent);
 
         hSCM = OpenSCManagerW(NULL, NULL, SC_MANAGER_CONNECT);
         if ( !hSCM ) {
