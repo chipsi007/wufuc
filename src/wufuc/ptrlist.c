@@ -360,10 +360,18 @@ leave:
         return result;
 }
 
-void ptrlist_for_each_stdcall(ptrlist_t *list, void(__stdcall *f)(void *))
+void ptrlist_for(ptrlist_t *list, size_t index, size_t count, void(__cdecl *f)(void *))
 {
         ptrlist_lock(list);
-        ptrlist_for_stdcall(list, 0, list->count, f);
+        for ( size_t i = index; i < count; i++ )
+                f(list->values[i]);
+        ptrlist_unlock(list);
+}
+
+void ptrlist_for_each(ptrlist_t *list, void(__cdecl *f)(void *))
+{
+        ptrlist_lock(list);
+        ptrlist_for(list, 0, list->count, f);
         ptrlist_unlock(list);
 }
 
@@ -375,17 +383,9 @@ void ptrlist_for_stdcall(ptrlist_t *list, size_t index, size_t count, void(__std
         ptrlist_unlock(list);
 }
 
-void ptrlist_for_each_cdecl(ptrlist_t *list, void(__cdecl *f)(void *))
+void ptrlist_for_each_stdcall(ptrlist_t *list, void(__stdcall *f)(void *))
 {
         ptrlist_lock(list);
-        ptrlist_for_cdecl(list, 0, list->count, f);
-        ptrlist_unlock(list);
-}
-
-void ptrlist_for_cdecl(ptrlist_t *list, size_t index, size_t count, void(__cdecl *f)(void *))
-{
-        ptrlist_lock(list);
-        for ( size_t i = index; i < count; i++ )
-                f(list->values[i]);
+        ptrlist_for_stdcall(list, 0, list->count, f);
         ptrlist_unlock(list);
 }

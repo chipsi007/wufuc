@@ -28,7 +28,8 @@ void CALLBACK RUNDLL32_StartW(HWND hwnd,
         void **values;
         uint32_t *tags;
         size_t count;
-        DWORD ret;
+        DWORD e;
+        DWORD r;
         size_t index;
         size_t crashes = 0;
 
@@ -64,58 +65,62 @@ void CALLBACK RUNDLL32_StartW(HWND hwnd,
                 NotifyBuffer.pfnNotifyCallback = (PFN_SC_NOTIFY_CALLBACK)cb_service_notify;
                 NotifyBuffer.pContext = (PVOID)&list;
                 while ( !Unloading && !Lagging ) {
-                        switch ( NotifyServiceStatusChangeW(hService,
+                        e = NotifyServiceStatusChangeW(hService,
                                 SERVICE_NOTIFY_START_PENDING | SERVICE_NOTIFY_RUNNING,
-                                &NotifyBuffer) ) {
+                                &NotifyBuffer);
+                        switch ( e ) {
                         case ERROR_SUCCESS:
-                                if ( !ptrlist_copy(&list, &values, &tags, &count) ) {
-                                        Unloading = true;
-                                        break;
-                                }
-                                ret = WaitForMultipleObjectsEx((DWORD)count,
-                                        values, FALSE, INFINITE, TRUE);
-
-                                if ( ret >= WAIT_OBJECT_0 && ret < WAIT_OBJECT_0 + count ) {
-                                        // object signaled
-                                        index = ret - WAIT_OBJECT_0;
-
-                                        if ( index == 0 ) { // Unload event
+                                do {
+                                        if ( !ptrlist_copy(&list, &values, &tags, &count) ) {
                                                 Unloading = true;
                                                 break;
-                                        } else { // crash mutex was closed but the process didn't crash
+                                        }
+                                        r = WaitForMultipleObjectsEx((DWORD)count,
+                                                values, FALSE, INFINITE, TRUE);
+
+                                        if ( r >= WAIT_OBJECT_0 && r < WAIT_OBJECT_0 + count ) {
+                                                // object signaled
+                                                index = r - WAIT_OBJECT_0;
+                                                if ( !index ) {
+                                                        // Unload event
+                                                        Unloading = true;
+                                                } else {
+                                                        // crash mutex was released cleanly
+                                                        ptrlist_remove(&list, values[index]);
+                                                        ReleaseMutex(values[index]);
+                                                        CloseHandle(values[index]);
+                                                }
+                                        } else if ( r >= WAIT_ABANDONED_0 && r < WAIT_ABANDONED_0 + count ) {
+                                                // object abandoned
+                                                // crash mutex was abandoned, process has most likely crashed.
+                                                index = r - WAIT_ABANDONED_0;
+
                                                 ptrlist_remove(&list, values[index]);
                                                 ReleaseMutex(values[index]);
                                                 CloseHandle(values[index]);
-                                        }
-                                } else if ( ret >= WAIT_ABANDONED_0 && ret < WAIT_ABANDONED_0 + count ) {
-                                        // object abandoned
-                                        // crash mutex was abandoned, process has most likely crashed.
-                                        index = ret - WAIT_ABANDONED_0;
 
-                                        ptrlist_remove(&list, values[index]);
-                                        ReleaseMutex(values[index]);
-                                        CloseHandle(values[index]);
+                                                crashes++;
+                                                trace(L"A process that wufuc injected into has crashed %Iu time%ls!!! (PID=%lu)",
+                                                        crashes, crashes != 1 ? L"s" : L"", tags[index]);
 
-                                        crashes++;
-                                        trace(L"A process that wufuc injected into has crashed %Iu time%ls!!! (PID=%lu)",
-                                                crashes, crashes != 1 ? L"s" : L"", tags[index]);
-
-                                        if ( crashes >= SVCHOST_CRASH_THRESHOLD ) {
-                                                trace(L"Crash threshold has been reached, disabling wufuc until next reboot!");
+                                                if ( crashes >= SVCHOST_CRASH_THRESHOLD ) {
+                                                        trace(L"Crash threshold has been reached, disabling wufuc until next reboot!");
+                                                        Unloading = true;
+                                                }
+                                        } else if ( r == WAIT_FAILED ) {
+                                                trace(L"WTF - Unexpected result from wait function!!!");
                                                 Unloading = true;
                                         }
-                                } else if ( ret == WAIT_FAILED ) {
-                                        trace(L"WTF - Unexpected result from wait function!!!");
-                                        Unloading = true;
-                                }
-                                free(values);
-                                free(tags);
+                                        free(values);
+                                        free(tags);
+                                } while ( r != WAIT_IO_COMPLETION && !Unloading );
                                 break;
                         case ERROR_SERVICE_NOTIFY_CLIENT_LAGGING:
                                 trace(L"Client lagging!");
                                 Lagging = true;
                                 break;
                         default:
+                                trace(L"NotifyServiceStatusChange failed, return value: %lu (%08X)", e);
                                 Unloading = true;
                                 break;
                         }
