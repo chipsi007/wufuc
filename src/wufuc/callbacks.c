@@ -82,7 +82,6 @@ DWORD WINAPI cb_start(HANDLE *pParam)
                 goto release;
         }
 
-
         if ( dwServiceType == SERVICE_WIN32_SHARE_PROCESS ) {
                 // assume wuaueng.dll hasn't been loaded yet, apply
                 // RegQueryValueExW hook to fix incompatibility with
