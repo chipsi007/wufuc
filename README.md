@@ -2,7 +2,7 @@
 [![Donate Bitcoin](https://cdn.rawgit.com/zeffy/wufuc/badges/bitcoin.svg)](https://admin.gear.mycelium.com/gateways/3554/orders/new)
 [![AppVeyor Builds](https://img.shields.io/appveyor/ci/zeffy/wufuc.svg?logo=appveyor&style=flat-square)][AppVeyor]
 [![All Releases](https://img.shields.io/github/downloads/zeffy/wufuc/total.svg?style=flat-square)][Latest]
-[![Chat on Discord](https://discordapp.com/api/guilds/421524706043101194/widget.png)](https://discord.gg/G8PD2Wa)
+[![Chat on Discord](https://img.shields.io/discord/421524706043101194.svg?label=discord&logo=discord&colorA=7078C2&colorB=7B81D8&style=flat-square)](https://discord.gg/G8PD2Wa)
 
 [:de:] [:es:] [:fr:] [:it:] [:hungary:] [:brazil:] [:ru:] [:cn:] [:taiwan:]
 
