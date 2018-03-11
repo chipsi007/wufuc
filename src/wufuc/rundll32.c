@@ -139,7 +139,7 @@ destroy_list:
         ptrlist_destroy(&list);
 
         if ( Suspending )
-                NtSuspendProcess(GetCurrentProcess());
+                NtSuspendProcess(NtCurrentProcess());
 release_mutex:
         ReleaseMutex(g_hMainMutex);
         CloseHandle(g_hMainMutex);
