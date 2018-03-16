@@ -21,10 +21,10 @@
     <ROW Property="AiPreventAutoPin" Value="System.AppUserModel.ExcludeFromShowInNewInstall"/>
     <ROW Property="MSIFASTINSTALL" MultiBuildValue="x64Build:6#x86Build:6"/>
     <ROW Property="Manufacturer" Value="zeffy"/>
-    <ROW Property="ProductCode" Value="1027:{F4D292D2-CE8F-4908-80AF-CB48B3E560CF} 1028:{66D6B564-B289-4F83-98E0-4296CDE37CB9} 1031:{F4662CF2-7D9F-4370-B45F-ADB021733AF9} 1033:{0DAE2218-2FB5-4AD0-9558-FA2F1B1E5ABF} 1035:{7A1DE4CB-ED5F-4EA0-B262-137BB5CDF2BF} 1036:{B2D2636D-2170-457A-A876-051F227DEEA2} 1038:{9D2917A0-8F1E-4E0F-AE62-1938BD4CED0E} 1040:{3BD98571-9F20-44F8-9162-62D664860999} 1041:{64C167D2-432B-4B82-B5AF-AF795C78F4A1} 1042:{8EAAC0A1-89E3-46B8-B101-E149E87F04F4} 1043:{8AB22455-426B-4757-B640-30729411FD11} 1045:{1CC402B6-02FD-4E14-BE66-10A12FA99106} 1046:{9E7919D2-D6AF-4864-A6C3-028F759BF307} 1049:{8FA26981-B9FF-4505-B547-4EFA9B5241C8} 1060:{3992ECFB-F774-49FE-8B7A-9C2F7B52B271} 2052:{75CEB203-1CE4-4B6F-A9DF-18D8B902C6B8} 2070:{8B6326BE-B5FE-46F3-BD61-1AC95EB0C1CA} 3082:{D564C11C-4870-43C1-BD62-F71DFC45FBF2} " Type="16"/>
+    <ROW Property="ProductCode" Value="1027:{84169AC2-619B-4E39-ABAC-D97D0CCE52AA} 1028:{3242799A-EABC-4846-9FB2-9157464AC6B2} 1031:{15845A1D-9531-4B6B-B56E-93E56652876D} 1033:{02D77154-1789-4037-8157-4F9B400D184E} 1035:{2AB75127-0A1D-46C3-9939-7E1BEF4101F8} 1036:{E0275036-3F2B-44F3-BCDB-78C55071F41B} 1038:{66A9F4FC-8DB1-45AE-98A5-469F14DC2867} 1040:{A037A274-187E-4231-9857-17075F270D01} 1041:{8E027F22-470D-4800-B135-3661E11F1B2D} 1042:{0C7CB276-E4EB-4D99-BC4D-E362BD4AEA46} 1043:{DDD233EB-262F-42B5-BB37-61366CCB3AB7} 1045:{1008FE13-9C80-4061-BAF1-AFEFA3C322BE} 1046:{2C6C0A74-CDEE-4495-858D-EE570F1B14F0} 1049:{D86825C0-4294-441C-B200-3C7B1314FF10} 1060:{D475BE6D-DB4D-4783-8396-F96186694C6E} 2052:{BA2561A6-D217-400D-A2B0-A0AA07222A94} 2070:{3C2F9949-F866-45C9-BE0E-0D046934E2CF} 3082:{AB82F7D2-24EF-47C9-9978-A69CE1BE56B0} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="wufuc"/>
-    <ROW Property="ProductVersion" Value="1.0.0.0" Type="32" TargetFile="wufuc64.dll"/>
+    <ROW Property="ProductVersion" Value="1.0.0.191" Type="32" TargetFile="wufuc64.dll"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{4C52972C-251E-4D1B-AD09-EAA765719DCC}"/>
     <ROW Property="WindowsType9X" MultiBuildValue="x64Build:Windows 9x/ME#x86Build:Windows 9x/ME" ValueLocId="-"/>
@@ -55,7 +55,7 @@
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
     <ROW Component="COPYING" ComponentId="{6CA1ECA7-4C30-4BD0-A5E8-6B3E5BCBE31D}" Directory_="APPDIR" Attributes="0" KeyPath="COPYING" Type="0"/>
     <ROW Component="ProductInformation" ComponentId="{75030EAB-5C17-4F84-B529-28003271CA3F}" Directory_="APPDIR" Attributes="4" KeyPath="Version"/>
-    <ROW Component="Restore_wuauserv.reg" ComponentId="{5CE5C35B-6B0E-4EE4-B92C-7B1D9882DFC0}" Directory_="Troubleshooting_1_Dir" Attributes="0" KeyPath="Restore_wuauserv.reg" Type="0"/>
+    <ROW Component="Restore_wuauserv.reg" ComponentId="{ED9F90C5-1984-48DE-B109-4AF6F12A2E8F}" Directory_="Troubleshooting_1_Dir" Attributes="0" KeyPath="Restore_wuauserv.reg" Type="0"/>
     <ROW Component="SHORTCUTDIR" ComponentId="{910396A4-AFDD-4E57-BF00-2FDD4108AC61}" Directory_="SHORTCUTDIR" Attributes="0"/>
     <ROW Component="Troubleshooting" ComponentId="{D4F7163C-0FD7-4862-BF97-F1693236500C}" Directory_="Troubleshooting_Dir" Attributes="0"/>
     <ROW Component="X64FeatureItems" ComponentId="{0E189A37-1F40-4756-ACB9-6511067D5B47}" Directory_="X64FeatureItems_Dir" Attributes="0"/>
@@ -72,7 +72,7 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
     <ROW File="COPYING" Component_="COPYING" FileName="COPYING.txt" Attributes="0" SourcePath="..\..\COPYING" SelfReg="false" NextFile="Restore_wuauserv.reg"/>
-    <ROW File="Restore_wuauserv.reg" Component_="Restore_wuauserv.reg" FileName="RESTOR~1.REG|Restore_wuauserv.reg" Attributes="0" SourcePath="..\wufuc_setup_bat\Restore_wuauserv.reg" SelfReg="false"/>
+    <ROW File="Restore_wuauserv.reg" Component_="Restore_wuauserv.reg" FileName="RESTOR~1.REG|Restore_wuauserv.reg" Attributes="0" SourcePath="..\wufuc_setup_bat\Troubleshooting\Restore_wuauserv.reg" SelfReg="false"/>
     <ROW File="wufuc32.dll" Component_="wufuc32.dll" FileName="wufuc32.dll" Attributes="0" SourcePath="wufuc32.dll" SelfReg="false" NextFile="wufuc64.dll"/>
     <ROW File="wufuc64.dll" Component_="wufuc64.dll" FileName="wufuc64.dll" Attributes="0" SourcePath="wufuc64.dll" SelfReg="false" NextFile="COPYING"/>
   </COMPONENT>
@@ -313,7 +313,7 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
     <ROW Shortcut="License" Directory_="SHORTCUTDIR" Name="License" Component_="COPYING" Target="[#COPYING]" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
-    <ROW Shortcut="Openwufuclogfile" Directory_="Troubleshooting_Dir" Name="OPENWU~1|Open wufuc log file" Component_="Restore_wuauserv.reg" Target="[CommonAppDataFolder]wufuc\wufuc.log" Hotkey="0" IconIndex="0" ShowCmd="1"/>
+    <ROW Shortcut="Openwufuclogfile" Directory_="Troubleshooting_Dir" Name="OPENWU~1|Open wufuc log file" Component_="SHORTCUTDIR" Target="[CommonAppDataFolder]wufuc\wufuc.log" Hotkey="0" IconIndex="0" ShowCmd="1"/>
     <ROW Shortcut="Uninstallwufuc" Directory_="SHORTCUTDIR" Name="UNINST~2|Uninstall [|ProductName]" Component_="ProductInformation" Target="[SystemFolder]msiexec.exe" Arguments="/x [ProductCode]" Hotkey="0" Icon_="msiexec.exe" IconIndex="0" ShowCmd="1" CustomFlags="1"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiThemeComponent">
