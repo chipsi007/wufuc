@@ -93,7 +93,9 @@ close_mutex:
                 CloseHandle(hCrashMutex);
         }
         if ( result )
-                trace(L"Successfully injected into process: %lu", dwProcessId);
+                log_info(L"Successfully injected into process! (ProcessId=%lu)", dwProcessId);
+        else
+                log_warning(L"Failed to inject into process! (ProcessId=%lu)", dwProcessId);
         return result;
 }
 
@@ -108,17 +110,15 @@ bool wufuc_hook(HMODULE hModule)
         UINT cbInternalName;
         VS_FIXEDFILEINFO *pffi;
         UINT cbffi;
-        int tmp;
+        bool tmp;
         MODULEINFO modinfo;
         size_t offset;
-        LPVOID pTarget;
-
-        if ( !ver_verify_windows_7_sp1() && !ver_verify_windows_8_1() )
-                return false;
+        LPVOID pTarget = NULL;
+        MH_STATUS status;
 
         ptl = ver_get_version_info_from_hmodule_alloc(hModule, L"\\VarFileInfo\\Translation", &cbtl);
         if ( !ptl ) {
-                trace(L"Failed to get translation info from hModule.");
+                log_error(L"ver_get_version_info_from_hmodule_alloc failed!");
                 return false;
         }
         hProcess = GetCurrentProcess();
@@ -133,58 +133,58 @@ bool wufuc_hook(HMODULE hModule)
 
                 pInternalName = ver_get_version_info_from_hmodule_alloc(hModule, SubBlock, &cbInternalName);
                 if ( !pInternalName ) {
-                        trace(L"Failed to get internal name from hModule.");
+                        log_error(L"ver_get_version_info_from_hmodule_alloc failed!");
                         continue;
                 }
-
                 // identify wuaueng.dll by its resource data
                 if ( _wcsicmp(pInternalName, L"wuaueng.dll") ) {
-                        trace(L"Module internal name does not match. (%ls)", pInternalName);
+                        log_error(L"Module internal name does not match! (InternalName=%ls)", pInternalName);
                         goto free_iname;
                 }
                 pffi = ver_get_version_info_from_hmodule_alloc(hModule, L"\\", &cbffi);
                 if ( !pffi ) {
-                        trace(L"Failed to get version info from hModule.");
+                        log_error(L"ver_get_version_info_from_hmodule_alloc failed!");
                         break;
                 }
-                trace(L"Windows Update Agent version: %hu.%hu.%hu.%hu",
+                // assure wuaueng.dll version is supported
+                tmp = ((ver_verify_version_info(6, 1, 0) && ver_compare_product_version(pffi, 7, 6, 7601, 23714) != -1)
+                        || (ver_verify_version_info(6, 3, 0) && ver_compare_product_version(pffi, 7, 9, 9600, 18621) != -1));
+
+                log_info(L"%ls Windows Update Agent version: %hu.%hu.%hu.%hu",
+                        tmp ? L"Supported" : L"Unsupported",
                         HIWORD(pffi->dwProductVersionMS),
                         LOWORD(pffi->dwProductVersionMS),
                         HIWORD(pffi->dwProductVersionLS),
                         LOWORD(pffi->dwProductVersionLS));
-
-                // assure wuaueng.dll is at least the minimum supported version
-                tmp = ((ver_verify_windows_7_sp1() && ver_compare_product_version(pffi, 7, 6, 7601, 23714) != -1)
-                        || (ver_verify_windows_8_1() && ver_compare_product_version(pffi, 7, 9, 9600, 18621) != -1));
                 free(pffi);
-                if ( !tmp ) {
-                        trace(L"Windows Update Agent does not meet the minimum supported version.");
-                        break;
-                }
+                if ( !tmp ) break;
+
                 if ( !GetModuleInformation(hProcess, hModule, &modinfo, sizeof modinfo) ) {
-                        trace(L"Failed to get module info: %p, %p (GLE=%08x)", hProcess, hModule, GetLastError());
+                        log_error(L"GetModuleInformation failed! (hModule=%p, GLE=%lu)",
+                                hModule, GetLastError());
                         break;
                 }
                 offset = patternfind(modinfo.lpBaseOfDll, modinfo.SizeOfImage,
 #ifdef _WIN64
                         "FFF3 4883EC?? 33DB 391D???????? 7508 8B05????????"
 #else
-                        ver_verify_windows_7_sp1()
+                        ver_verify_version_info(6, 1, 0)
                         ? "833D????????00 743E E8???????? A3????????"
                         : "8BFF 51 833D????????00 7507 A1????????"
 #endif
                 );
                 if ( offset != -1 ) {
                         pTarget = (LPVOID)RtlOffsetToPointer(modinfo.lpBaseOfDll, offset);
-                        trace(L"Found IsDeviceServiceable function: %p", pTarget);
+                        log_info(L"Matched IsDeviceServiceable function! (Offset=%IX, Address=%p)", offset, pTarget);
 
-                        result = (MH_CreateHook(pTarget, IsDeviceServiceable_hook, NULL) == MH_OK)
-                                && (MH_EnableHook(pTarget) == MH_OK);
-                        if ( result )
-                                trace(L"Successfully hooked IsDeviceServiceable!");
-                } else {
-                        trace(L"Could not find function offset!");
-                }
+                        status = MH_CreateHook(pTarget, IsDeviceServiceable_hook, NULL);
+                        if ( status == MH_OK ) {
+                                status = MH_EnableHook(pTarget);
+                                if ( status == MH_OK )
+                                        log_info(L"Hooked IsDeviceServiceable! (Address=%p)", pTarget);
+                                else log_error(L"Failed to enable IsDeviceServiceable hook! (Status=%hs)", MH_StatusToString(status));
+                        } else log_error(L"Failed to create IsDeviceServiceable hook! (Status=%hs)", MH_StatusToString(status));
+                } else log_info(L"Couldn't match IsDeviceServiceable function! (Already patched?)");
 free_iname:
                 free(pInternalName);
                 break;

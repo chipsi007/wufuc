@@ -5,9 +5,11 @@
 #include "modulehelper.h"
 #include "registryhelper.h"
 #include "servicehelper.h"
+#include "versionhelper.h"
 #include "ptrlist.h"
 #include "wufuc.h"
 
+#include <VersionHelpers.h>
 #include <minhook.h>
 
 VOID CALLBACK cb_service_notify(PSERVICE_NOTIFYW pNotifyBuffer)
@@ -38,25 +40,30 @@ DWORD WINAPI cb_start(HANDLE *pParam)
         DWORD dwProcessId;
         LPQUERY_SERVICE_CONFIGW pServiceConfig;
         DWORD dwServiceType;
+        const wchar_t szKernel32Dll[] = L"kernel32.dll";
+        const wchar_t szKernelBaseDll[] = L"KernelBase.dll";
+        const wchar_t *pszModule;
+        MH_STATUS status;
         int tmp;
-        LPVOID pTarget = NULL;
+        LPVOID pv1 = NULL;
+        LPVOID pv2 = NULL;
         wchar_t *str;
         HMODULE hModule;
 
         if ( !pParam ) {
-                trace(L"Parameter argument is null!");
+                log_error(L"Parameter argument is null!");
                 goto unload;
         }
-
         handles[0] = pParam[0]; // main mutex
         handles[1] = pParam[1]; // unload event
         hCrashMutex = pParam[2]; // crash mutex
         hProceedEvent = pParam[3]; // proceed event
-        VirtualFree(pParam, 0, MEM_RELEASE);
+        if ( !VirtualFree(pParam, 0, MEM_RELEASE) )
+                log_warning(L"VirtualFree failed! (lpAddress=%p, GLE=%lu)", pParam, GetLastError());
 
         // acquire child mutex, this should be immediate.
         if ( WaitForSingleObject(hCrashMutex, 5000) != WAIT_OBJECT_0 ) {
-                trace(L"Failed to acquire child mutex within five seconds. (%p)", hCrashMutex);
+                log_error(L"Failed to acquire child mutex within five seconds. (%p)", hCrashMutex);
                 goto close_handles;
         }
         SetEvent(hProceedEvent);
@@ -64,12 +71,10 @@ DWORD WINAPI cb_start(HANDLE *pParam)
 
         hSCM = OpenSCManagerW(NULL, NULL, SC_MANAGER_CONNECT);
         if ( !hSCM ) {
-                trace(L"Failed to open SCM. (GetLastError=%lu)", GetLastError());
+                log_error(L"Failed to open SCM. (GetLastError=%lu)", GetLastError());
                 goto release;
         }
-
-        hService = OpenServiceW(hSCM, L"wuauserv",
-                SERVICE_QUERY_STATUS | SERVICE_QUERY_CONFIG);
+        hService = OpenServiceW(hSCM, L"wuauserv", SERVICE_QUERY_STATUS | SERVICE_QUERY_CONFIG);
         dwProcessId = svc_heuristic_process_id(hSCM, hService);
         pServiceConfig = svc_query_config_alloc(hSCM, hService, NULL);
         dwServiceType = pServiceConfig->dwServiceType;
@@ -79,23 +84,33 @@ DWORD WINAPI cb_start(HANDLE *pParam)
         CloseServiceHandle(hSCM);
 
         if ( tmp || dwProcessId != GetCurrentProcessId() ) {
-                trace(L"Injected into wrong process!");
+                log_error(L"Injected into wrong process!");
                 goto release;
         }
-
+        if ( !ver_verify_version_info(6, 1, 0) && !ver_verify_version_info(6, 3, 0) ) {
+                log_error(L"Unsupported operating system!");
+                goto release;
+        }
         if ( dwServiceType == SERVICE_WIN32_SHARE_PROCESS ) {
                 // assume wuaueng.dll hasn't been loaded yet, apply
                 // RegQueryValueExW hook to fix incompatibility with
                 // UpdatePack7R2 and other patches that modify the
                 // Windows Update ServiceDll path in the registry.
-                MH_CreateHookApiEx(L"kernel32.dll",
+                pszModule = IsWindows8OrGreater()
+                        ? szKernelBaseDll
+                        : szKernel32Dll;
+                status = MH_CreateHookApiEx(pszModule,
                         "RegQueryValueExW",
                         RegQueryValueExW_hook,
                         &(PVOID)g_pfnRegQueryValueExW,
-                        &pTarget);
-                MH_EnableHook(pTarget);
+                        &pv1);
+                if ( status == MH_OK ) {
+                        status = MH_EnableHook(pv1);
+                        if ( status == MH_OK )
+                                log_info(L"Hooked RegQueryValueExW! (Module=%ls, Address=%p)", pszModule, pv1);
+                        else log_error(L"Failed to enable RegQueryValueExW hook! (Status=%hs)", MH_StatusToString(status));
+                } else log_error(L"Failed to create RegQueryValueExW hook! (Status=%hs)", MH_StatusToString(status));
         }
-
         // query the ServiceDll path after applying our compat hook so that it
         // is correct
         str = (wchar_t *)reg_query_value_alloc(HKEY_LOCAL_MACHINE,
@@ -103,18 +118,25 @@ DWORD WINAPI cb_start(HANDLE *pParam)
                 L"ServiceDll", NULL, NULL);
         if ( !str ) {
 abort_hook:
-                if ( pTarget )
-                        MH_RemoveHook(pTarget);
+                if ( pv1 )
+                        MH_RemoveHook(pv1);
                 goto release;
         }
         g_pszWUServiceDll = env_expand_strings_alloc(str, NULL);
         free(str);
         if ( !g_pszWUServiceDll ) goto abort_hook;
 
-       MH_CreateHookApi(L"kernel32.dll",
+        status = MH_CreateHookApiEx(szKernelBaseDll,
                 "LoadLibraryExW",
                 LoadLibraryExW_hook,
-                &(PVOID)g_pfnLoadLibraryExW);
+                &(PVOID)g_pfnLoadLibraryExW,
+                &pv2);
+        if ( status == MH_OK ) {
+                status = MH_EnableHook(pv2);
+                if ( status == MH_OK )
+                        log_info(L"Hooked LoadLibraryExW! (Module=%ls, Address=%p)", szKernelBaseDll, pv2);
+                else log_error(L"Failed to enable LoadLibraryExW hook! (Status=%hs)", MH_StatusToString(status));
+        } else log_error(L"Failed to create LoadLibraryExW hook! (Status=%hs)", MH_StatusToString(status));
 
         if ( GetModuleHandleExW(0, g_pszWUServiceDll, &hModule)
                 || GetModuleHandleExW(0, PathFindFileNameW(g_pszWUServiceDll), &hModule) ) {
@@ -122,14 +144,11 @@ abort_hook:
                 // hook IsDeviceServiceable if wuaueng.dll is already loaded
                 wufuc_hook(hModule);
                 FreeLibrary(hModule);
-
         }
-        MH_EnableHook(MH_ALL_HOOKS);
-
         // wait for unload event or the main mutex to be released or abandoned,
         // for example if the user killed rundll32.exe with task manager.
         WaitForMultipleObjects(_countof(handles), handles, FALSE, INFINITE);
-        trace(L"Unload condition has been met.");
+        log_info(L"Unload condition has been met.");
 
         MH_DisableHook(MH_ALL_HOOKS);
         free(g_pszWUServiceDll);
@@ -140,7 +159,7 @@ close_handles:
         CloseHandle(handles[0]);
         CloseHandle(handles[1]);
 unload:
-        trace(L"Unloading wufuc and exiting thread.");
+        log_info(L"Unloading wufuc and exiting thread.");
         FreeLibraryAndExitThread(PIMAGEBASE, 0);
 }
 

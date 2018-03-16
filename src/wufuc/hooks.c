@@ -19,7 +19,7 @@ LSTATUS WINAPI RegQueryValueExW_hook(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpR
         ULONG ResultLength;
         PKEY_NAME_INFORMATION pkni;
         size_t NameCount;
-        int current;
+        unsigned int current;
         int pos;
         wchar_t *fname;
         const wchar_t realpath[] = L"%systemroot%\\system32\\wuaueng.dll";
@@ -30,7 +30,6 @@ LSTATUS WINAPI RegQueryValueExW_hook(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpR
         if ( lpData && lpcbData )
                 MaximumLength = *lpcbData;
         result = g_pfnRegQueryValueExW(hKey, lpValueName, lpReserved, lpType, lpData, lpcbData);
-
 
         if ( result != ERROR_SUCCESS
                 || !MaximumLength
@@ -51,7 +50,7 @@ LSTATUS WINAPI RegQueryValueExW_hook(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpR
         for ( size_t i = 0; i < NameCount; i++ )
                 pkni->Name[i] = towlower(pkni->Name[i]);
 
-        if ( _snwscanf_s(pkni->Name, NameCount, L"\\registry\\machine\\system\\controlset%03d\\services\\wuauserv\\parameters%n", &current, &pos) == 1
+        if ( _snwscanf_s(pkni->Name, NameCount, L"\\registry\\machine\\system\\controlset%03u\\services\\wuauserv\\parameters%n", &current, &pos) == 1
                 && pos == NameCount ) {
 
                 fname = PathFindFileNameW(pBuffer);
@@ -66,7 +65,7 @@ LSTATUS WINAPI RegQueryValueExW_hook(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpR
                                         && SUCCEEDED(StringCbCopyW(pBuffer, MaximumLength, expandedpath)) ) {
                                         
                                         *lpcbData = cchLength * (sizeof *expandedpath);
-                                        trace(L"Fixed path to Windows Update service library.");
+                                        log_info(L"Fixed path to Windows Update service library.");
                                 }
                                 free(expandedpath);
                         }
@@ -82,9 +81,10 @@ HMODULE WINAPI LoadLibraryExW_hook(LPCWSTR lpFileName, HANDLE hFile, DWORD dwFla
 
         result = g_pfnLoadLibraryExW(lpFileName, hFile, dwFlags);
         if ( !result ) return result;
-        trace(L"Loaded library: %ls (%p)", lpFileName, result);
+        log_debug(L"Loaded library: %ls (%p)", lpFileName, result);
 
-        if ( g_pszWUServiceDll
+        if ( dwFlags == LOAD_WITH_ALTERED_SEARCH_PATH
+                && g_pszWUServiceDll
                 && (!_wcsicmp(lpFileName, g_pszWUServiceDll)
                         || !_wcsicmp(lpFileName, PathFindFileNameW(g_pszWUServiceDll))) ) {
 
@@ -95,6 +95,6 @@ HMODULE WINAPI LoadLibraryExW_hook(LPCWSTR lpFileName, HANDLE hFile, DWORD dwFla
 
 BOOL WINAPI IsDeviceServiceable_hook(void)
 {
-        trace(L"Entered stub function.");
+        log_debug(L"Entered stub function.");
         return TRUE;
 }

@@ -35,7 +35,9 @@ Some people with older Intel and AMD processors are also affected! I've received
 - [Intel Atom D525](https://github.com/zeffy/wufuc/issues/34)
 - [Intel Core i5-M 560](https://github.com/zeffy/wufuc/issues/23)
 - [Intel Core i5-4300M](https://github.com/zeffy/wufuc/issues/24)
+- [Intel Core i7-4930K](https://github.com/zeffy/wufuc/issues/126)
 - [Intel Pentium B940](https://github.com/zeffy/wufuc/issues/63)
+- [AMD FX-6300](https://github.com/zeffy/wufuc/issues/135#issuecomment-367054217)
 - [AMD FX-8350](https://github.com/zeffy/wufuc/issues/32)
 - [AMD Turion 64 Mobile Technology ML-34](https://github.com/zeffy/wufuc/issues/80)
 

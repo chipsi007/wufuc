@@ -13,6 +13,20 @@
 
 These must be used from an elevated command line prompt.
 
+## How to restore Windows Update to its default configuration
+
+Windows Update by default is configured to run as `SERVICE_WIN32_SHARE_PROCESS`, which means it shares a single `svchost.exe` process with several other Windows services.
+It can also be configured as `SERVICE_WIN32_OWN_PROCESS`, which means it runs in its own process, which doesn't start until Windows Update does.
+
+Normally, either of these configurations is supported.
+
+However, if you have used another third-party solution for the CPU fix (such as UpdatePack7R2 or WuaCpuFix) either knowingly or unknowingly, wufuc will not function correctly if Windows Update is configured as `SERVICE_WIN32_OWN_PROCESS`.
+
+You have two ways to work around this limitation, either:
+
+- You can remove the other third-party solution yourself.
+- Alternatively, go to the directory that you installed wufuc to, open the `Troubleshooting` subdirectory, and merge the `Restore_wuauserv.reg` file with your registry by double-clicking it, and then restart your PC.
+
 ## How to manually remove wufuc v0.8.0.143 when it is impossible to uninstall it normally
 
 This applies exclusively to a very buggy version of wufuc that was only available for download for a short period of time, other versions are unaffected.

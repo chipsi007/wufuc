@@ -91,9 +91,9 @@ LPVOID ver_get_version_info_from_hmodule_alloc(HMODULE hModule, const wchar_t *p
 
 bool ver_verify_version_info(WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor)
 {
+        DWORDLONG dwlConditionMask = 0;
         OSVERSIONINFOEXW osvi = { sizeof osvi };
 
-        DWORDLONG dwlConditionMask = 0;
         VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, VER_EQUAL);
         VER_SET_CONDITION(dwlConditionMask, VER_MINORVERSION, VER_EQUAL);
         VER_SET_CONDITION(dwlConditionMask, VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL);
@@ -105,14 +105,4 @@ bool ver_verify_version_info(WORD wMajorVersion, WORD wMinorVersion, WORD wServi
         return VerifyVersionInfoW(&osvi,
                 VER_MAJORVERSION | VER_MINORVERSION | VER_SERVICEPACKMAJOR,
                 dwlConditionMask) != FALSE;
-}
-
-bool ver_verify_windows_7_sp1(void)
-{
-        return ver_verify_version_info(6, 1, 1);
-}
-
-bool ver_verify_windows_8_1(void)
-{
-        return ver_verify_version_info(6, 3, 0);
 }

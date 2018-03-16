@@ -134,7 +134,6 @@ goto :cancel
 
 :install
 call :uninstall
-net start Schedule
 schtasks /Create /XML "%wufuc_xml%" /TN "%wufuc_task%" /F
 schtasks /Change /TN "%wufuc_task%" /TR "'%systemroot%\System32\rundll32.exe' """%wufuc_dll_fullpath%""",RUNDLL32_Start"
 schtasks /Change /TN "%wufuc_task%" /ENABLE
@@ -166,8 +165,8 @@ goto :confirm_restart
         sfc /SCANFILE="%systemfolder%\wuaueng.dll"
 
         :: remove traces of wufuc 0.6-0.7, 0.9.999+
-        schtasks /Query /TN "%wufuc_task%" >nul 2>&1 && (
-        schtasks /Delete /TN "%wufuc_task%" /F )
+		net start Schedule
+        schtasks /Delete /TN "%wufuc_task%" /F
         rundll32 "%wufuc_dll_fullpath%",RUNDLL32_Unload
 
         :: remove traces of wufuc 0.8.x

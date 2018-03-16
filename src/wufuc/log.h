@@ -1,6 +1,17 @@
 #pragma once
 
-void logp_debug_write(const wchar_t *const format, ...);
-#define log_debug_write(format, ...) \
-        logp_debug_write(__FUNCTIONW__ L"(" _CRT_WIDE(_CRT_STRINGIZE(__LINE__)) L"): " format L"\r\n", ##__VA_ARGS__)
-#define trace log_debug_write
+typedef struct
+{
+        DWORD dwProcessId;
+        wchar_t szExeFilePath[MAX_PATH];
+        wchar_t *pszExeName;
+} ParamData;
+
+void log_debug_(const wchar_t *const format, ...);
+void log_trace_(const wchar_t *const format, ...);
+void log_close(void);
+
+#define log_debug(format, ...) log_debug_(__FUNCTIONW__ L"(" _CRT_WIDE(_CRT_STRINGIZE(__LINE__)) L"): [DEBUG] " format L"\r\n", ##__VA_ARGS__)
+#define log_info(format, ...) log_trace_(__FUNCTIONW__ L"(" _CRT_WIDE(_CRT_STRINGIZE(__LINE__)) L"): [INFO] " format L"\r\n", ##__VA_ARGS__)
+#define log_warning(format, ...) log_trace_(__FUNCTIONW__ L"(" _CRT_WIDE(_CRT_STRINGIZE(__LINE__)) L"): [WARNING] " format L"\r\n", ##__VA_ARGS__)
+#define log_error(format, ...) log_trace_(__FUNCTIONW__ L"(" _CRT_WIDE(_CRT_STRINGIZE(__LINE__)) L"): [ERROR] " format L"\r\n", ##__VA_ARGS__)

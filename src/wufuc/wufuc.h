@@ -7,7 +7,6 @@ typedef struct
 } LANGANDCODEPAGE, *PLANGANDCODEPAGE;
 
 #define SVCHOST_CRASH_THRESHOLD 3
-
 extern HANDLE g_hMainMutex;
 
 bool wufuc_inject(DWORD dwProcessId,

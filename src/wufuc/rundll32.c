@@ -101,16 +101,16 @@ void CALLBACK RUNDLL32_StartW(HWND hwnd,
                                                 CloseHandle(values[index]);
 
                                                 crashes++;
-                                                trace(L"A process wufuc injected into has crashed %Iu time%ls! (PID=%lu)",
+                                                log_warning(L"A process wufuc injected into has crashed %Iu time%ls! (ProcessId=%lu)",
                                                         crashes, crashes != 1 ? L"s" : L"", tags[index]);
 
                                                 if ( crashes >= SVCHOST_CRASH_THRESHOLD ) {
-                                                        trace(L"Crash threshold has been reached, disabling wufuc until next reboot!");
+                                                        log_error(L"Crash threshold has been reached, disabling wufuc until next reboot!");
                                                         Unloading = true;
                                                         Suspending = true;
                                                 }
                                         } else if ( r == WAIT_FAILED ) {
-                                                trace(L"Wait function failed!");
+                                                log_error(L"Wait function failed!");
                                                 Unloading = true;
                                         }
                                         free(values);
@@ -118,11 +118,11 @@ void CALLBACK RUNDLL32_StartW(HWND hwnd,
                                 } while ( r != WAIT_IO_COMPLETION && !Unloading );
                                 break;
                         case ERROR_SERVICE_NOTIFY_CLIENT_LAGGING:
-                                trace(L"Client lagging!");
+                                log_warning(L"Client lagging!");
                                 Lagging = true;
                                 break;
                         default:
-                                trace(L"NotifyServiceStatusChange failed, return value: %lu (%08X)", e);
+                                log_error(L"NotifyServiceStatusChange failed! (Return value=%lu)", e);
                                 Unloading = true;
                                 break;
                         }

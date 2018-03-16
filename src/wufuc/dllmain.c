@@ -16,6 +16,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
                 break;
         case DLL_PROCESS_DETACH:
                 MH_Uninitialize();
+                log_close();
                 break;
         }
         return TRUE;
