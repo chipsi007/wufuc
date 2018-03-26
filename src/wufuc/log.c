@@ -104,6 +104,8 @@ void log_trace_(const wchar_t *const format, ...)
         wchar_t *buf1;
         int ret;
         wchar_t *buf2;
+        int size;
+        char *buf3;
         DWORD written;
 
         bStatus = InitOnceExecuteOnce(&InitOnce,
@@ -135,11 +137,24 @@ void log_trace_(const wchar_t *const format, ...)
         buf2 = calloc(count + 1, sizeof *buf2);
         if ( !buf2 ) goto free_buf1;
 
-        ret = swprintf_s(buf2, count + 1, fmt, datebuf, timebuf, data.pszExeName, data.dwProcessId, buf1);
-        if ( ret == -1 ) goto free_buf2;
+        count = swprintf_s(buf2, count + 1, fmt, datebuf, timebuf, data.pszExeName, data.dwProcessId, buf1);
+        if ( count == -1 ) goto free_buf2;
 
-        if ( !bStatus || !WriteFile(m_hFile, buf2, count * (sizeof *buf2), &written, NULL) )
+        if ( bStatus ) {
+                size = WideCharToMultiByte(CP_UTF8, 0, buf2, count, NULL, 0, NULL, NULL);
+                if ( !size ) goto fallback;
+
+                buf3 = malloc(size);
+                if ( !buf3 ) goto fallback;
+
+                ret = WideCharToMultiByte(CP_UTF8, 0, buf2, count, buf3, size, NULL, NULL)
+                        && WriteFile(m_hFile, buf3, size, &written, NULL);
+                free(buf3);
+                if ( !ret ) goto fallback;
+        } else {
+fallback:
                 OutputDebugStringW(buf2);
+        }
 free_buf2:
         free(buf2);
 free_buf1:
