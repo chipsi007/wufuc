@@ -1,4 +1,4 @@
 #pragma once
 
-VOID CALLBACK cb_service_notify(PSERVICE_NOTIFYW pNotifyBuffer);
-DWORD WINAPI cb_start(HANDLE *pParam);
+VOID CALLBACK service_notify_callback(PSERVICE_NOTIFYW pNotifyBuffer);
+DWORD WINAPI thread_start_callback(HANDLE *pParam);

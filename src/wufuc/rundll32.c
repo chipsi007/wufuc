@@ -59,11 +59,11 @@ void CALLBACK RUNDLL32_StartW(HWND hwnd,
 
                         dwProcessId = svc_heuristic_process_id(hSCM, hService);
                         if ( dwProcessId )
-                                wufuc_inject(dwProcessId, (LPTHREAD_START_ROUTINE)cb_start, &list);
+                                wufuc_inject(dwProcessId, (LPTHREAD_START_ROUTINE)thread_start_callback, &list);
                 }
                 ZeroMemory(&NotifyBuffer, sizeof NotifyBuffer);
                 NotifyBuffer.dwVersion = SERVICE_NOTIFY_STATUS_CHANGE;
-                NotifyBuffer.pfnNotifyCallback = (PFN_SC_NOTIFY_CALLBACK)cb_service_notify;
+                NotifyBuffer.pfnNotifyCallback = (PFN_SC_NOTIFY_CALLBACK)service_notify_callback;
                 NotifyBuffer.pContext = (PVOID)&list;
                 while ( !Unloading && !Lagging ) {
                         e = NotifyServiceStatusChangeW(hService,

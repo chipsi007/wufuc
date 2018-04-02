@@ -9,7 +9,6 @@ wchar_t *g_pszWUServiceDll;
 
 LPFN_REGQUERYVALUEEXW g_pfnRegQueryValueExW;
 LPFN_LOADLIBRARYEXW g_pfnLoadLibraryExW;
-LPFN_ISDEVICESERVICEABLE g_pfnIsDeviceServiceable;
 
 LSTATUS WINAPI RegQueryValueExW_hook(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData)
 {
@@ -88,13 +87,7 @@ HMODULE WINAPI LoadLibraryExW_hook(LPCWSTR lpFileName, HANDLE hFile, DWORD dwFla
                 && (!_wcsicmp(lpFileName, g_pszWUServiceDll)
                         || !_wcsicmp(lpFileName, PathFindFileNameW(g_pszWUServiceDll))) ) {
 
-                wufuc_hook(result);
+                wufuc_patch(result);
         }
         return result;
-}
-
-BOOL WINAPI IsDeviceServiceable_hook(void)
-{
-        log_debug(L"Entered stub function.");
-        return TRUE;
 }

@@ -49,7 +49,7 @@ bool mod_inject_and_begin_thread(
                 hThread = CreateRemoteThread(hProcess,
                         NULL,
                         0,
-                        (LPTHREAD_START_ROUTINE)RtlOffsetToPointer(hRemoteModule, offset),
+                        OffsetToPointer(hRemoteModule, offset),
                         pBaseAddress,
                         0,
                         NULL);

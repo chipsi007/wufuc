@@ -57,6 +57,9 @@
     <ClInclude Include="mutexhelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resourcehelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="callbacks.c">
@@ -102,6 +105,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="eventhelper.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="resourcehelper.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

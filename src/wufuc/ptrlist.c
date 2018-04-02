@@ -46,7 +46,7 @@ bool ptrlist_create(ptrlist_t *list, size_t capacity, size_t maxCapacity)
         if ( tmp ) {
                 ZeroMemory(tmp, vsize + tsize);
                 list->values = tmp;
-                list->tags = (uint32_t *)RtlOffsetToPointer(tmp, vsize);
+                list->tags = OffsetToPointer(tmp, vsize);
                 list->capacity = c;
                 list->maxCapacity = maxCapacity;
                 list->count = 0;
@@ -129,7 +129,7 @@ bool ptrlist_add(ptrlist_t *list, void *value, uint32_t tag)
 
                 ZeroMemory(tmp1, vsize);
 
-                tmp2 = (uint32_t *)RtlOffsetToPointer(tmp1, vsize);
+                tmp2 = OffsetToPointer(tmp1, vsize);
                 ZeroMemory(tmp2, tsize);
 
                 if ( memmove_s(tmp1, vsize, list->values, list->count * (sizeof *list->values))

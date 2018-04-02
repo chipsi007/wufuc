@@ -1,10 +1,11 @@
 #pragma once
 
-typedef struct
+typedef struct _PATCHINFO
 {
-        WORD wLanguage;
-        WORD wCodePage;
-} LANGANDCODEPAGE, *PLANGANDCODEPAGE;
+        const char *pattern;
+        size_t off1;
+        size_t off2;
+} PATCHINFO;
 
 #define SVCHOST_CRASH_THRESHOLD 3
 extern HANDLE g_hMainMutex;
@@ -12,4 +13,4 @@ extern HANDLE g_hMainMutex;
 bool wufuc_inject(DWORD dwProcessId,
         LPTHREAD_START_ROUTINE pStartAddress,
         ptrlist_t *list);
-bool wufuc_hook(HMODULE hModule);
+void wufuc_patch(HMODULE hModule);

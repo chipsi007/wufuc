@@ -29,4 +29,4 @@
 
 extern IMAGE_DOS_HEADER __ImageBase;
 #define PIMAGEBASE ((HMODULE)&__ImageBase)
-
+#define OffsetToPointer(Base, Offset) ((void *)(((uint8_t *)(Base)) + ((ptrdiff_t)(Offset))))

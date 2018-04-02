@@ -12,14 +12,14 @@
 #include <VersionHelpers.h>
 #include <minhook.h>
 
-VOID CALLBACK cb_service_notify(PSERVICE_NOTIFYW pNotifyBuffer)
+VOID CALLBACK service_notify_callback(PSERVICE_NOTIFYW pNotifyBuffer)
 {
         switch ( pNotifyBuffer->dwNotificationStatus ) {
         case ERROR_SUCCESS:
                 if ( pNotifyBuffer->ServiceStatus.dwProcessId )
                         wufuc_inject(
                                 pNotifyBuffer->ServiceStatus.dwProcessId,
-                                (LPTHREAD_START_ROUTINE)cb_start,
+                                (LPTHREAD_START_ROUTINE)thread_start_callback,
                                 (ptrlist_t *)pNotifyBuffer->pContext);
                 break;
         case ERROR_SERVICE_MARKED_FOR_DELETE:
@@ -30,7 +30,7 @@ VOID CALLBACK cb_service_notify(PSERVICE_NOTIFYW pNotifyBuffer)
                 LocalFree((HLOCAL)pNotifyBuffer->pszServiceNames);
 }
 
-DWORD WINAPI cb_start(HANDLE *pParam)
+DWORD WINAPI thread_start_callback(HANDLE *pParam)
 {
         HANDLE handles[2];
         HANDLE hCrashMutex;
@@ -41,7 +41,7 @@ DWORD WINAPI cb_start(HANDLE *pParam)
         LPQUERY_SERVICE_CONFIGW pServiceConfig;
         DWORD dwServiceType;
         const wchar_t szKernel32Dll[] = L"kernel32.dll";
-        const wchar_t szKernelBaseDll[] = L"KernelBase.dll";
+        const wchar_t szKernelBaseDll[] = L"kernelbase.dll";
         const wchar_t *pszModule;
         MH_STATUS status;
         int tmp;
@@ -63,7 +63,7 @@ DWORD WINAPI cb_start(HANDLE *pParam)
 
         // acquire child mutex, this should be immediate.
         if ( WaitForSingleObject(hCrashMutex, 5000) != WAIT_OBJECT_0 ) {
-                log_error(L"Failed to acquire child mutex within five seconds. (%p)", hCrashMutex);
+                log_error(L"Failed to acquire crash mutex within five seconds. (%p)", hCrashMutex);
                 goto close_handles;
         }
         SetEvent(hProceedEvent);
@@ -112,7 +112,7 @@ DWORD WINAPI cb_start(HANDLE *pParam)
                 } else log_error(L"Failed to create RegQueryValueExW hook! (Status=%hs)", MH_StatusToString(status));
         }
         // query the ServiceDll path after applying our compat hook so that it
-        // is correct
+        // is consistent
         str = (wchar_t *)reg_query_value_alloc(HKEY_LOCAL_MACHINE,
                 L"SYSTEM\\CurrentControlSet\\services\\wuauserv\\Parameters",
                 L"ServiceDll", NULL, NULL);
@@ -142,7 +142,7 @@ abort_hook:
                 || GetModuleHandleExW(0, PathFindFileNameW(g_pszWUServiceDll), &hModule) ) {
 
                 // hook IsDeviceServiceable if wuaueng.dll is already loaded
-                wufuc_hook(hModule);
+                wufuc_patch(hModule);
                 FreeLibrary(hModule);
         }
         // wait for unload event or the main mutex to be released or abandoned,
