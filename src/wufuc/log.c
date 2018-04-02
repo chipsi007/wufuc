@@ -3,54 +3,55 @@
 
 #include <ShlObj.h>
 
-HANDLE m_hFile = INVALID_HANDLE_VALUE;
+static HANDLE m_hFile = INVALID_HANDLE_VALUE;
+static DWORD m_dwProcessId;
+static wchar_t m_szExeFilePath[MAX_PATH];
+static wchar_t *m_pszExeName;
 
-BOOL CALLBACK init_file_handle(
-        PINIT_ONCE pInitOnce,
-        ParamData *pParam,
-        PVOID *ppContext)
+BOOL CALLBACK init_once_callback(
+        PINIT_ONCE InitOnce,
+        PVOID *Parameter,
+        PVOID *lpContext)
 {
-        BOOL result = FALSE;
-        HANDLE hFile;
+        BOOL result;
         HRESULT hr;
         wchar_t *pszPath;
         wchar_t szFilePath[MAX_PATH];
         int ret;
 
-        pParam->dwProcessId = GetCurrentProcessId();
-        if ( !GetModuleFileNameW(NULL, pParam->szExeFilePath, _countof(pParam->szExeFilePath)) ) {
+        m_dwProcessId = GetCurrentProcessId();
+        if ( !GetModuleFileNameW(NULL, m_szExeFilePath, _countof(m_szExeFilePath)) ) {
                 log_debug(L"GetModuleFileNameW failed! (GLE=%lu)", GetLastError());
-                return result;
+                return FALSE;
         }
-        pParam->pszExeName = PathFindFileNameW(pParam->szExeFilePath);
+        m_pszExeName = PathFindFileNameW(m_szExeFilePath);
 
         hr = SHGetKnownFolderPath(&FOLDERID_ProgramData, 0, NULL, &pszPath);
         if ( hr != S_OK ) {
                 log_debug(L"SHGetKnownFolderPath failed! (HRESULT=0x%08X)", hr);
-                return result;
+                return FALSE;
         }
         ret = wcscpy_s(szFilePath, _countof(szFilePath), pszPath);
         CoTaskMemFree(pszPath);
         if ( ret ) {
                 log_debug(L"wcscpy_s failed! (Return value=%d)", ret);
-                return result;
+                return FALSE;
         }
-
         if ( !PathAppendW(szFilePath, L"wufuc") ) {
 append_fail:
                 log_debug(L"PathAppendW failed!");
-                return result;
+                return FALSE;
         }
         if ( !CreateDirectoryW(szFilePath, NULL)
                 && GetLastError() != ERROR_ALREADY_EXISTS ) {
 
                 log_debug(L"CreateDirectoryW failed! (GLE=%lu)", GetLastError());
-                return result;
+                return FALSE;
         }
-        if ( !PathAppendW(szFilePath, L"wufuc.log") )
+        if ( !PathAppendW(szFilePath, L"wufuc.1.log") )
                 goto append_fail;
 
-        hFile = CreateFileW(szFilePath,
+        m_hFile = CreateFileW(szFilePath,
                 FILE_APPEND_DATA,
                 FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                 NULL,
@@ -58,12 +59,9 @@ append_fail:
                 FILE_ATTRIBUTE_NORMAL,
                 NULL);
 
-        if ( hFile != INVALID_HANDLE_VALUE ) {
-                *ppContext = (PVOID)hFile;
-                result = TRUE;
-        } else {
+        result = m_hFile != INVALID_HANDLE_VALUE;
+        if ( !result )
                 log_debug(L"CreateFileW failed! (GLE=%lu)", GetLastError());
-        }
         return result;
 }
 
@@ -93,9 +91,7 @@ void log_debug_(const wchar_t *const format, ...)
 void log_trace_(const wchar_t *const format, ...)
 {
         static INIT_ONCE InitOnce = INIT_ONCE_STATIC_INIT;
-        static ParamData data;
         BOOL bStatus;
-        errno_t e;
         wchar_t datebuf[9];
         wchar_t timebuf[9];
         va_list ap;
@@ -108,46 +104,44 @@ void log_trace_(const wchar_t *const format, ...)
         char *buf3;
         DWORD written;
 
-        bStatus = InitOnceExecuteOnce(&InitOnce,
-                (PINIT_ONCE_FN)init_file_handle,
-                &data,
-                &(LPVOID)m_hFile);
+        bStatus = InitOnceExecuteOnce(&InitOnce, init_once_callback, NULL, NULL);
 
-        e = _wstrdate_s(datebuf, _countof(datebuf));
-        if ( e ) return;
-        e = _wstrtime_s(timebuf, _countof(timebuf));
-        if ( e ) return;
+        if ( _wstrdate_s(datebuf, _countof(datebuf))
+                || _wstrtime_s(timebuf, _countof(timebuf)) )
+                return;
 
         va_start(ap, format);
-        count = _vscwprintf(format, ap);
+        ret = _vscwprintf(format, ap);
         va_end(ap);
-        if ( count == -1 ) return;
+        if ( ret == -1 ) return;
+        count = ret + 1;
 
-        buf1 = calloc(count + 1, sizeof *buf1);
+        buf1 = calloc(count, sizeof *buf1);
         if ( !buf1 ) return;
 
         va_start(ap, format);
-        ret = vswprintf_s(buf1, count + 1, format, ap);
+        ret = vswprintf_s(buf1, count, format, ap);
         va_end(ap);
         if ( ret == -1 ) goto free_buf1;
 
-        count = _scwprintf(fmt, datebuf, timebuf, data.pszExeName, data.dwProcessId, buf1);
-        if ( count == -1 ) goto free_buf1;
+        ret = _scwprintf(fmt, datebuf, timebuf, m_pszExeName, m_dwProcessId, buf1);
+        if ( ret == -1 ) goto free_buf1;
+        count = ret + 1;
 
-        buf2 = calloc(count + 1, sizeof *buf2);
+        buf2 = calloc(count, sizeof *buf2);
         if ( !buf2 ) goto free_buf1;
 
-        count = swprintf_s(buf2, count + 1, fmt, datebuf, timebuf, data.pszExeName, data.dwProcessId, buf1);
-        if ( count == -1 ) goto free_buf2;
+        ret = swprintf_s(buf2, count, fmt, datebuf, timebuf, m_pszExeName, m_dwProcessId, buf1);
+        if ( ret == -1 ) goto free_buf2;
 
         if ( bStatus ) {
-                size = WideCharToMultiByte(CP_UTF8, 0, buf2, count, NULL, 0, NULL, NULL);
+                size = WideCharToMultiByte(CP_UTF8, 0, buf2, ret, NULL, 0, NULL, NULL);
                 if ( !size ) goto fallback;
 
                 buf3 = malloc(size);
                 if ( !buf3 ) goto fallback;
 
-                ret = WideCharToMultiByte(CP_UTF8, 0, buf2, count, buf3, size, NULL, NULL)
+                ret = WideCharToMultiByte(CP_UTF8, 0, buf2, ret, buf3, size, NULL, NULL)
                         && WriteFile(m_hFile, buf3, size, &written, NULL);
                 free(buf3);
                 if ( !ret ) goto fallback;

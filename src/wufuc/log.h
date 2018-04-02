@@ -1,12 +1,5 @@
 #pragma once
 
-typedef struct
-{
-        DWORD dwProcessId;
-        wchar_t szExeFilePath[MAX_PATH];
-        wchar_t *pszExeName;
-} ParamData;
-
 void log_debug_(const wchar_t *const format, ...);
 void log_trace_(const wchar_t *const format, ...);
 void log_close(void);
