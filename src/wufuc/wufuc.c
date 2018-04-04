@@ -100,49 +100,49 @@ close_mutex:
         return result;
 }
 
-static int wufuc_get_patch_info(VS_FIXEDFILEINFO *pffi, PATCHINFO *ppi)
+static bool wufuc_get_patch_info(VS_FIXEDFILEINFO *pffi, PATCHINFO *ppi)
 {
 #ifdef _WIN64
-        if ( ver_verify_version_info(6, 1, 0) && ver_compare_product_version(pffi, 7, 6, 7601, 23714) != -1
+        if ( ver_verify_version_info(6, 1, 1) && ver_compare_product_version(pffi, 7, 6, 7601, 23714) != -1
                 || ver_verify_version_info(6, 3, 0) && ver_compare_product_version(pffi, 7, 9, 9600, 18621) != -1 ) {
 
                 ppi->pattern = "FFF3 4883EC?? 33DB 391D???????? 7508 8B05????????";
                 ppi->off1 = 0xa;
                 ppi->off2 = 0x12;
-                return 0;
+                return true;
         }
 #elif _WIN32
-        if ( ver_verify_version_info(6, 1, 0)
+        if ( ver_verify_version_info(6, 1, 1)
                 && ver_compare_product_version(pffi, 7, 6, 7601, 23714) != -1 ) {
 
                 ppi->pattern = "833D????????00 743E E8???????? A3????????";
                 ppi->off1 = 0x2;
                 ppi->off2 = 0xf;
-                return 0;
+                return true;
         } else if ( ver_verify_version_info(6, 3, 0)
                 && ver_compare_product_version(pffi, 7, 9, 9600, 18621) != -1 ) {
 
                 ppi->pattern = "8BFF 51 833D????????00 7507 A1????????";
                 ppi->off1 = 0x5;
                 ppi->off2 = 0xd;
-                return 0;
+                return true;
         }
 #endif
-        return 1;
+        return false;
 }
 
-static int wufuc_get_patch_ptrs(const PATCHINFO *ppi, uintptr_t pfn, PBOOL *ppval1, PBOOL *ppval2)
+static bool wufuc_get_patch_ptrs(const PATCHINFO *ppi, uintptr_t pfn, PBOOL *ppval1, PBOOL *ppval2)
 {
 #ifdef _WIN64
         *ppval1 = (PBOOL)(pfn + ppi->off1 + sizeof(uint32_t) + *(uint32_t *)(pfn + ppi->off1));
         *ppval2 = (PBOOL)(pfn + ppi->off2 + sizeof(uint32_t) + *(uint32_t *)(pfn + ppi->off2));
-        return 0;
+        return true;
 #elif _WIN32
         *ppval1 = (PBOOL)(*(uintptr_t *)(pfn + ppi->off1));
         *ppval2 = (PBOOL)(*(uintptr_t *)(pfn + ppi->off2));
-        return 0;
+        return true;
 #else
-        return 1;
+        return false;
 #endif
 }
 
@@ -162,7 +162,7 @@ void wufuc_patch(HMODULE hModule)
         PBOOL pval2;
 
         pBlock = res_get_version_info(hModule);
-        if ( !pBlock ) goto free_pBlock;
+        if ( !pBlock ) return;
 
         plcp = res_query_var_file_info(pBlock, &count);
         if ( !plcp ) goto free_pBlock;
@@ -178,7 +178,7 @@ cont_patch:
         pffi = res_query_fixed_file_info(pBlock);
         if ( !pffi ) goto free_pBlock;
 
-        if ( wufuc_get_patch_info(pffi, &pi) ) {
+        if ( !wufuc_get_patch_info(pffi, &pi) ) {
                 log_warning(L"Unsupported Windows Update Agent version: %hu.%hu.%hu.%hu",
                         HIWORD(pffi->dwProductVersionMS),
                         LOWORD(pffi->dwProductVersionMS),
@@ -192,27 +192,31 @@ cont_patch:
                 HIWORD(pffi->dwProductVersionLS),
                 LOWORD(pffi->dwProductVersionLS));
 
-        if ( GetModuleInformation(GetCurrentProcess(), hModule, &modinfo, sizeof modinfo) ) {
-                offset = patternfind(modinfo.lpBaseOfDll, modinfo.SizeOfImage, pi.pattern);
-                if ( offset != -1 ) {
-                        pfn = OffsetToPointer(modinfo.lpBaseOfDll, offset);
-                        log_info(L"Matched %ls!IsDeviceServiceable function! (Offset=%IX, Address=%p)",
-                                pInternalName, offset, pfn);
+        if ( !GetModuleInformation(GetCurrentProcess(), hModule, &modinfo, sizeof modinfo) ) {
+                log_error(L"GetModuleInformation failed! (hModule=%p, GLE=%lu)", hModule, GetLastError());
+                goto free_pBlock;
+        }
+        offset = patternfind(modinfo.lpBaseOfDll, modinfo.SizeOfImage, pi.pattern);
+        if ( offset == -1 ) {
+                log_info(L"Couldn't match IsDeviceServiceable function!");
+                goto free_pBlock;
+        }
+        pfn = OffsetToPointer(modinfo.lpBaseOfDll, offset);
+        log_info(L"Matched %ls!IsDeviceServiceable function! (Offset=%IX, Address=%p)",
+                PathFindFileNameW(g_pszWUServiceDll), offset, pfn);
 
-                        if ( !wufuc_get_patch_ptrs(&pi, (uintptr_t)pfn, &pval1, &pval2) ) {
-                                if ( *pval1 && VirtualProtect(pval1, sizeof *pval1, PAGE_READWRITE, &fOldProtect) ) {
-                                        *pval1 = FALSE;
-                                        VirtualProtect(pval1, sizeof *pval1, fOldProtect, &fOldProtect);
-                                        log_info(L"Patched variable! (Address=%p)", pval1);
-                                }
-                                if ( !*pval2 && VirtualProtect(pval2, sizeof *pval2, PAGE_READWRITE, &fOldProtect) ) {
-                                        *pval2 = TRUE;
-                                        VirtualProtect(pval2, sizeof *pval2, fOldProtect, &fOldProtect);
-                                        log_info(L"Patched variable! (Address=%p)", pval2);
-                                }
-                        }
-                } else log_info(L"Couldn't match IsDeviceServiceable function!");
-        } else log_error(L"GetModuleInformation failed! (hModule=%p, GLE=%lu)", hModule, GetLastError());
+        if ( wufuc_get_patch_ptrs(&pi, (uintptr_t)pfn, &pval1, &pval2) ) {
+                if ( *pval1 && VirtualProtect(pval1, sizeof *pval1, PAGE_READWRITE, &fOldProtect) ) {
+                        *pval1 = FALSE;
+                        VirtualProtect(pval1, sizeof *pval1, fOldProtect, &fOldProtect);
+                        log_info(L"Patched variable! (Address=%p)", pval1);
+                }
+                if ( !*pval2 && VirtualProtect(pval2, sizeof *pval2, PAGE_READWRITE, &fOldProtect) ) {
+                        *pval2 = TRUE;
+                        VirtualProtect(pval2, sizeof *pval2, fOldProtect, &fOldProtect);
+                        log_info(L"Patched variable! (Address=%p)", pval2);
+                }
+        }
 free_pBlock:
         free(pBlock);
 }
