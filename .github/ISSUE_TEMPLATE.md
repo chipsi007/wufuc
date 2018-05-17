@@ -6,7 +6,7 @@ Then, make sure the following things are included in your issue:
 - Operating system version and Service Pack (including 32- or 64-bit).
 - Short description of the issue.
 - Elaborate steps to reproduce the bug/issue being reported.
-- Attach wufuc's log file (located at `C:\ProgramData\wufuc\wufuc.log`).
+- Attach wufuc's log file (located at `C:\ProgramData\wufuc\wufuc.1.log`).
 - Any supporting information that could help solve/understand the issue.
 
 Any issues that do not include these, or go more than a week without a
