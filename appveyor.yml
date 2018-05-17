@@ -22,9 +22,9 @@ before_build:
     set "BUILD_ZIPFILE=%APPVEYOR_BUILD_FOLDER%\%APPVEYOR_PROJECT_NAME%_v%BUILD_COMMIT_VERSION%-%PLATFORM%.zip"
 after_build:
 - cmd: >-
-    copy /Y "COPYING" "src\wufuc_setup_bat\COPYING.txt"
+    copy /Y "COPYING" "src\setup_bat\COPYING.txt"
 
-    cd "%APPVEYOR_BUILD_FOLDER%\src\wufuc_setup_bat"
+    cd "%APPVEYOR_BUILD_FOLDER%\src\setup_bat"
 
     echo v%BUILD_COMMIT_VERSION%>version.txt
 
@@ -32,9 +32,9 @@ after_build:
 
     for /R %%i in (*.bat) do unix2dos "%%i"
 
-    7z a "%BUILD_ZIPFILE%" "..\wufuc_setup_bat"
+    7z a "%BUILD_ZIPFILE%" "..\setup_bat"
 
-    7z rn "%BUILD_ZIPFILE%" "wufuc_setup_bat" "%APPVEYOR_PROJECT_NAME%"
+    7z rn "%BUILD_ZIPFILE%" "setup_bat" "%APPVEYOR_PROJECT_NAME%"
 
     7z d "%BUILD_ZIPFILE%" "%APPVEYOR_PROJECT_NAME%\.gitignore"
 artifacts:

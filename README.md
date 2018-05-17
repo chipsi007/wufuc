@@ -41,13 +41,6 @@ Some people with older Intel and AMD processors are also affected! I've received
 - [AMD FX-8350](https://github.com/zeffy/wufuc/issues/32)
 - [AMD Turion 64 Mobile Technology ML-34](https://github.com/zeffy/wufuc/issues/80)
 
-## Bad Microsoft!
-
-If you are interested, you can read my original write-up on discovering the CPU check [here](https://github.com/zeffy/wufuc/tree/old-kb4012218-19).
-
-The tl;dr version is basically, inside a system file named `wuaueng.dll`, there are two functions responsible for the CPU check: `IsDeviceServiceable(void)` and `IsCPUSupported(void)`. 
-`IsDeviceServiceable` simply calls `IsCPUSupported` once, and then re-uses the result that it receives on subsequent calls.
-
 ## Features
 
 - Enables Windows Update on PCs with unsupported processors.
@@ -57,34 +50,36 @@ The tl;dr version is basically, inside a system file named `wuaueng.dll`, there 
 - Byte pattern-based patching, which means it will usually keep working even after new updates come out.
 - No dependencies.
 
-## Frequently Asked Questions
+## How wufuc works
 
-See [FAQ.md](https://github.com/zeffy/wufuc/blob/master/FAQ.md).
+The tl;dr version is basically:
 
-## How it works
+* Inside a system file called `wuaueng.dll`, there are two functions responsible for the CPU check: `IsDeviceServiceable` and `IsCPUSupported`.
+* `IsDeviceServiceable` simply calls `IsCPUSupported` once, and then saves the result and re-uses it on subsequent calls.
+* I take advantage of this behavior in wufuc by patching the saved result so that it is always `TRUE`, or supported.
 
-This is a basic run-down of what wufuc does when you install it:
+If you would like more information, you can read my original write-up on discovering the CPU check [here](https://github.com/zeffy/wufuc/tree/old-kb4012218-19).
 
-- The installer registers a scheduled task that automatically starts wufuc on system boot/user log on.
-- Depending on how the Windows Update service is configured to run, wufuc will:
-    * **Shared process**: inject itself into the service host process that Windows Update will run in when it starts.
-    * **Own process**: wait for the Windows Update service to start and then inject into it.
-- Once injected, wufuc will hook some functions where appropriate:
-    * `LoadLibraryExW` hook will automatically hook the `IsDeviceServiceable()` function inside `wuaueng.dll` when it is loaded.
-    * `RegQueryValueExW` hook is necessary to provide compatibility with [UpdatePack7R2](../../issues/100). This hook not applied when `wuauserv` is configured to run in its own process.
+
+## Building
+
+To build wufuc from source, you need to download and install the following:
+
+1. [Visual Studio 2017](https://www.visualstudio.com/).
+2. [Windows Driver Kit (WDK)](https://docs.microsoft.com/en-us/windows-hardware/drivers/download-the-wdk).
+3. (Optional, for MSI packages) [Advanced Installer](https://www.advancedinstaller.com/).
 
 ## Sponsors
 
 ### [Advanced Installer](https://www.advancedinstaller.com/)
 
-The installer packages are created with Advanced Installer using an [open source license](http://www.advancedinstaller.com/free-license.html). 
+The installer packages are created with Advanced Installer using an [open source license](https://www.advancedinstaller.com/free-license.html). 
 Advanced Installer's intuitive and friendly user interface allowed me to quickly create a feature complete installer with minimal effort. Check it out!
 
 ## Special thanks
 
-- Wen Jia Liu ([@wj32](https://github.com/wj32)) for his awesome program [Process Hacker](https://github.com/processhacker2/processhacker), and also for his [phnt headers](https://github.com/processhacker2/processhacker/tree/master/phnt).
-- Duncan Ogilvie ([@mrexodia](https://github.com/mrexodia)) for [x64dbg](https://github.com/x64dbg/x64dbg), its [`patternfind.cpp`](https://github.com/x64dbg/x64dbg/blob/development/src/dbg/patternfind.cpp) algorithm, and its issue template which I adapted for this project.
-- Tsuda Kageyu ([@TsudaKageyu](https://github.com/TsudaKageyu)) for his excellent [minhook](https://github.com/TsudaKageyu/minhook) library.
+- [**@wj32**](https://github.com/wj32) for his awesome program [Process Hacker](https://github.com/processhacker2/processhacker), and also for his [phnt headers](https://github.com/processhacker2/processhacker/tree/master/phnt).
+- [**@mrexodia**](https://github.com/mrexodia) for [x64dbg](https://github.com/x64dbg/x64dbg), its [`patternfind.cpp`](https://github.com/x64dbg/x64dbg/blob/development/src/dbg/patternfind.cpp) algorithm, and its issue template which I adapted for this project.
 
 [Latest]: https://github.com/zeffy/wufuc/releases/latest
 [AppVeyor]: https://ci.appveyor.com/project/zeffy/wufuc

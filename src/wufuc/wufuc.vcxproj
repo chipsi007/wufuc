@@ -19,36 +19,27 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="callbacks.h" />
-    <ClInclude Include="eventhelper.h" />
-    <ClInclude Include="mutexhelper.h" />
-    <ClInclude Include="ptrlist.h" />
-    <ClInclude Include="log.h" />
-    <ClInclude Include="modulehelper.h" />
-    <ClInclude Include="registryhelper.h" />
-    <ClInclude Include="resourcehelper.h" />
-    <ClInclude Include="servicehelper.h" />
-    <ClInclude Include="versionhelper.h" />
-    <ClInclude Include="hooks.h" />
+    <ClInclude Include="asprintf.h" />
+    <ClInclude Include="logger.h" />
+    <ClInclude Include="memory.h" />
+    <ClInclude Include="modules.h" />
+    <ClInclude Include="registry.h" />
+    <ClInclude Include="helpers.h" />
+    <ClInclude Include="utf8.h" />
+    <ClInclude Include="versioninfo.h" />
+    <ClInclude Include="verify.h" />
     <ClInclude Include="patternfind.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="wufuc.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="callbacks.c" />
+    <ClCompile Include="asprintf.c" />
     <ClCompile Include="dllmain.c" />
-    <ClCompile Include="eventhelper.c" />
-    <ClCompile Include="ptrlist.c" />
-    <ClCompile Include="modulehelper.c" />
-    <ClCompile Include="registryhelper.c" />
-    <ClCompile Include="resourcehelper.c" />
-    <ClCompile Include="servicehelper.c" />
-    <ClCompile Include="mutexhelper.c" />
-    <ClCompile Include="versionhelper.c" />
-    <ClCompile Include="hooks.c" />
-    <ClCompile Include="log.c" />
+    <ClCompile Include="logger.c" />
+    <ClCompile Include="memory.c" />
+    <ClCompile Include="modules.c" />
     <ClCompile Include="patternfind.c" />
+    <ClCompile Include="registry.c" />
     <ClCompile Include="stdafx.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -56,7 +47,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="rundll32.c" />
-    <ClCompile Include="wufuc.c" />
+    <ClCompile Include="helpers.c" />
+    <ClCompile Include="utf8.c" />
+    <ClCompile Include="versioninfo.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
@@ -125,8 +118,8 @@
     <IntDir>$(ProjectDir)$(BaseIntermediateOutputPath)$(Configuration)\$(PlatformShortName)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
     <GenerateManifest>false</GenerateManifest>
-    <IncludePath>$(SolutionDir)..\inc\phnt;$(SolutionDir)..\inc\minhook;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\minhook;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..\inc\phnt;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -134,8 +127,8 @@
     <IntDir>$(ProjectDir)$(BaseIntermediateOutputPath)$(Configuration)\$(PlatformShortName)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
     <GenerateManifest>false</GenerateManifest>
-    <IncludePath>$(SolutionDir)..\inc\phnt;$(SolutionDir)..\inc\minhook;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\minhook;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..\inc\phnt;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -143,8 +136,8 @@
     <IntDir>$(ProjectDir)obj\$(Configuration)\$(PlatformShortName)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
     <GenerateManifest>false</GenerateManifest>
-    <IncludePath>$(SolutionDir)..\inc\phnt;$(SolutionDir)..\inc\minhook;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\minhook;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..\inc\phnt;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -152,8 +145,8 @@
     <IntDir>$(ProjectDir)obj\$(Configuration)\$(PlatformShortName)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
     <GenerateManifest>false</GenerateManifest>
-    <IncludePath>$(SolutionDir)..\inc\phnt;$(SolutionDir)..\inc\minhook;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\lib\minhook;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..\inc\phnt;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -172,11 +165,9 @@
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
       <EntryPointSymbol>
       </EntryPointSymbol>
-      <AdditionalDependencies>version.lib;Shlwapi.lib;libMinHook.x86.MTd.lib;%(AdditionalDependencies);ntdll.lib</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;Shlwapi.lib;%(AdditionalDependencies);ntdll.lib</AdditionalDependencies>
     </Link>
-    <ResourceCompile>
-      <PreprocessorDefinitions>X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ResourceCompile>
+    <ResourceCompile />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -195,11 +186,9 @@
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
       <EntryPointSymbol>
       </EntryPointSymbol>
-      <AdditionalDependencies>version.lib;Shlwapi.lib;libMinHook.x64.MTd.lib;%(AdditionalDependencies);ntdll.lib</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;Shlwapi.lib;%(AdditionalDependencies);ntdll.lib</AdditionalDependencies>
     </Link>
-    <ResourceCompile>
-      <PreprocessorDefinitions>X64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ResourceCompile>
+    <ResourceCompile />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -226,15 +215,13 @@
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
       <EntryPointSymbol>
       </EntryPointSymbol>
-      <AdditionalDependencies>version.lib;Shlwapi.lib;libMinHook.x86.MT.lib;%(AdditionalDependencies);ntdll.lib</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;Shlwapi.lib;%(AdditionalDependencies);ntdll.lib</AdditionalDependencies>
       <SetChecksum>true</SetChecksum>
     </Link>
-    <ResourceCompile>
-      <PreprocessorDefinitions>X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ResourceCompile>
+    <ResourceCompile />
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetPath)" "$(SolutionDir)wufuc_setup_bat\"
-copy /Y "$(TargetPath)" "$(SolutionDir)wufuc_setup\"</Command>
+      <Command>copy /Y "$(TargetPath)" "$(SolutionDir)setup_bat\"
+copy /Y "$(TargetPath)" "$(SolutionDir)setup_ai\"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy release binaries to the setup staging directories</Message>
@@ -263,15 +250,13 @@ copy /Y "$(TargetPath)" "$(SolutionDir)wufuc_setup\"</Command>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
-      <AdditionalDependencies>version.lib;Shlwapi.lib;libMinHook.x64.MT.lib;%(AdditionalDependencies);ntdll.lib</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;Shlwapi.lib;%(AdditionalDependencies);ntdll.lib</AdditionalDependencies>
       <SetChecksum>true</SetChecksum>
     </Link>
-    <ResourceCompile>
-      <PreprocessorDefinitions>X64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ResourceCompile>
+    <ResourceCompile />
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetPath)" "$(SolutionDir)wufuc_setup_bat\"
-copy /Y "$(TargetPath)" "$(SolutionDir)wufuc_setup\"</Command>
+      <Command>copy /Y "$(TargetPath)" "$(SolutionDir)setup_bat\"
+copy /Y "$(TargetPath)" "$(SolutionDir)setup_ai\"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy release binaries to the setup staging directories</Message>

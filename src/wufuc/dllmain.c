@@ -1,7 +1,4 @@
 #include "stdafx.h"
-#include "log.h"
-
-#include <minhook.h>
 
 BOOL APIENTRY DllMain(HMODULE hModule,
         DWORD  ul_reason_for_call,
@@ -9,14 +6,12 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 {
         switch ( ul_reason_for_call ) {
         case DLL_PROCESS_ATTACH:
-                MH_Initialize();
-                break;
         case DLL_THREAD_ATTACH:
         case DLL_THREAD_DETACH:
                 break;
         case DLL_PROCESS_DETACH:
-                MH_Uninitialize();
-                log_close();
+                if ( !lpReserved )
+                        log_close();
                 break;
         }
         return TRUE;

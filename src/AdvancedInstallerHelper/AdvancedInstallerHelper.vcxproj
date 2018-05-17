@@ -46,6 +46,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <GenerateManifest>false</GenerateManifest>
+    <OutDir>$(ProjectDir)bin\$(Configuration)\$(PlatformShortName)\</OutDir>
+    <IntDir>$(ProjectDir)$(BaseIntermediateOutputPath)$(Configuration)\$(PlatformShortName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -93,7 +95,7 @@
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetPath)" "$(SolutionDir)wufuc_setup\"</Command>
+      <Command>copy /Y "$(TargetPath)" "$(SolutionDir)setup_ai\"</Command>
       <Message>Copy release binaries to the setup staging directory</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>

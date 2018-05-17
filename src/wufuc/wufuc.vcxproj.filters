@@ -15,12 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="callbacks.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="hooks.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -30,45 +24,36 @@
     <ClInclude Include="patternfind.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="versionhelper.h">
+    <ClInclude Include="asprintf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="servicehelper.h">
+    <ClInclude Include="versioninfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="registryhelper.h">
+    <ClInclude Include="verify.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="wufuc.h">
+    <ClInclude Include="registry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="modulehelper.h">
+    <ClInclude Include="modules.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="log.h">
+    <ClInclude Include="logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ptrlist.h">
+    <ClInclude Include="utf8.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="eventhelper.h">
+    <ClInclude Include="memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mutexhelper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resourcehelper.h">
+    <ClInclude Include="helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="callbacks.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="dllmain.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="hooks.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="rundll32.c">
@@ -80,34 +65,28 @@
     <ClCompile Include="patternfind.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="servicehelper.c">
+    <ClCompile Include="asprintf.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="versionhelper.c">
+    <ClCompile Include="versioninfo.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="registryhelper.c">
+    <ClCompile Include="modules.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="wufuc.c">
+    <ClCompile Include="registry.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="log.c">
+    <ClCompile Include="logger.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="modulehelper.c">
+    <ClCompile Include="utf8.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ptrlist.c">
+    <ClCompile Include="memory.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mutexhelper.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="eventhelper.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="resourcehelper.c">
+    <ClCompile Include="helpers.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -116,7 +95,7 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="resource.h">
-      <Filter>Header Files</Filter>
+      <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

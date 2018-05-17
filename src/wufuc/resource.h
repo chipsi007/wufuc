@@ -8,11 +8,11 @@
 #define BUILD_VERSION_COMMA 1,0,1,0
 #endif
 
-#define S_(x) #x
-#define S(x) S_(x)
+#define STRINGIZE_(x) #x
+#define STRINGIZE(x) STRINGIZE_(x)
 
-#ifdef X64
+#ifdef _WIN64
 #define FILENAME "wufuc64.dll"
-#elif defined(X86)
+#else
 #define FILENAME "wufuc32.dll"
 #endif
