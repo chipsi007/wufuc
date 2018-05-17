@@ -20,7 +20,7 @@ If you have used another third-party solution for the CPU fix (such as UpdatePac
 You have two ways to work around this limitation, either:
 
 - You can remove the other third-party solution yourself.
-- Alternatively, go to the directory that you installed wufuc to, open the `Troubleshooting` subdirectory, and merge the `Restore_wuauserv.reg` file with your registry by double-clicking it, and then restart your PC.
+- Alternatively, go to the directory that you installed wufuc to, and merge the `Restore_wuauserv.reg` file with your registry by double-clicking it, and then restart your PC.
 
 ## How to manually remove wufuc v0.8.0.143 when it is impossible to uninstall it normally
 
