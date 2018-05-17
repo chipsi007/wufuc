@@ -105,7 +105,7 @@ typedef enum _PROCESSINFOCLASS
     ProcessBasePriority, // s: KPRIORITY
     ProcessRaisePriority, // s: ULONG
     ProcessDebugPort, // q: HANDLE
-    ProcessExceptionPort, // s: HANDLE
+    ProcessExceptionPort, // s: PROCESS_EXCEPTION_PORT
     ProcessAccessToken, // s: PROCESS_ACCESS_TOKEN
     ProcessLdtInformation, // qs: PROCESS_LDT_INFORMATION // 10
     ProcessLdtSize, // s: PROCESS_LDT_SIZE
@@ -132,12 +132,12 @@ typedef enum _PROCESSINFOCLASS
     ProcessHandleTracing, // q: PROCESS_HANDLE_TRACING_QUERY; s: size 0 disables, otherwise enables
     ProcessIoPriority, // qs: IO_PRIORITY_HINT
     ProcessExecuteFlags, // qs: ULONG
-    ProcessResourceManagement,
+    ProcessResourceManagement, // ProcessTlsInformation // PROCESS_TLS_INFORMATION
     ProcessCookie, // q: ULONG
     ProcessImageInformation, // q: SECTION_IMAGE_INFORMATION
     ProcessCycleTime, // q: PROCESS_CYCLE_TIME_INFORMATION // since VISTA
-    ProcessPagePriority, // q: ULONG
-    ProcessInstrumentationCallback, // 40
+    ProcessPagePriority, // q: PAGE_PRIORITY_INFORMATION
+    ProcessInstrumentationCallback, // qs: PROCESS_INSTRUMENTATION_CALLBACK_INFORMATION // 40
     ProcessThreadStackAllocation, // s: PROCESS_STACK_ALLOCATION_INFORMATION, PROCESS_STACK_ALLOCATION_INFORMATION_EX
     ProcessWorkingSetWatchEx, // q: PROCESS_WS_WATCH_INFORMATION_EX[]
     ProcessImageFileNameWin32, // q: UNICODE_STRING
@@ -146,7 +146,7 @@ typedef enum _PROCESSINFOCLASS
     ProcessMemoryAllocationMode, // qs: PROCESS_MEMORY_ALLOCATION_MODE
     ProcessGroupInformation, // q: USHORT[]
     ProcessTokenVirtualizationEnabled, // s: ULONG
-    ProcessConsoleHostProcess, // q: ULONG_PTR
+    ProcessConsoleHostProcess, // q: ULONG_PTR // ProcessOwnerInformation
     ProcessWindowInformation, // q: PROCESS_WINDOW_INFORMATION // 50
     ProcessHandleInformation, // q: PROCESS_HANDLE_SNAPSHOT_INFORMATION // since WIN8
     ProcessMitigationPolicy, // s: PROCESS_MITIGATION_POLICY_INFORMATION
@@ -187,6 +187,9 @@ typedef enum _PROCESSINFOCLASS
     ProcessEnableReadWriteVmLogging, // PROCESS_READWRITEVM_LOGGING_INFORMATION
     ProcessUptimeInformation, // PROCESS_UPTIME_INFORMATION
     ProcessImageSection,
+    ProcessDebugAuthInformation, // since REDSTONE4
+    ProcessSystemResourceManagement, // PROCESS_SYSTEM_RESOURCE_MANAGEMENT
+    ProcessSequenceNumber, // q: ULONGLONG
     MaxProcessInfoClass
 } PROCESSINFOCLASS;
 #endif
@@ -353,6 +356,15 @@ typedef struct _POOLED_USAGE_AND_LIMITS
     SIZE_T PagefileLimit;
 } POOLED_USAGE_AND_LIMITS, *PPOOLED_USAGE_AND_LIMITS;
 
+#define PROCESS_EXCEPTION_PORT_ALL_STATE_BITS 0x00000003
+#define PROCESS_EXCEPTION_PORT_ALL_STATE_FLAGS ((ULONG_PTR)((1UL << PROCESS_EXCEPTION_PORT_ALL_STATE_BITS) - 1))
+
+typedef struct _PROCESS_EXCEPTION_PORT 
+{
+    _In_ HANDLE ExceptionPortHandle; // Handle to the exception port. No particular access required.
+    _Inout_ ULONG StateFlags; // Miscellaneous state flags to be cached along with the exception port in the kernel.
+} PROCESS_EXCEPTION_PORT, *PPROCESS_EXCEPTION_PORT;
+
 typedef struct _PROCESS_ACCESS_TOKEN
 {
     HANDLE Token; // needs TOKEN_ASSIGN_PRIMARY access
@@ -448,6 +460,8 @@ typedef struct _PROCESS_SESSION_INFORMATION
     ULONG SessionId;
 } PROCESS_SESSION_INFORMATION, *PPROCESS_SESSION_INFORMATION;
 
+#define PROCESS_HANDLE_EXCEPTIONS_ENABLED 0x00000001
+
 #define PROCESS_HANDLE_RAISE_EXCEPTION_ON_INVALID_HANDLE_CLOSE_DISABLED 0x00000000
 #define PROCESS_HANDLE_RAISE_EXCEPTION_ON_INVALID_HANDLE_CLOSE_ENABLED 0x00000001
 
@@ -486,6 +500,42 @@ typedef struct _PROCESS_HANDLE_TRACING_QUERY
 } PROCESS_HANDLE_TRACING_QUERY, *PPROCESS_HANDLE_TRACING_QUERY;
 
 #endif
+
+// private
+typedef struct _THREAD_TLS_INFORMATION
+{
+    ULONG Flags;
+    PVOID NewTlsData;
+    PVOID OldTlsData;
+    HANDLE ThreadId;
+} THREAD_TLS_INFORMATION, *PTHREAD_TLS_INFORMATION;
+
+// private
+typedef enum _PROCESS_TLS_INFORMATION_TYPE
+{
+    ProcessTlsReplaceIndex,
+    ProcessTlsReplaceVector,
+    MaxProcessTlsOperation
+} PROCESS_TLS_INFORMATION_TYPE, *PPROCESS_TLS_INFORMATION_TYPE;
+
+// private
+typedef struct _PROCESS_TLS_INFORMATION
+{
+    ULONG Flags;
+    ULONG OperationType;
+    ULONG ThreadDataCount;
+    ULONG TlsIndex;
+    ULONG PreviousCount;
+    THREAD_TLS_INFORMATION ThreadData[1];
+} PROCESS_TLS_INFORMATION, *PPROCESS_TLS_INFORMATION;
+
+// private
+typedef struct _PROCESS_INSTRUMENTATION_CALLBACK_INFORMATION
+{
+    ULONG Version;
+    ULONG Reserved;
+    PVOID Callback;
+} PROCESS_INSTRUMENTATION_CALLBACK_INFORMATION, *PPROCESS_INSTRUMENTATION_CALLBACK_INFORMATION;
 
 // private
 typedef struct _PROCESS_STACK_ALLOCATION_INFORMATION
@@ -757,17 +807,19 @@ typedef struct _MANAGE_WRITES_TO_EXECUTABLE_MEMORY
     ULONG Spare : 22;
 } MANAGE_WRITES_TO_EXECUTABLE_MEMORY, *PMANAGE_WRITES_TO_EXECUTABLE_MEMORY;
 
-typedef struct _PROCESS_READWRITEVM_LOGGING_INFORMATION
+#define PROCESS_READWRITEVM_LOGGING_ENABLE_READVM 1
+#define PROCESS_READWRITEVM_LOGGING_ENABLE_WRITEVM 2
+#define PROCESS_READWRITEVM_LOGGING_ENABLE_READVM_V 1UL
+#define PROCESS_READWRITEVM_LOGGING_ENABLE_WRITEVM_V 2UL
+
+typedef union _PROCESS_READWRITEVM_LOGGING_INFORMATION
 {
-    union
+    UCHAR Flags;
+    struct
     {
-        BOOLEAN Flags;
-        struct
-        {
-            BOOLEAN EnableReadVmLogging : 1;
-            BOOLEAN EnableWriteVmLogging : 1;
-            BOOLEAN Unused : 6;
-        };
+        UCHAR EnableReadVmLogging : 1;
+        UCHAR EnableWriteVmLogging : 1;
+        UCHAR Unused : 6;
     };
 } PROCESS_READWRITEVM_LOGGING_INFORMATION, *PPROCESS_READWRITEVM_LOGGING_INFORMATION;
 
@@ -787,6 +839,16 @@ typedef struct _PROCESS_UPTIME_INFORMATION
         ULONG Terminated : 1;       
     };
 } PROCESS_UPTIME_INFORMATION, *PPROCESS_UPTIME_INFORMATION;
+
+typedef union _PROCESS_SYSTEM_RESOURCE_MANAGEMENT
+{
+    ULONG Flags;
+    struct
+    {
+        ULONG Foreground : 1;
+        ULONG Reserved : 31;
+    };
+} PROCESS_SYSTEM_RESOURCE_MANAGEMENT, *PPROCESS_SYSTEM_RESOURCE_MANAGEMENT;
 
 // end_private
 
@@ -1008,6 +1070,7 @@ NtResumeProcess(
 #define NtCurrentProcessToken() ((HANDLE)(LONG_PTR)-4)
 #define NtCurrentThreadToken() ((HANDLE)(LONG_PTR)-5)
 #define NtCurrentEffectiveToken() ((HANDLE)(LONG_PTR)-6)
+#define NtCurrentSilo() ((HANDLE)(LONG_PTR)-1)
 
 // Not NT, but useful.
 #define NtCurrentProcessId() (NtCurrentTeb()->ClientId.UniqueProcess)
@@ -1471,7 +1534,8 @@ typedef enum _PS_MITIGATION_OPTION
     PS_MITIGATION_OPTION_EXPORT_ADDRESS_FILTER_PLUS,
     PS_MITIGATION_OPTION_RESTRICT_CHILD_PROCESS_CREATION,
     PS_MITIGATION_OPTION_IMPORT_ADDRESS_FILTER,
-    PS_MITIGATION_OPTION_MODULE_TAMPERING_PROTECTION
+    PS_MITIGATION_OPTION_MODULE_TAMPERING_PROTECTION,
+    PS_MITIGATION_OPTION_RESTRICT_INDIRECT_BRANCH_PREDICTION
 } PS_MITIGATION_OPTION;
 
 // windows-internals-book:"Chapter 5"
