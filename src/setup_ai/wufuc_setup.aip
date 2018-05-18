@@ -21,7 +21,7 @@
     <ROW Property="ProductCode" Value="1027:{8788C792-140E-41E9-B875-685F557ACEE6} 1028:{C3A9DFE3-DBAB-47BA-ABAD-804D54F0FBF4} 1031:{85F838D1-6E19-4D99-BEE8-3A46A6D52813} 1033:{F011FFEE-01E3-495E-80CA-10A640C55031} 1035:{03787122-8FC5-4BF2-B447-372148E7E0CD} 1036:{C83296AB-0CC4-4954-A218-3F76BE31C530} 1038:{8D87BFD2-FE05-4506-A1D8-62EE821DB623} 1040:{C48A5EF8-8DB1-4D08-B468-683879C807E3} 1041:{5CCB0BE8-E87D-4D8C-BD5F-B5A6E1CDDB4A} 1042:{2AE0CA07-01C9-4B29-A880-E52CE19EB157} 1043:{28C34648-07BD-463C-A61E-AE47525AF2D2} 1045:{F7E7320E-9EBF-44C5-97E7-E8FEB7A47613} 1046:{393B1C36-514F-4722-A577-408055568261} 1049:{13DAE24C-D5C2-443E-8105-8B3FE24C9370} 1060:{836B7413-1503-4164-9D21-87C28468AD61} 2052:{880E51E8-4243-42F4-BAA3-B32785746291} 2070:{E76212D9-7C99-4C47-9004-3F32D658D6A6} 3082:{CFE6B8E7-9D52-488C-BEA6-A7EE3306B20C} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="wufuc"/>
-    <ROW Property="ProductVersion" Value="1.0.1.0" Type="32" TargetFile="wufuc64.dll"/>
+    <ROW Property="ProductVersion" Value="1.0.1.201" Type="32" TargetFile="wufuc64.dll"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{4C52972C-251E-4D1B-AD09-EAA765719DCC}"/>
     <ROW Property="WindowsType9X" MultiBuildValue="x64Build:Windows 9x/ME#x86Build:Windows 9x/ME" ValueLocId="-"/>
@@ -209,7 +209,7 @@
     <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]" MultiBuildTarget="x64Build:[ProgramFiles64Folder]\[ProductName]#x86Build:[ProgramFilesFolder]\[ProductName]"/>
     <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]"/>
     <ROW Action="SET_TARGETDIR_TO_APPDIR" Type="51" Source="TARGETDIR" Target="[APPDIR]"/>
-    <ROW Action="StartWindowsUpdateService" Type="3073" Source="aicustact.dll" Target="StartWinService" Options="1" AdditionalSeq="AI_DATA_SETTER_3"/>
+    <ROW Action="StartWindowsUpdateService" Type="3137" Source="aicustact.dll" Target="StartWinService" Options="1" AdditionalSeq="AI_DATA_SETTER_3"/>
     <ROW Action="StopWindowsUpdateService" Type="3137" Source="aicustact.dll" Target="StopWinService" Options="1" AdditionalSeq="AI_DATA_SETTER_2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
@@ -218,15 +218,13 @@
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIniFileComponent">
     <ROW IniFile="ServiceDll" FileName="RESTOR~1.REG|Restore_wuauserv.reg" DirProperty="APPDIR" Section="HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\wuauserv\Parameters" Key="&quot;ServiceDll&quot;" Value="hex(2):25,00,73,00,79,00,73,00,74,00,65,00,6d,00,72,00,6f,00,6f,\" Action="0" Component_="ProductInformation"/>
     <ROW IniFile="URL" FileName="Donate.url" DirProperty="SHORTCUTDIR" Section="InternetShortcut" Key="URL" Value="https://github.com/zeffy/wufuc/blob/master/DONATE.md" Action="0" Component_="SHORTCUTDIR"/>
-    <ROW IniFile="URL_2" FileName="Readme.url" DirProperty="SHORTCUTDIR" Section="InternetShortcut" Key="URL" Value="https://github.com/zeffy/wufuc" Action="0" Component_="SHORTCUTDIR"/>
-    <ROW IniFile="URL_6" FileName="LATEST~1.URL|Latest release.url" DirProperty="SHORTCUTDIR" Section="InternetShortcut" Key="URL" Value="https://github.com/zeffy/wufuc/releases/latest" Action="0" Component_="SHORTCUTDIR"/>
+    <ROW IniFile="URL_2" FileName="WUFUCO~1.URL|wufuc on GitHub.url" DirProperty="SHORTCUTDIR" Section="InternetShortcut" Key="URL" Value="https://github.com/zeffy/wufuc" Action="0" Component_="SHORTCUTDIR"/>
+    <ROW IniFile="URL_6" FileName="LATEST~1.URL|Latest release.url" DirProperty="Troubleshooting_Dir" Section="InternetShortcut" Key="URL" Value="https://github.com/zeffy/wufuc/releases/latest" Action="0" Component_="SHORTCUTDIR"/>
     <ROW IniFile="URL_7" FileName="REPORT~1.URL|Report an issue.url" DirProperty="Troubleshooting_Dir" Section="InternetShortcut" Key="URL" Value="https://github.com/zeffy/wufuc/issues" Action="0" Component_="SHORTCUTDIR"/>
-    <ROW IniFile="URL_8" FileName="FAQ.url" DirProperty="Troubleshooting_Dir" Section="InternetShortcut" Key="URL" Value="https://github.com/zeffy/wufuc/blob/master/FAQ.md" Action="0" Component_="SHORTCUTDIR"/>
     <ROW IniFile="WorkingDirectory" FileName="Donate.url" DirProperty="SHORTCUTDIR" Section="InternetShortcut" Key="WorkingDirectory" Value="[SHORTCUTDIR]" Action="0" Component_="SHORTCUTDIR"/>
-    <ROW IniFile="WorkingDirectory_2" FileName="Readme.url" DirProperty="SHORTCUTDIR" Section="InternetShortcut" Key="WorkingDirectory" Value="[SHORTCUTDIR]" Action="0" Component_="SHORTCUTDIR"/>
-    <ROW IniFile="WorkingDirectory_6" FileName="LATEST~1.URL|Latest release.url" DirProperty="SHORTCUTDIR" Section="InternetShortcut" Key="WorkingDirectory" Value="[SHORTCUTDIR]" Action="0" Component_="SHORTCUTDIR"/>
+    <ROW IniFile="WorkingDirectory_2" FileName="WUFUCO~1.URL|wufuc on GitHub.url" DirProperty="SHORTCUTDIR" Section="InternetShortcut" Key="WorkingDirectory" Value="[SHORTCUTDIR]" Action="0" Component_="SHORTCUTDIR"/>
+    <ROW IniFile="WorkingDirectory_6" FileName="LATEST~1.URL|Latest release.url" DirProperty="Troubleshooting_Dir" Section="InternetShortcut" Key="WorkingDirectory" Value="[SHORTCUTDIR]" Action="0" Component_="SHORTCUTDIR"/>
     <ROW IniFile="WorkingDirectory_7" FileName="REPORT~1.URL|Report an issue.url" DirProperty="Troubleshooting_Dir" Section="InternetShortcut" Key="WorkingDirectory" Value="[Troubleshooting_Dir]" Action="0" Component_="SHORTCUTDIR"/>
-    <ROW IniFile="WorkingDirectory_8" FileName="FAQ.url" DirProperty="Troubleshooting_Dir" Section="InternetShortcut" Key="WorkingDirectory" Value="[Troubleshooting_Dir]" Action="0" Component_="SHORTCUTDIR"/>
     <ROW IniFile="c00730079007300740065006d0033003200" FileName="RESTOR~1.REG|Restore_wuauserv.reg" DirProperty="APPDIR" Section="HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\wuauserv\Parameters" Key="00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,\" Value="00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,\" Action="0" Component_="ProductInformation"/>
     <ROW IniFile="e0067002e0064006c006c000000" FileName="RESTOR~1.REG|Restore_wuauserv.reg" DirProperty="APPDIR" Section="HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\wuauserv\Parameters" Key="77,00,75,00,61,00,75,00,65,00,6e,00,67,00,2e,00,64,00,6c,00,6c,00,00,00" Value="77,00,75,00,61,00,75,00,65,00,6e,00,67,00,2e,00,64,00,6c,00,6c,00,00,00" Action="0" Component_="ProductInformation"/>
   </COMPONENT>

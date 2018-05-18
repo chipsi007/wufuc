@@ -16,6 +16,9 @@ static BOOL CALLBACK init_once_callback(
         LPWSTR folder;
         int count;
         LPWSTR file;
+        WIN32_FILE_ATTRIBUTE_DATA fad;
+        ULARGE_INTEGER size;
+        DWORD dwCreationDisposition = OPEN_ALWAYS;
 
         if ( !GetModuleFileNameW(NULL, s_szExeFilePath, _countof(s_szExeFilePath)) )
                 return FALSE;
@@ -34,11 +37,18 @@ static BOOL CALLBACK init_once_callback(
         if ( (CreateDirectoryW(folder, NULL) || GetLastError() == ERROR_ALREADY_EXISTS)
                 && aswprintf(&file, L"%ls\\wufuc.1.log", folder) != -1 ) {
 
+                if ( GetFileAttributesExW(file, GetFileExInfoStandard, &fad) ) {
+                        size.HighPart = fad.nFileSizeHigh;
+                        size.LowPart = fad.nFileSizeLow;
+
+                        if ( size.QuadPart > (4 << 20) ) // 4 MiB
+                                dwCreationDisposition = CREATE_ALWAYS;
+                }
                 s_hFile = CreateFileW(file,
                         FILE_APPEND_DATA,
                         FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                         NULL,
-                        OPEN_ALWAYS,
+                        dwCreationDisposition,
                         FILE_ATTRIBUTE_NORMAL,
                         NULL);
                 free(file);
