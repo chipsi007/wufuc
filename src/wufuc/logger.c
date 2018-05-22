@@ -30,7 +30,7 @@ static BOOL CALLBACK init_once_callback(
 
         count = aswprintf(&folder, L"%ls\\wufuc", pszPath);
         CoTaskMemFree(pszPath);
-
+        
         if ( count == -1 )
                 return FALSE;
 

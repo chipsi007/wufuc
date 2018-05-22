@@ -1,4 +1,5 @@
 # wufuc
+[![Donate on Liberapay](https://cdn.rawgit.com/zeffy/wufuc/badges/liberapay.svg)](https://liberapay.com/zeffy)
 [![Donate Bitcoin](https://cdn.rawgit.com/zeffy/wufuc/badges/bitcoin.svg)](https://admin.gear.mycelium.com/gateways/3554/orders/new)
 [![AppVeyor Builds](https://img.shields.io/appveyor/ci/zeffy/wufuc.svg?logo=appveyor&style=flat-square)][AppVeyor]
 [![All Releases](https://img.shields.io/github/downloads/zeffy/wufuc/total.svg?style=flat-square)][Latest]
@@ -16,7 +17,7 @@ Disables the "Unsupported Hardware" message in Windows Update, and allows you to
 
 ## Donate :heart:
 
-[**Click here for donation options!**](https://github.com/zeffy/wufuc/blob/master/DONATE.md)
+[**Click here for donation options!**](https://github.com/zeffy/wufuc/blob/micro/DONATE.md)
 
 ## Background
 
@@ -78,8 +79,8 @@ Advanced Installer's intuitive and friendly user interface allowed me to quickly
 
 ## Special thanks
 
-- [**@wj32**](https://github.com/wj32) for his awesome program [Process Hacker](https://github.com/processhacker2/processhacker), and also for his [phnt headers](https://github.com/processhacker2/processhacker/tree/master/phnt).
-- [**@mrexodia**](https://github.com/mrexodia) for [x64dbg](https://github.com/x64dbg/x64dbg), its [`patternfind.cpp`](https://github.com/x64dbg/x64dbg/blob/development/src/dbg/patternfind.cpp) algorithm, and its issue template which I adapted for this project.
+- [**wj32**](https://github.com/wj32) for his awesome program [Process Hacker](https://github.com/processhacker2/processhacker), and also for his [phnt headers](https://github.com/processhacker2/processhacker/tree/master/phnt).
+- [**mrexodia**](https://github.com/mrexodia) for [x64dbg](https://github.com/x64dbg/x64dbg), its [`patternfind.cpp`](https://github.com/x64dbg/x64dbg/blob/development/src/dbg/patternfind.cpp) algorithm, and its issue template which I adapted for this project.
 
 [Latest]: https://github.com/zeffy/wufuc/releases/latest
 [AppVeyor]: https://ci.appveyor.com/project/zeffy/wufuc
